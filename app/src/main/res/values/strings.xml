@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">BandSdk</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="scanner_permission_rationale">Android 6.0以上的系统需要授予对设备位置的访问才能扫描蓝牙设备</string>
+    <string name="open_gps">打开GPS</string>
+    <string name="cancel">取消</string>
+    <string name="no_ble">设备不支持蓝牙功能!</string>
+    <string name="ok">确定</string>
+    <string name="location_permission">请允许APP获取位置权限，否则无法搜索到蓝牙设备！</string>
+    <string name="device_list">设备列表</string>
+    <string name="not_support">不支持蓝牙</string>
+    <string name="unknown_device">Unknown device</string>
+
+</resources>
