@@ -23,12 +23,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wakeup.bandsdk.activity.DeviceScanActivity;
+import com.wakeup.mylibrary.Config;
+import com.wakeup.mylibrary.bean.BandInfo;
+import com.wakeup.mylibrary.bean.Battery;
+import com.wakeup.mylibrary.bean.CurrentDataBean;
+import com.wakeup.mylibrary.bean.HeartRateBean;
+import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
+import com.wakeup.mylibrary.command.CommandManager;
+import com.wakeup.mylibrary.data.DataParse;
 import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
+import com.wakeup.mylibrary.utils.SPUtils;
 
 import java.util.List;
 
@@ -59,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
     };
     private String address;
     private Button connectBt;
+    private ProgressBar progressBar;
+    private CommandManager commandManager;
+    private DataParse dataPasrse;
+    private BandInfo bandInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         mTextMessage = (TextView) findViewById(R.id.message);
         connectBt = findViewById(R.id.connect);
+        progressBar = findViewById(R.id.progressBar);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -88,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
         //启动蓝牙服务
         Intent gattServiceIntent = new Intent(this, BluetoothService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+
+        commandManager = CommandManager.getInstance(this);
+        dataPasrse = DataParse.getInstance();
+
 
     }
 
@@ -197,6 +216,8 @@ public class MainActivity extends AppCompatActivity {
             Log.i(TAG, "name: " + name + "\n" + "address: " + address);
 
             mTextMessage.setText("name: " + name + "\n" + "address: " + address);
+
+            SPUtils.putString(MainActivity.this, SPUtils.ADDRESS, address);
         }
     }
 
@@ -204,12 +225,12 @@ public class MainActivity extends AppCompatActivity {
         if (connectBt.getText().toString().equals("连接")) {
             if (!TextUtils.isEmpty(address)) {
                 mBluetoothLeService.connect(address);
+                progressBar.setVisibility(View.VISIBLE);
             }
-        }else if (connectBt.getText().toString().equals("断开连接")){
+        } else if (connectBt.getText().toString().equals("断开连接")) {
             mBluetoothLeService.disconnect();
         }
     }
-
 
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -218,15 +239,18 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-           if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
+            if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
-               connectBt.setText("断开连接");
+                connectBt.setText("断开连接");
+                progressBar.setVisibility(View.GONE);
+
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
-               connectBt.setText("连接");
+                connectBt.setText("连接");
+                progressBar.setVisibility(View.GONE);
 
 
-           } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+            } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
 
 
@@ -234,11 +258,80 @@ public class MainActivity extends AppCompatActivity {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
                 Log.d(TAG, "接收的数据：" + DataHandUtils.bytesToHexStr(txValue));
                 List<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
-                //db 10 是应答包  设备没收到我的数据 重发
                 if (datas.size() == 0) {
                     return;
                 }
 
+                if (datas.get(0) == 0xAB) {
+
+
+                    switch (datas.get(4)) {
+                        case 0x91:
+                            //电池电量
+                            Battery battery = (Battery) dataPasrse.parseData(datas);
+                            Log.i(TAG, battery.toString());
+                            break;
+                        case 0x92:
+                            //手环信息
+                            bandInfo = (BandInfo) dataPasrse.parseData(datas);
+                            Log.i(TAG, bandInfo.toString());
+                            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
+                            if (bandInfo.getBandType() == 0x0B
+                                    || bandInfo.getBandType() == 0x0D
+                                    || bandInfo.getBandType() == 0x0E
+                                    || bandInfo.getBandType() == 0x0F) {
+                                Config.hasContinuousHeart = true;
+
+                            }
+
+                            break;
+                        case 0x51:
+
+                            switch (datas.get(5)) {
+                                case 0x11:
+                                    //返回心率数据
+                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, "heartRateBean: " + heartRateBean);
+                                    break;
+                                case 0x12:
+                                    //返回血氧数据
+
+                                    break;
+                                case 0x14:
+                                    //返回血氧数据
+
+                                    break;
+                                case 0x08:
+                                    //当前数据
+                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, currentDataBean.toString());
+                                    break;
+                                case 0x20:
+                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+
+
+                                    break;
+
+                            }
+
+
+                            break;
+                        case 0x52:
+
+
+                            break;
+
+                        default:
+
+                            break;
+                    }
+                } else if (datas.get(0) == 0) {
+                    //整点数据
+                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+                    Log.i(TAG, hourlyMeasureDataBean.toString());
+
+                }
 
 
             }
@@ -250,8 +343,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        address = SPUtils.getString(MainActivity.this, SPUtils.ADDRESS, "");
+        mTextMessage.setText(address);
 
     }
+
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothService.ACTION_GATT_CONNECTED);
@@ -260,10 +356,47 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothService.ACTION_DATA_AVAILABLE);
         return intentFilter;
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unbindService(mServiceConnection);
         unregisterReceiver(mGattUpdateReceiver);
+    }
+
+    public void findBand(View view) {
+        commandManager.findBand();
+    }
+
+    public void version(View view) {
+        commandManager.getVersion();
+
+    }
+
+    public void battery(View view) {
+        commandManager.getBatteryInfo();
+    }
+
+    public void syncTime(View view) {
+        commandManager.setTimeSync();
+    }
+
+    public void syncData(View view) {
+        if (bandInfo == null) {
+            Toast.makeText(MainActivity.this, "请先获取手环的信息", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //带连续心率的手环的同步数据的方式
+        if (Config.hasContinuousHeart) {
+            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
+
+            commandManager.setSyncDataHr(System.currentTimeMillis() - 7 * 24 * 3600 * 1000,
+                    System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
+
+        } else {
+            //不带连续心率的手环的同步数据的方式
+            commandManager.syncData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
+
+        }
     }
 }

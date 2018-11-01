@@ -8,7 +8,7 @@ import android.util.Log;
 import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
 
-import java.nio.ByteBuffer;
+import java.util.Calendar;
 
 
 /**
@@ -34,470 +34,634 @@ public class CommandManager {
 
 
     /**
-     * 应答
-     *
-     * @param data6
-     * @param data7
+     * 清除数据
      */
-    public void anwser(int data6, int data7) {
-        Log.i(TAG,"应答");
-
-        byte[] bytes = new byte[8];
-        bytes[0] = (byte) 0xDB;
-        bytes[1] = (byte) 0x10;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) 0x00;
-        bytes[4] = (byte) 0x00;
-        bytes[5] = (byte) 0x00;
-        bytes[6] = (byte) data6;
-        bytes[7] = (byte) data7;
+    public void setClearData() {
+        Log.i(TAG, "setClearData: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x23;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) 0x00;
         broadcastData(bytes);
     }
 
     /**
-     * 应答错误
+     * 恢复手环出厂设置
      */
-    private void anwserForError() {
-        Log.i(TAG,"应答错误");
-
-        byte[] bytes = new byte[8];
-        bytes[0] = (byte) 0xDB;
-        bytes[1] = (byte) 0x30;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) 0x00;
-        bytes[4] = (byte) 0x00;
-        bytes[5] = (byte) 0x00;
-        bytes[6] = (byte) 0x00;
-        bytes[7] = (byte) 0x00;
-        broadcastData(bytes);
-    }
-
-
-
-
-
-    /**
-     * 验证密码
-     *
-     * @param password
-     */
-    public void verifyPassword(String password) {
-        Log.i(TAG,"验证密码");
-
-        if (TextUtils.isEmpty(password)) {
-            return;
-        }
-        byte[] bytes2 = password.getBytes();
-        int length = bytes2.length;
-
-        byte[] bytes1 = new byte[13];
-        bytes1[0] = (byte) 0xDB;
-        bytes1[1] = (byte) 0x00;
-        bytes1[2] = (byte) 0x00;
-        bytes1[3] = (byte) (length + 5);
-        bytes1[4] = (byte) 0x01;
-        bytes1[5] = (byte) 0x01;
-        bytes1[6] = (byte) 0x00;
-        bytes1[7] = (byte) 0x00;
-
-        bytes1[8] = (byte) 0x01;
-        bytes1[9] = (byte) 0x00;
-        bytes1[10] = (byte) 0x05;
-        bytes1[11] = (byte) 0x00;
-        bytes1[12] = (byte) 0x08;
-
-        byte[] combined = new byte[bytes1.length + bytes2.length];
-        System.arraycopy(bytes1, 0, combined, 0, bytes1.length);
-        System.arraycopy(bytes2, 0, combined, bytes1.length, bytes2.length);
-
-        broadcastData(combined);
-    }
-
-
-
-
-    /**
-     * 发送钱包序列号，名字，私钥，到设备
-     *
-     * @param serialNumber
-     * @param name
-     * @param privateKey
-     * @param coinType
-     */
-    public void setPrivateKey(String password, String serialNumber, String name, String privateKey, int coinType) {
-        Log.i(TAG,"发送钱包序列号，名字，私钥，到设备");
-
-        if (TextUtils.isEmpty(password) || TextUtils.isEmpty(serialNumber) || TextUtils.isEmpty(name) || TextUtils.isEmpty
-                (privateKey)) {
-            return;
-        }
-        byte[] passwordBytes = password.getBytes();//密码
-        byte[] serialNumberBytes = serialNumber.getBytes();//序列号
-        byte[] nameBytes = name.getBytes();//名称
-        byte[] keyBytes = privateKey.getBytes();//私钥
-
-        byte[] nameLengthBytes = new byte[2];
-        nameLengthBytes[0] = (byte) 0x00;
-        nameLengthBytes[1] = (byte) nameBytes.length;
-
-        byte[] keyBytesLength = new byte[2];
-        keyBytesLength[0] = (byte) coinType;
-        keyBytesLength[1] = (byte) keyBytes.length;
-
-        byte[] bytes1 = new byte[13];
-        bytes1[0] = (byte) 0xDB;
-        bytes1[1] = (byte) 0x00;
-        bytes1[2] = (byte) 0x00;
-        bytes1[3] = (byte) (passwordBytes.length + serialNumberBytes.length + 2 + nameBytes.length + 2 + keyBytes.length + 5);//第二个包的总长度
-        bytes1[4] = (byte) 0x00;
-        bytes1[5] = (byte) 0x00;
-        bytes1[6] = (byte) 0x00;
-        bytes1[7] = (byte) 0x00;
-
-        bytes1[8] = (byte) 0x02;//command id
-        bytes1[9] = (byte) 0x00;
-        bytes1[10] = (byte) 0x01;//key
-        bytes1[11] = (byte) 0x00;
-        bytes1[12] = (byte) (passwordBytes.length + serialNumberBytes.length + 2 + nameBytes.length + 2 + keyBytes.length);
-        //后面的所有长度
-
-
-        byte[] bigByteArray = new byte[bytes1.length + passwordBytes.length+serialNumberBytes.length + 2 + nameBytes
-                .length + 2 +
-                keyBytes
-                .length];
-        Log.i(TAG, "bigByteArray: " + bigByteArray.length);
-
-        ByteBuffer target = ByteBuffer.wrap(bigByteArray);
-        target.put(bytes1);
-        target.put(passwordBytes);
-        target.put(serialNumberBytes);
-        target.put(nameLengthBytes);
-        target.put(nameBytes);
-        target.put(keyBytesLength);
-        target.put(keyBytes);
-
-        byte[] array = target.array();
-        Log.i(TAG, String.valueOf(array.length));
-        Log.i(TAG, DataHandUtils.bytesToHexStr(array));
-        broadcastData(array);
-    }
-
-    /**
-     * 通过序列号获取设备存的私钥
-     */
-    public void getPrivateKey(String password, String serialNumber) {
-        Log.i(TAG,"输入密码 通过序列号获取设备存的私钥");
-
-        if (TextUtils.isEmpty(serialNumber)) {
-            return;
-        }
-        byte[] serialNumberBytes = serialNumber.getBytes();
-        byte[] passwordBytes = password.getBytes();
-
-
-        byte[] bytes = new byte[13];
-        bytes[0] = (byte) 0xDB;
-        bytes[1] = (byte) 0x00;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) (passwordBytes.length+serialNumberBytes.length + 5);
-        bytes[4] = (byte) 0x00;
-        bytes[5] = (byte) 0x00;
-        bytes[6] = (byte) 0x00;
-        bytes[7] = (byte) 0x00;
-
-        bytes[8] = (byte) 0x02;
-        bytes[9] = (byte) 0x00;
-        bytes[10] = (byte) 0x03;
-        bytes[11] = (byte) 0x00;
-        bytes[12] = (byte) (passwordBytes.length+serialNumberBytes.length);
-
-
-        byte[] bigByteArray = new byte[bytes.length + passwordBytes.length+serialNumberBytes.length];
-
-        ByteBuffer target = ByteBuffer.wrap(bigByteArray);
-        target.put(bytes);
-        target.put(passwordBytes);
-        target.put(serialNumberBytes);
-        byte[] array = target.array();
-
-        broadcastData(array);
-    }
-
-
-    //---------------------------
-
-    /**
-     * 获取初始化状态
-     */
-    public void getInitStatus(){
-        Log.i(TAG,"获取初始化状态");
-        byte[] bytes = new byte[13];
-        bytes[0] = (byte) 0xDB;
-        bytes[1] = (byte) 0x00;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) 0x05;
-        bytes[4] = (byte) 0x01;
-        bytes[5] = (byte) 0x01;
-        bytes[6] = (byte) 0x00;
-        bytes[7] = (byte) 0x00;
-
-        bytes[8] = (byte) 0x01;
-        bytes[9] = (byte) 0x00;
-        bytes[10] = (byte) 0x01;
-        bytes[11] = (byte) 0x00;
-        bytes[12] = (byte) 0x00;
+    public void setResetBand() {
+        Log.i(TAG, "setResetBand: ");
+        byte[] bytes = new byte[6];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 3;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0xFF;
+        bytes[5] = (byte) 0x80;
         broadcastData(bytes);
     }
 
 
     /**
-     * 设置密码
+     * 单次、实时测量
      *
-     * @param password
+     * @param status  心率：0X09(单次) 0X0A(实时)
+     *                血氧：0X11(单次) 0X12(实时)
+     *                血压：0X21(单次) 0X22(实时)
+     * @param control 0关  1开
      */
-    public void setPassword(String password) {
-        Log.i(TAG,"设置密码");
-
-        if (TextUtils.isEmpty(password)) {
-            return;
-        }
-        byte[] passwordBytes = password.getBytes();
-        int length = passwordBytes.length;
-
-        byte[] bytes1 = new byte[13];
-        bytes1[0] = (byte) 0xDB;
-        bytes1[1] = (byte) 0x00;
-        bytes1[2] = (byte) 0x00;
-        bytes1[3] = (byte) (length + 5);
-        bytes1[4] = (byte) 0x00;
-        bytes1[5] = (byte) 0x00;
-        bytes1[6] = (byte) 0x00;
-        bytes1[7] = (byte) 0x00;
-
-        bytes1[8] = (byte) 0x01;
-        bytes1[9] = (byte) 0x00;
-        bytes1[10] = (byte) 0x03;
-        bytes1[11] = (byte) 0x00;
-        bytes1[12] = (byte) length;
-
-        byte[] combined = new byte[bytes1.length + passwordBytes.length];
-        System.arraycopy(bytes1, 0, combined, 0, bytes1.length);
-        System.arraycopy(passwordBytes, 0, combined, bytes1.length, passwordBytes.length);
-
-        broadcastData(combined);
-    }
-
-
-    /**
-     * 获取硬件钱包唯一标识
-     */
-    public void getDeviceIdentifier(){
-        Log.i(TAG,"获取硬件钱包唯一标识");
-        byte[] bytes = new byte[13];
-        bytes[0] = (byte) 0xDB;
-        bytes[1] = (byte) 0x00;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) 0x05;
-        bytes[4] = (byte) 0x00;
-        bytes[5] = (byte) 0x00;
-        bytes[6] = (byte) 0x00;
-        bytes[7] = (byte) 0x00;
-
-        bytes[8] = (byte) 0x01;
-        bytes[9] = (byte) 0x00;
-        bytes[10] = (byte) 0x05;
-        bytes[11] = (byte) 0x00;
-        bytes[12] = (byte) 0x00;
+    public void setOnceOrRealTimeMeasure(int status, int control) {
+        Log.i(TAG, "setOnceOrRealTimeMeasure: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x31;
+        bytes[5] = (byte) status;
+        bytes[6] = (byte) control;
         broadcastData(bytes);
     }
+
     /**
-     * 删除钱包
-     * @param password
-     * @param serialNumber
+     * 一键测量
+     *
+     * @param control 0(关)  1(开)
      */
-    public void deletePrivateKey(String password, String serialNumber){
-        Log.i(TAG,"删除钱包");
-        if (TextUtils.isEmpty(serialNumber)||TextUtils.isEmpty(password)) {
-            return;
-        }
-        byte[] serialNumberBytes = serialNumber.getBytes();
-        byte[] passwordBytes = password.getBytes();
-
-        byte[] bytes = new byte[13];
-        bytes[0] = (byte) 0xDB;
-        bytes[1] = (byte) 0x00;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) (passwordBytes.length+serialNumberBytes.length + 5);
-        bytes[4] = (byte) 0x00;
-        bytes[5] = (byte) 0x00;
-        bytes[6] = (byte) 0x00;
-        bytes[7] = (byte) 0x00;
-
-        bytes[8] = (byte) 0x02;
-        bytes[9] = (byte) 0x00;
-        bytes[10] = (byte) 0x05;
-        bytes[11] = (byte) 0x00;
-        bytes[12] = (byte) (passwordBytes.length+serialNumberBytes.length);
-
-        byte[] bigByteArray = new byte[bytes.length + passwordBytes.length+serialNumberBytes.length];
-
-        ByteBuffer target = ByteBuffer.wrap(bigByteArray);
-        target.put(bytes);
-        target.put(passwordBytes);
-        target.put(serialNumberBytes);
-        byte[] array = target.array();
-
-        broadcastData(array);
-
+    public void setOnceKeyMeasure(int control) {
+        Log.i(TAG, "setOnceKeyMeasure: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x32;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
     }
 
     /**
-     * 恢复出厂设置
-     * @param password
+     * 同步时间
      */
-    public void reset(String password){
-        Log.i(TAG,"恢复出厂设置");
-        if (TextUtils.isEmpty(password)) {
-            return;
-        }
-        byte[] passwordBytes = password.getBytes();
-        byte[] bytes = new byte[13];
-        bytes[0] = (byte) 0xDB;
-        bytes[1] = (byte) 0x00;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) (passwordBytes.length+5);
-        bytes[4] = (byte) 0x00;
-        bytes[5] = (byte) 0x00;
-        bytes[6] = (byte) 0x00;
-        bytes[7] = (byte) 0x00;
+    public void setTimeSync() {
+        Log.i(TAG, "setTimeSync: ");
+        //当前时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
 
-        bytes[8] = (byte) 0x03;
-        bytes[9] = (byte) 0x00;
-        bytes[10] = (byte) 0x01;
-        bytes[11] = (byte) 0x00;
-        bytes[12] = (byte) passwordBytes.length;
-
-        byte[] bigByteArray = new byte[bytes.length + passwordBytes.length];
-
-        ByteBuffer target = ByteBuffer.wrap(bigByteArray);
-        target.put(bytes);
-        target.put(passwordBytes);
-        byte[] array = target.array();
-
-        broadcastData(array);
-
-    }
-
-    public void otaMode(String password){
-        Log.i(TAG,"进入ota模式");
-        if (TextUtils.isEmpty(password)) {
-            return;
-        }
-        byte[] passwordBytes = password.getBytes();
-        byte[] bytes = new byte[13];
-        bytes[0] = (byte) 0xDB;
-        bytes[1] = (byte) 0x00;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) (passwordBytes.length+5);
-        bytes[4] = (byte) 0x00;
-        bytes[5] = (byte) 0x00;
-        bytes[6] = (byte) 0x00;
-        bytes[7] = (byte) 0x00;
-
-        bytes[8] = (byte) 0x04;
-        bytes[9] = (byte) 0x00;
-        bytes[10] = (byte) 0x01;
-        bytes[11] = (byte) 0x00;
-        bytes[12] = (byte) passwordBytes.length;
-
-        byte[] bigByteArray = new byte[bytes.length + passwordBytes.length];
-
-        ByteBuffer target = ByteBuffer.wrap(bigByteArray);
-        target.put(bytes);
-        target.put(passwordBytes);
-        byte[] array = target.array();
-
-        broadcastData(array);
-    }
-
-    /**
-     * 没有初始化的ota
-     */
-    public void otaMode2(){
-        Log.i(TAG,"无密码进入ota模式");
-        byte[] bytes = new byte[13];
-        bytes[0] = (byte) 0xDB;
-        bytes[1] = (byte) 0x00;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) 0x0d;
-        bytes[4] = (byte) 0x00;
-        bytes[5] = (byte) 0x00;
-        bytes[6] = (byte) 0x00;
-        bytes[7] = (byte) 0x00;
-
-        bytes[8] = (byte) 0x04;
-        bytes[9] = (byte) 0x00;
-        bytes[10] = (byte) 0x01;
-        bytes[11] = (byte) 0x00;
-        bytes[12] = (byte) 0x08;
-
-        byte[] bigByteArray = new byte[bytes.length + 8];
-
-        ByteBuffer target = ByteBuffer.wrap(bigByteArray);
-        target.put(bytes);
-        byte[] array = target.array();
-
-        Log.i(TAG,DataHandUtils.bytesToHexStr(array));
-        broadcastData(array);
-    }
-
-
-    /**
-     * 切换硬件语言0x03
-     */
-    public void switchLang(int control){
-        Log.i(TAG,"切换硬件语言 "+control);
         byte[] bytes = new byte[14];
-        bytes[0] = (byte) 0xDB;
-        bytes[1] = (byte) 0x00;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) 0x06;
-        bytes[4] = (byte) 0x00;
-        bytes[5] = (byte) 0x00;
-        bytes[6] = (byte) 0x00;
-        bytes[7] = (byte) 0x00;
-
-        bytes[8] = (byte) 0x05;
-        bytes[9] = (byte) 0x00;
-        bytes[10] = (byte) 0x03;
-        bytes[11] = (byte) 0x00;
-        bytes[12] = (byte) 0x01;
-        bytes[13] = (byte) control;
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 11;
+        bytes[3] = (byte) 0xff;
+        bytes[4] = (byte) 0x93;
+        bytes[5] = (byte) 0x80;
+//        bytes[6] = (byte)0;//占位符
+        bytes[7] = (byte) ((year & 0xff00) >> 8);
+        bytes[8] = (byte) (year & 0xff);
+        bytes[9] = (byte) (month & 0xff);
+        bytes[10] = (byte) (day & 0xff);
+        bytes[11] = (byte) (hour & 0xff);
+        bytes[12] = (byte) (minute & 0xff);
+        bytes[13] = (byte) (second & 0xff);
         broadcastData(bytes);
     }
 
     /**
-     * 获取版本号
+     * 下拉同步数据
+     *
+     * @param timeInMillis 同步数据起始时间毫秒值
      */
-    public void getVersion(){
-        Log.i(TAG,"获取版本号");
+    public void syncData(long timeInMillis) {
+        Log.i(TAG, "syncData: ");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeInMillis);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
 
-        byte[] bytes = new byte[13];
-        bytes[0] = (byte) 0xDB;
+        byte[] data = new byte[12];
+        data[0] = (byte) 0xAB;
+        data[1] = (byte) 0;
+        data[2] = (byte) 9;
+        data[3] = (byte) 0xff;
+        data[4] = (byte) 0x51;
+        data[5] = (byte) 0x80;
+//        data[6] = (byte)0;//占位符，没意义
+        data[7] = (byte) ((year - 2000));
+        data[8] = (byte) (month);
+        data[9] = (byte) (day);
+        data[10] = (byte) (hour);
+        data[11] = (byte) (minute);
+        broadcastData(data);
+    }
+
+    /**
+     * 下拉同步数据 带有连续心率手环
+     * <p>
+     * Byte 7-11的时间值为APP发送给手环用来筛选需求的整点存储数据。
+     * Byte 12-16的时间值为APP发送给手环用来筛选需求的心率存储数据。
+     * 如2017/12/12 12:00，手环会将这时间之后的数据发送给APP
+     * （如果有比这个时间更新的数据）
+     *
+     * @param timeInMillis 同步数据起始时间毫秒值
+     */
+    public void setSyncDataHr(long timeInMillis, long timeInMillis2) {
+        Log.i(TAG, "setSyncDataHr: ");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeInMillis);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTimeInMillis(timeInMillis2);
+        int year2 = calendar.get(Calendar.YEAR);
+        int month2 = calendar.get(Calendar.MONTH) + 1;
+        int day2 = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour2 = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute2 = calendar.get(Calendar.MINUTE);
+        int second2 = calendar.get(Calendar.SECOND);
+        byte[] data = new byte[17];
+        data[0] = (byte) 0xAB;
+        data[1] = (byte) 0;
+        data[2] = (byte) 14;
+        data[3] = (byte) 0xff;
+        data[4] = (byte) 0x51;
+        data[5] = (byte) 0x80;
+//        data[6] = (byte)0;//占位符，没意义
+        data[7] = (byte) ((year - 2000));
+        data[8] = (byte) (month);
+        data[9] = (byte) (day);
+        data[10] = (byte) (hour);
+        data[11] = (byte) (minute);
+
+        data[12] = (byte) ((year2 - 2000));
+        data[13] = (byte) (month2);
+        data[14] = (byte) (day2);
+        data[15] = (byte) (hour2);
+        data[16] = (byte) (minute2);
+        broadcastData(data);
+    }
+
+
+    /**
+     * 获取实时心率
+     *
+     * @param bol 0-关 1-开
+     */
+    public void getTrueTimeRate(int bol) {
+        Log.i(TAG, "getTrueTimeRate: ");
+        byte[] data = new byte[7];
+        data[0] = (byte) 0xAB;
+        data[1] = (byte) 0;
+        data[2] = (byte) 4;
+        data[3] = (byte) 0xff;
+        data[4] = (byte) 0x84;
+        data[5] = (byte) 0x80;
+        data[6] = (byte) bol;
+//        data[6] = (byte)0;//占位符，没意义
+        broadcastData(data);
+    }
+
+
+    /**
+     * 查找手环
+     */
+    public void findBand() {
+        Log.i(TAG, "findBand: ");
+        byte[] bytes = new byte[6];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 3;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x71;
+        bytes[5] = (byte) 0x80;
+        Log.i(TAG, "查找手环");
+        broadcastData(bytes);
+    }
+
+
+    /**
+     * 抬手亮屏
+     *
+     * @param control 0关  1开
+     */
+    public void setUpHandLightScreen(int control) {
+        Log.i(TAG, "setUpHandLightScreen: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x77;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        Log.i("lq", "抬手亮屏" + "--" + control);
+        broadcastData(bytes);
+    }
+
+    /**
+     * 整点测量
+     *
+     * @param control 0关  1开
+     */
+    public void setOnTimeMeasure(int control) {
+        Log.i(TAG, "setOnTimeMeasure: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x78;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 心率报警
+     *
+     * @param control 0关  1开
+     */
+    public void setHrWarn(int control) {
+        Log.i(TAG, "setHrWarn: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x85;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 摇摇拍照指令
+     *
+     * @param control 0关  1开
+     */
+    public void setSharkTakePhoto(int control) {
+        Log.i(TAG, "setSharkTakePhoto: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x79;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+
+
+    /**
+     * 防丢
+     *
+     * @param control 0关  1开
+     */
+    public void setAntiLostAlert(int control) {
+        Log.i(TAG, "setAntiLostAlert: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7A;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 中英文切换
+     *
+     * @param control 0中文  1英文
+     */
+    public void setSwitchChineseOrEnglish(int control) {
+        Log.i(TAG, "setSwitchChineseOrEnglish: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7B;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 时间制切换
+     *
+     * @param control 0（24小时制）  1(12小时制)
+     */
+    public void set12HourSystem(int control) {
+        Log.i(TAG, "set12HourSystem: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7C;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 同步天气信息
+     *
+     * @param weather 0多云 1晴天 2雪天 3雨天
+     * @param temp    0(0度以上)  1(0度以下)
+     */
+    public void setSyncWeather(int weather, int temp) {
+        Log.i(TAG, "setSyncWeather: ");
+        byte[] bytes = new byte[9];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 6;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7E;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) weather;
+        bytes[7] = (byte) temp;
+        bytes[8] = (byte) (temp >= 0 ? 0 : 1);
+        broadcastData(bytes);
+    }
+
+
+    /**
+     * 挂断电话
+     */
+    public void setHangUpPhone() {
+        Log.i(TAG, "setHangUpPhone: ");
+        byte[] bytes = new byte[6];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 3;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x81;
+        bytes[5] = (byte) 0;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 智能提醒
+     *
+     * @param MessageId
+     * @param type
+     */
+    public void setSmartWarnNoContent(int MessageId, int type) {
+        Log.i(TAG, "setSmartWarnNoContent: ");
+        byte[] bytes = new byte[8];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 5;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x72;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) MessageId;//来电提醒、短信提醒等
+        bytes[7] = (byte) type;//0开 1关 2来消息通知
+        broadcastData(bytes);
+    }
+
+    /**
+     * 智能提醒,带消息内容
+     *
+     * @param MessageId
+     * @param type
+     */
+    public void setSmartWarn(int MessageId, int type, String content) {
+        Log.i(TAG, content);
+        Log.i(TAG, String.valueOf(content.length()));
+        byte[] bytes1 = null;
+        int length = 0;
+        if (!TextUtils.isEmpty(content)) {
+            bytes1 = content.getBytes();
+            length = bytes1.length;
+        }
+        byte[] bytes2 = new byte[8];
+        bytes2[0] = (byte) 0xAB;
+        bytes2[1] = (byte) 0;
+        bytes2[2] = (byte) (length + 5);
+        bytes2[3] = (byte) 0xFF;
+        bytes2[4] = (byte) 0x72;
+        bytes2[5] = (byte) 0x80;
+        bytes2[6] = (byte) MessageId;//来电提醒、短信提醒等
+        bytes2[7] = (byte) type;//0开 1关 2来消息通知
+        byte[] bytes = DataHandUtils.addBytes(bytes2, bytes1);
+        broadcastData(bytes);
+    }
+
+    /**
+     * 查看电量
+     */
+    public void getBatteryInfo() {
+        Log.i(TAG, "getBatteryInfo: ");
+        byte[] bytes = new byte[6];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 3;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x91;
+        bytes[5] = (byte) 0x80;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 查看版本
+     */
+    public void getVersion() {
+        Log.i(TAG, "getVersion: ");
+        byte[] bytes = new byte[6];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 3;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x92;
+        bytes[5] = (byte) 0x80;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 心电开始测量
+     */
+    public void startMeasureEcg() {
+        Log.i(TAG, "startMeasureEcg: ");
+        byte[] bytes = new byte[2];
+        bytes[0] = (byte) 0xAC;
+        bytes[1] = (byte) 0x01;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 心电停止测量
+     */
+    public void stoptMeasureEcg() {
+        Log.i(TAG, "stoptMeasureEcg: ");
+        byte[] bytes = new byte[2];
+        bytes[0] = (byte) 0xAC;
         bytes[1] = (byte) 0x00;
-        bytes[2] = (byte) 0x00;
-        bytes[3] = (byte) 0x05;
-        bytes[4] = (byte) 0x00;
-        bytes[5] = (byte) 0x00;
-        bytes[6] = (byte) 0x00;
-        bytes[7] = (byte) 0x00;
+        broadcastData(bytes);
+    }
 
-        bytes[8] = (byte) 0x05;
-        bytes[9] = (byte) 0x00;
-        bytes[10] = (byte) 0x01;
-        bytes[11] = (byte) 0x00;
-        bytes[12] = (byte) 0x00;
+
+    /**
+     * 设置闹钟
+     */
+    public void setAlertClock(int id, int status, int hour, int minute, int repeat) {
+        Log.i(TAG, "setAlertClock: ");
+        byte[] data = new byte[11];
+        data[0] = (byte) 0xAB;
+        data[1] = (byte) 0;
+        data[2] = (byte) 8;
+        //数据id + status 共 3 bytes
+        data[3] = (byte) 0xff;
+        data[4] = (byte) 0x73;
+        data[5] = (byte) 0x80;
+        //数据值
+        data[6] = (byte) id;
+        data[7] = (byte) status;
+        data[8] = (byte) hour;
+        data[9] = (byte) minute;
+        data[10] = (byte) repeat;
+        broadcastData(data);
+    }
+
+
+    /**
+     * 校准时间
+     */
+    public void setCalibrationTime(int hour, int minute) {
+        Log.i(TAG, "setCalibrationTime: ");
+        byte[] bytes = new byte[8];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 5;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7D;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) hour;//小时
+        bytes[7] = (byte) minute;//分
+        broadcastData(bytes);
+    }
+
+    /**
+     * 血压参考值
+     */
+    public void setBloodPressureReference(int control, int systaltic_value, int diastolic_value) {
+        Log.i(TAG, "setBloodPressureReference: ");
+        byte[] data = new byte[9];
+        data[0] = (byte) 0xAB;
+        data[1] = (byte) 0;
+        data[2] = (byte) 6;
+        data[3] = (byte) 0xff;
+        data[4] = (byte) 0x95;
+        data[5] = (byte) 0x80;
+        data[6] = (byte) control;
+        data[7] = (byte) systaltic_value;
+        data[8] = (byte) diastolic_value;
+        broadcastData(data);
+    }
+
+
+    /**
+     * 省电模式
+     *
+     * @param control 0关  1开
+     */
+    public void setPowerSaving(int control) {
+        Log.i(TAG, "setPowerSaving: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x96;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 红外参数设置
+     *
+     * @param num
+     */
+    public void sethongwai(int num) {
+        Log.i(TAG, "红外参数设置: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x98;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) num;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 根据byte长度截取消息
+     *
+     * @param MessageId
+     * @param type
+     * @param content
+     * @param length
+     */
+    public void setSmartWarn2(int MessageId, int type, String content, int length) {
+        Log.i(TAG, "setSmartWarn2");
+
+        if (TextUtils.isEmpty(content)) {
+            Log.i(TAG, "content 空");
+            return;
+        }
+
+        byte[] sendBytes;//要发送的bytes
+
+        byte[] contentBytes = content.getBytes();
+        int contentBytesLength = contentBytes.length;
+
+        Log.i(TAG, "contentBytesLength: " + contentBytesLength + "  length: " + length);
+        if (contentBytesLength > length) {
+            //如果内容的长度大于规定的最大长度，就截取
+            byte[] dest = new byte[length];
+            System.arraycopy(contentBytes, 0, dest, 0, length);
+            Log.i(TAG, "length:" + dest.length);
+            sendBytes = dest;
+        } else {
+            sendBytes = contentBytes;
+        }
+
+
+        byte[] bytes2 = new byte[8];
+        bytes2[0] = (byte) 0xAB;
+        bytes2[1] = (byte) 0;
+        bytes2[2] = (byte) (sendBytes.length + 5);
+        bytes2[3] = (byte) 0xFF;
+        bytes2[4] = (byte) 0x72;
+        bytes2[5] = (byte) 0x80;
+        bytes2[6] = (byte) MessageId;//来电提醒、短信提醒等
+        bytes2[7] = (byte) type;//0开 1关 2来消息通知
+        byte[] bytes = DataHandUtils.addBytes(bytes2, sendBytes);
         broadcastData(bytes);
     }
 
