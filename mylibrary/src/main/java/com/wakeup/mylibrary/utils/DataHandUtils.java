@@ -106,4 +106,10 @@ public class DataHandUtils {
 		return datas;
 	}
 
+	public static List<Integer> combine2Packet(List<Integer> datas) {
+		//如果是遇到整点数据第一个包，接下来的一个包就要拼接到前一个包上面
+
+
+		return null;
+	}
 }

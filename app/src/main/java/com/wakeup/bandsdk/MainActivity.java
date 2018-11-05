@@ -234,7 +234,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-
+        /**拼接包的长度**/
+        private int combineSize;
+        /**开始拼接包**/
+        private boolean combine;
+        /**临时包**/
+        private byte[] templeBytes = new byte[0];
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -262,9 +267,40 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
+                //如果是遇到整点数据第一个包，接下来的一个包就要拼接到前一个包上面
+                if (datas.get(0) == 0xAB && datas.get(4) == 0x51 && datas.get(5) == 0x20) {
+                    combineSize = 26;//两个包的总长度20+6
+                    //开始拼接
+                    combine = true;
+                }
+                if (combine) {
+                    byte[] combined = new byte[templeBytes.length + txValue.length];
+                    System.arraycopy(templeBytes, 0, combined, 0, templeBytes.length);
+                    System.arraycopy(txValue, 0, combined, templeBytes.length, txValue.length);
+                    templeBytes = combined;
+                    Log.i(TAG, "length:" + combined.length);
+
+                    if (combined.length == combineSize) {
+                        List<Integer> combineList = DataHandUtils.bytesToArrayList(combined);
+                        Log.i(TAG, "combined:" + DataHandUtils.bytesToHexStr(combined));
+
+                        //返回整点数据
+                        HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(combineList);
+                        Log.i(TAG, hourlyMeasureDataBean.toString());
+
+
+
+                        //拼接完成 重置状态
+                        combine = false;
+                        //临时数组置空
+                        templeBytes = new byte[0];
+                    }
+
+
+                }
+
+
                 if (datas.get(0) == 0xAB) {
-
-
                     switch (datas.get(4)) {
                         case 0x91:
                             //电池电量
@@ -276,6 +312,8 @@ public class MainActivity extends AppCompatActivity {
                             bandInfo = (BandInfo) dataPasrse.parseData(datas);
                             Log.i(TAG, bandInfo.toString());
                             Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
+
+
                             if (bandInfo.getBandType() == 0x0B
                                     || bandInfo.getBandType() == 0x0D
                                     || bandInfo.getBandType() == 0x0E
@@ -284,6 +322,7 @@ public class MainActivity extends AppCompatActivity {
 
                             }
 
+
                             break;
                         case 0x51:
 
@@ -291,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
                                 case 0x11:
                                     //返回心率数据
                                     HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, "heartRateBean: " + heartRateBean);
+                                    Log.i(TAG, heartRateBean.toString());
                                     break;
                                 case 0x12:
                                     //返回血氧数据
@@ -306,12 +345,7 @@ public class MainActivity extends AppCompatActivity {
                                     CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, currentDataBean.toString());
                                     break;
-                                case 0x20:
-                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, hourlyMeasureDataBean.toString());
 
-
-                                    break;
 
                             }
 
@@ -326,11 +360,6 @@ public class MainActivity extends AppCompatActivity {
 
                             break;
                     }
-                } else if (datas.get(0) == 0) {
-                    //整点数据
-                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-                    Log.i(TAG, hourlyMeasureDataBean.toString());
-
                 }
 
 
@@ -390,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
         if (Config.hasContinuousHeart) {
             Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
 
-            commandManager.setSyncDataHr(System.currentTimeMillis() - 7 * 24 * 3600 * 1000,
+            commandManager.syncDataHr(System.currentTimeMillis() - 7 * 24 * 3600 * 1000,
                     System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
 
         } else {

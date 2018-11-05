@@ -179,8 +179,8 @@ public class CommandManager {
      *
      * @param timeInMillis 同步数据起始时间毫秒值
      */
-    public void setSyncDataHr(long timeInMillis, long timeInMillis2) {
-        Log.i(TAG, "setSyncDataHr: ");
+    public void syncDataHr(long timeInMillis, long timeInMillis2) {
+        Log.i(TAG, "syncDataHr: ");
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeInMillis);
         int year = calendar.get(Calendar.YEAR);
