@@ -72,12 +72,7 @@
                 android:text="获取手环信息"
                 android:onClick="version"
                 />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="电量"
-                android:onClick="battery"
-                />
+
         </LinearLayout>
 
         <LinearLayout
@@ -86,7 +81,19 @@
             android:orientation="horizontal"
             >
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="电量"
+                android:onClick="battery"
+                />
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="开启整点测量"
+                android:onClick="openMeasure"
+                />
 
             <Button
                 android:layout_width="wrap_content"
@@ -94,12 +101,39 @@
                 android:text="获取数据"
                 android:onClick="syncData"
                 />
+
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="获取"
-                android:onClick="version"
+                android:text="清除手环数据"
+                android:onClick="clearData"
                 />
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="开启消息通知"
+                android:onClick="openMessage"
+                />
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="发送消息"
+                android:onClick="sendMessage"
+                />
+
 
 
         </LinearLayout>

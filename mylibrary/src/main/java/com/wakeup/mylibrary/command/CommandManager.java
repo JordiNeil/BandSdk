@@ -36,8 +36,8 @@ public class CommandManager {
     /**
      * 清除数据
      */
-    public void setClearData() {
-        Log.i(TAG, "setClearData: ");
+    public void clearData() {
+        Log.i(TAG, "clearData: ");
         byte[] bytes = new byte[7];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -282,8 +282,8 @@ public class CommandManager {
      *
      * @param control 0关  1开
      */
-    public void setOnTimeMeasure(int control) {
-        Log.i(TAG, "setOnTimeMeasure: ");
+    public void openHourlyMeasure(int control) {
+        Log.i(TAG, "openHourlyMeasure: ");
         byte[] bytes = new byte[7];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -449,9 +449,7 @@ public class CommandManager {
      * @param MessageId
      * @param type
      */
-    public void setSmartWarn(int MessageId, int type, String content) {
-        Log.i(TAG, content);
-        Log.i(TAG, String.valueOf(content.length()));
+    public void sendMessage(int MessageId, int type, String content) {
         byte[] bytes1 = null;
         int length = 0;
         if (!TextUtils.isEmpty(content)) {
@@ -468,6 +466,7 @@ public class CommandManager {
         bytes2[6] = (byte) MessageId;//来电提醒、短信提醒等
         bytes2[7] = (byte) type;//0开 1关 2来消息通知
         byte[] bytes = DataHandUtils.addBytes(bytes2, bytes1);
+        Log.i(TAG,DataHandUtils.bytesToHexStr(bytes));
         broadcastData(bytes);
     }
 

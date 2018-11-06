@@ -399,8 +399,9 @@ public class BluetoothService extends Service {
             String action = intent.getAction();
             if (action.equals(ACTION_SEND_DATA_TO_BLE)) {//from commandManager
                 byte[] send_data = intent.getByteArrayExtra(EXTRA_SEND_DATA_TO_BLE);
+                Log.i(TAG, DataHandUtils.bytesToHexStr(send_data));
                 if (send_data != null) {
-                    Log.i(TAG,"from commandManager");
+                    Log.i(TAG, "from commandManager");
                     BLE_send_data_set(send_data, false);
                 }
 
@@ -568,7 +569,7 @@ public class BluetoothService extends Service {
             return false;
         }
         boolean b = mBluetoothGatt.writeCharacteristic(characteristic);
-        Log.i(TAG, "汉天下 writeCharacteristic: "+b);
+        Log.i(TAG, "汉天下 writeCharacteristic: " + b);
 
         return b;
     }
@@ -732,17 +733,17 @@ public class BluetoothService extends Service {
                 //不是第一个包
                 if (send_data.length - send_data_pointer >= SEND_PACKET_SIZE) {
                     temp_buffer = new byte[SEND_PACKET_SIZE];
-//                    temp_buffer[0] = (byte) packet_counter;
-                    for (int i = 0; i < SEND_PACKET_SIZE; i++) {
+                    temp_buffer[0] = (byte) packet_counter;
+                    for (int i = 1; i < SEND_PACKET_SIZE; i++) {
                         temp_buffer[i] = send_data[send_data_pointer];
                         send_data_pointer++;
                     }
                 } else {
                     //最后一个包
                     final_packet = true;
-                    temp_buffer = new byte[send_data.length - send_data_pointer];
-//                    temp_buffer[0] = (byte) packet_counter;
-                    for (int i = 0; i < temp_buffer.length; i++) {
+                    temp_buffer = new byte[send_data.length - send_data_pointer + 1];
+                    temp_buffer[0] = (byte) packet_counter;
+                    for (int i = 1; i < temp_buffer.length; i++) {
                         temp_buffer[i] = send_data[send_data_pointer];
                         send_data_pointer++;
                     }
@@ -769,7 +770,7 @@ public class BluetoothService extends Service {
                     break;
                 }
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(1);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -821,7 +822,7 @@ public class BluetoothService extends Service {
      * @param value
      */
     public boolean writeRXCharacteristic(byte[] value) {
-        Log.i(TAG, "writeRXCharacteristic: " + value.length);
+//        Log.i(TAG, "writeRXCharacteristic: " + value.length);
         if (mRXCharacteristic == null) {
             Log.e(TAG, " mRXCharacteristic==null");
             return false;

@@ -35,6 +35,8 @@ import com.wakeup.mylibrary.bean.CurrentDataBean;
 import com.wakeup.mylibrary.bean.HeartRateBean;
 import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
 import com.wakeup.mylibrary.command.CommandManager;
+import com.wakeup.mylibrary.constants.MessageID;
+import com.wakeup.mylibrary.constants.MessageType;
 import com.wakeup.mylibrary.data.DataParse;
 import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
@@ -427,5 +429,34 @@ public class MainActivity extends AppCompatActivity {
             commandManager.syncData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
 
         }
+    }
+
+    /**
+     * 开启整点测量
+     * @param view
+     */
+    public void openMeasure(View view) {
+        commandManager.openHourlyMeasure(1);
+    }
+
+    /**
+     * 清除手环数据
+     * @param view
+     */
+    public void clearData(View view) {
+        commandManager.clearData();
+    }
+
+    /**
+     * 发送消息
+     * @param view
+     */
+    public void sendMessage(View view) {
+        commandManager.sendMessage(MessageID.QQ,MessageType.COMING_MESSAGES,"微克科技张光耀");
+    }
+
+    public void openMessage(View view) {
+        commandManager.sendMessage(MessageID.QQ,MessageType.ON,null);
+
     }
 }
