@@ -525,9 +525,13 @@ public class CommandManager {
 
     /**
      * 设置闹钟
+     * @param id 闹钟索引（最多开8个）
+     * @param status 0：关闭闹钟提醒功能  1：开启闹钟提醒功能
+     * @param hour  闹钟提醒时间之小时
+     * @param minute  闹钟提醒时间之分钟
+     * @param repeat
      */
-    public void setAlertClock(int id, int status, int hour, int minute, int repeat) {
-        Log.i(TAG, "setAlertClock: ");
+    public void setAlarmClock(int id, int status, int hour, int minute, int repeat) {
         byte[] data = new byte[11];
         data[0] = (byte) 0xAB;
         data[1] = (byte) 0;

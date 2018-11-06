@@ -35,6 +35,7 @@ import com.wakeup.mylibrary.bean.CurrentDataBean;
 import com.wakeup.mylibrary.bean.HeartRateBean;
 import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
 import com.wakeup.mylibrary.command.CommandManager;
+import com.wakeup.mylibrary.constants.Constants;
 import com.wakeup.mylibrary.constants.MessageID;
 import com.wakeup.mylibrary.constants.MessageType;
 import com.wakeup.mylibrary.data.DataParse;
@@ -280,11 +281,9 @@ public class MainActivity extends AppCompatActivity {
                     System.arraycopy(templeBytes, 0, combined, 0, templeBytes.length);
                     System.arraycopy(txValue, 0, combined, templeBytes.length, txValue.length);
                     templeBytes = combined;
-                    Log.i(TAG, "length:" + combined.length);
 
                     if (combined.length == combineSize) {
                         List<Integer> combineList = DataHandUtils.bytesToArrayList(combined);
-                        Log.i(TAG, "combined:" + DataHandUtils.bytesToHexStr(combined));
 
                         //返回整点数据
                         HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(combineList);
@@ -452,11 +451,27 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void sendMessage(View view) {
-        commandManager.sendMessage(MessageID.QQ,MessageType.COMING_MESSAGES,"微克科技张光耀");
+        commandManager.sendMessage(MessageID.QQ,MessageType.COMING_MESSAGES,"测试消息通知");
     }
 
     public void openMessage(View view) {
         commandManager.sendMessage(MessageID.QQ,MessageType.ON,null);
 
+    }
+
+
+    /**
+     * 设置闹钟
+     * @param view
+     */
+    public void alarm_clock(View view) {
+        //id 为0 开启18:00闹钟，只响一次
+        commandManager.setAlarmClock(0,1,18,0,Constants.ALARMCLOCK_TYPE1);
+
+//        //id 为1 开启06:30闹钟，周一至周五
+//        commandManager.setAlarmClock(1,1,6,30,Constants.ALARMCLOCK_TYPE2);
+//
+//        //id 为2 开启08:00，每天
+//        commandManager.setAlarmClock(2,1,8,0,Constants.ALARMCLOCK_TYPE3);
     }
 }

@@ -130,7 +130,39 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="发送消息"
+                android:text="测试消息通知"
+                android:onClick="sendMessage"
+                />
+
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="设置闹钟"
+                android:onClick="alarm_clock"
+                />
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="开启消息通知"
+                android:onClick="openMessage"
+                />
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="测试消息通知"
                 android:onClick="sendMessage"
                 />
 
