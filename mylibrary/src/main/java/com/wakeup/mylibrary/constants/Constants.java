@@ -4,13 +4,13 @@ public class Constants {
     /**
      * 只响一次
      */
-    public static final int ALARMCLOCK_TYPE1 = Integer.parseInt("10000000",2);
+    public static final int ALARM_CLOCK_TYPE1 = Integer.parseInt("10000000",2);
     /**
      * 周一至周五
      */
-    public static final int ALARMCLOCK_TYPE2 = Integer.parseInt("00011111",2);
+    public static final int ALARM_CLOCK_TYPE2 = Integer.parseInt("00011111",2);
     /**
      * 每天
      */
-    public static final int ALARMCLOCK_TYPE3 = Integer.parseInt("01111111",2);
+    public static final int ALARM_CLOCK_TYPE3 = Integer.parseInt("01111111",2);
 }

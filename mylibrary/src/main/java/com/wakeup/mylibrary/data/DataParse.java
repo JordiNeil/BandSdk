@@ -168,7 +168,7 @@ public class DataParse {
                             hourlyMeasureDataBean.setBloodOxygen(bloodOxygen);
                             hourlyMeasureDataBean.setBloodPressure_high(bloodPressure_high);
                             hourlyMeasureDataBean.setBloodPressure_low(bloodPressure_low);
-                            hourlyMeasureDataBean.setTimeInMillis(timeInMillis);
+                            hourlyMeasureDataBean.setTimeInMillis(timeInMillis+3600*1000);//整点数据时间加一个小时
 
                             int shallowSleep = datas.get(21) * 60 + datas.get(22);
                             int deepSleep = datas.get(23) * 60 +datas.get(24);

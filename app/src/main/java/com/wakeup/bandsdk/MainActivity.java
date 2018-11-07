@@ -329,16 +329,16 @@ public class MainActivity extends AppCompatActivity {
 
                             switch (datas.get(5)) {
                                 case 0x11:
-                                    //返回心率数据
+                                    //单机测量 心率数据
                                     HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, heartRateBean.toString());
                                     break;
                                 case 0x12:
-                                    //返回血氧数据
+                                    //单机测量 血氧数据
 
                                     break;
                                 case 0x14:
-                                    //返回血氧数据
+                                    //单机测量 血压数据
 
                                     break;
                                 case 0x08:
@@ -394,8 +394,8 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(mGattUpdateReceiver);
     }
 
-    public void findBand(View view) {
-        commandManager.findBand();
+    public void vibrate(View view) {
+        commandManager.vibrate();
     }
 
     public void version(View view) {
@@ -465,13 +465,13 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void alarm_clock(View view) {
-        //id 为0 开启18:00闹钟，只响一次
-        commandManager.setAlarmClock(0,1,18,0,Constants.ALARMCLOCK_TYPE1);
+        //闹钟id 为0 开启18:00闹钟，只响一次
+        commandManager.setAlarmClock(0,1,18,0,Constants.ALARM_CLOCK_TYPE1);
 
-//        //id 为1 开启06:30闹钟，周一至周五
-//        commandManager.setAlarmClock(1,1,6,30,Constants.ALARMCLOCK_TYPE2);
+//        //闹钟id 为1 开启06:30闹钟，周一至周五
+//        commandManager.setAlarmClock(1,1,6,30,Constants.ALARM_CLOCK_TYPE2);
 //
-//        //id 为2 开启08:00，每天
-//        commandManager.setAlarmClock(2,1,8,0,Constants.ALARMCLOCK_TYPE3);
+//        //闹钟id 为2 开启08:00，每天
+//        commandManager.setAlarmClock(2,1,8,0,Constants.ALARM_CLOCK_TYPE3);
     }
 }

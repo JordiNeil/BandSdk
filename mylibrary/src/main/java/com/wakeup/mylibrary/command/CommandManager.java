@@ -52,8 +52,7 @@ public class CommandManager {
     /**
      * 恢复手环出厂设置
      */
-    public void setResetBand() {
-        Log.i(TAG, "setResetBand: ");
+    public void resetBand() {
         byte[] bytes = new byte[6];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -73,8 +72,7 @@ public class CommandManager {
      *                血压：0X21(单次) 0X22(实时)
      * @param control 0关  1开
      */
-    public void setOnceOrRealTimeMeasure(int status, int control) {
-        Log.i(TAG, "setOnceOrRealTimeMeasure: ");
+    public void onceOrRealTimeMeasure(int status, int control) {
         byte[] bytes = new byte[7];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -91,8 +89,7 @@ public class CommandManager {
      *
      * @param control 0(关)  1(开)
      */
-    public void setOnceKeyMeasure(int control) {
-        Log.i(TAG, "setOnceKeyMeasure: ");
+    public void onceKeyMeasure(int control) {
         byte[] bytes = new byte[7];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -108,7 +105,6 @@ public class CommandManager {
      * 同步时间
      */
     public void setTimeSync() {
-        Log.i(TAG, "setTimeSync: ");
         //当前时间
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -171,7 +167,7 @@ public class CommandManager {
 
     /**
      * 下拉同步数据 带有连续心率手环
-     * <p>
+     *
      * Byte 7-11的时间值为APP发送给手环用来筛选需求的整点存储数据。
      * Byte 12-16的时间值为APP发送给手环用来筛选需求的心率存储数据。
      * 如2017/12/12 12:00，手环会将这时间之后的数据发送给APP
@@ -188,7 +184,6 @@ public class CommandManager {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
-        int second = calendar.get(Calendar.SECOND);
 
         Calendar calendar2 = Calendar.getInstance();
         calendar2.setTimeInMillis(timeInMillis2);
@@ -197,7 +192,6 @@ public class CommandManager {
         int day2 = calendar.get(Calendar.DAY_OF_MONTH);
         int hour2 = calendar.get(Calendar.HOUR_OF_DAY);
         int minute2 = calendar.get(Calendar.MINUTE);
-        int second2 = calendar.get(Calendar.SECOND);
         byte[] data = new byte[17];
         data[0] = (byte) 0xAB;
         data[1] = (byte) 0;
@@ -221,31 +215,13 @@ public class CommandManager {
     }
 
 
-    /**
-     * 获取实时心率
-     *
-     * @param bol 0-关 1-开
-     */
-    public void getTrueTimeRate(int bol) {
-        Log.i(TAG, "getTrueTimeRate: ");
-        byte[] data = new byte[7];
-        data[0] = (byte) 0xAB;
-        data[1] = (byte) 0;
-        data[2] = (byte) 4;
-        data[3] = (byte) 0xff;
-        data[4] = (byte) 0x84;
-        data[5] = (byte) 0x80;
-        data[6] = (byte) bol;
-//        data[6] = (byte)0;//占位符，没意义
-        broadcastData(data);
-    }
+
 
 
     /**
-     * 查找手环
+     * 震动手环
      */
-    public void findBand() {
-        Log.i(TAG, "findBand: ");
+    public void vibrate() {
         byte[] bytes = new byte[6];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -257,25 +233,6 @@ public class CommandManager {
         broadcastData(bytes);
     }
 
-
-    /**
-     * 抬手亮屏
-     *
-     * @param control 0关  1开
-     */
-    public void setUpHandLightScreen(int control) {
-        Log.i(TAG, "setUpHandLightScreen: ");
-        byte[] bytes = new byte[7];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 4;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x77;
-        bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) control;
-        Log.i("lq", "抬手亮屏" + "--" + control);
-        broadcastData(bytes);
-    }
 
     /**
      * 整点测量
@@ -295,124 +252,22 @@ public class CommandManager {
         broadcastData(bytes);
     }
 
-    /**
-     * 心率报警
-     *
-     * @param control 0关  1开
-     */
-    public void setHrWarn(int control) {
-        Log.i(TAG, "setHrWarn: ");
-        byte[] bytes = new byte[7];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 4;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x85;
-        bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) control;
-        broadcastData(bytes);
-    }
-
-    /**
-     * 摇摇拍照指令
-     *
-     * @param control 0关  1开
-     */
-    public void setSharkTakePhoto(int control) {
-        Log.i(TAG, "setSharkTakePhoto: ");
-        byte[] bytes = new byte[7];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 4;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x79;
-        bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) control;
-        broadcastData(bytes);
-    }
 
 
-    /**
-     * 防丢
-     *
-     * @param control 0关  1开
-     */
-    public void setAntiLostAlert(int control) {
-        Log.i(TAG, "setAntiLostAlert: ");
-        byte[] bytes = new byte[7];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 4;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x7A;
-        bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) control;
-        broadcastData(bytes);
-    }
 
-    /**
-     * 中英文切换
-     *
-     * @param control 0中文  1英文
-     */
-    public void setSwitchChineseOrEnglish(int control) {
-        Log.i(TAG, "setSwitchChineseOrEnglish: ");
-        byte[] bytes = new byte[7];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 4;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x7B;
-        bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) control;
-        broadcastData(bytes);
-    }
 
-    /**
-     * 时间制切换
-     *
-     * @param control 0（24小时制）  1(12小时制)
-     */
-    public void set12HourSystem(int control) {
-        Log.i(TAG, "set12HourSystem: ");
-        byte[] bytes = new byte[7];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 4;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x7C;
-        bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) control;
-        broadcastData(bytes);
-    }
 
-    /**
-     * 同步天气信息
-     *
-     * @param weather 0多云 1晴天 2雪天 3雨天
-     * @param temp    0(0度以上)  1(0度以下)
-     */
-    public void setSyncWeather(int weather, int temp) {
-        Log.i(TAG, "setSyncWeather: ");
-        byte[] bytes = new byte[9];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 6;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x7E;
-        bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) weather;
-        bytes[7] = (byte) temp;
-        bytes[8] = (byte) (temp >= 0 ? 0 : 1);
-        broadcastData(bytes);
-    }
+
+
+
+
+
 
 
     /**
      * 挂断电话
      */
     public void setHangUpPhone() {
-        Log.i(TAG, "setHangUpPhone: ");
         byte[] bytes = new byte[6];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -423,28 +278,10 @@ public class CommandManager {
         broadcastData(bytes);
     }
 
-    /**
-     * 智能提醒
-     *
-     * @param MessageId
-     * @param type
-     */
-    public void setSmartWarnNoContent(int MessageId, int type) {
-        Log.i(TAG, "setSmartWarnNoContent: ");
-        byte[] bytes = new byte[8];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 5;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x72;
-        bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) MessageId;//来电提醒、短信提醒等
-        bytes[7] = (byte) type;//0开 1关 2来消息通知
-        broadcastData(bytes);
-    }
+
 
     /**
-     * 智能提醒,带消息内容
+     * 智能提醒
      *
      * @param MessageId
      * @param type
@@ -466,7 +303,7 @@ public class CommandManager {
         bytes2[6] = (byte) MessageId;//来电提醒、短信提醒等
         bytes2[7] = (byte) type;//0开 1关 2来消息通知
         byte[] bytes = DataHandUtils.addBytes(bytes2, bytes1);
-        Log.i(TAG,DataHandUtils.bytesToHexStr(bytes));
+        Log.i(TAG, DataHandUtils.bytesToHexStr(bytes));
         broadcastData(bytes);
     }
 
@@ -500,38 +337,18 @@ public class CommandManager {
         broadcastData(bytes);
     }
 
-    /**
-     * 心电开始测量
-     */
-    public void startMeasureEcg() {
-        Log.i(TAG, "startMeasureEcg: ");
-        byte[] bytes = new byte[2];
-        bytes[0] = (byte) 0xAC;
-        bytes[1] = (byte) 0x01;
-        broadcastData(bytes);
-    }
-
-    /**
-     * 心电停止测量
-     */
-    public void stoptMeasureEcg() {
-        Log.i(TAG, "stoptMeasureEcg: ");
-        byte[] bytes = new byte[2];
-        bytes[0] = (byte) 0xAC;
-        bytes[1] = (byte) 0x00;
-        broadcastData(bytes);
-    }
 
 
     /**
      * 设置闹钟
-     * @param id 闹钟索引（最多开8个）
-     * @param status 0：关闭闹钟提醒功能  1：开启闹钟提醒功能
-     * @param hour  闹钟提醒时间之小时
-     * @param minute  闹钟提醒时间之分钟
+     *
+     * @param id     闹钟索引（最多开8个）
+     * @param control 0：关闭闹钟提醒功能  1：开启闹钟提醒功能
+     * @param hour   闹钟提醒时间之小时
+     * @param minute 闹钟提醒时间之分钟
      * @param repeat
      */
-    public void setAlarmClock(int id, int status, int hour, int minute, int repeat) {
+    public void setAlarmClock(int id, int control, int hour, int minute, int repeat) {
         byte[] data = new byte[11];
         data[0] = (byte) 0xAB;
         data[1] = (byte) 0;
@@ -542,7 +359,7 @@ public class CommandManager {
         data[5] = (byte) 0x80;
         //数据值
         data[6] = (byte) id;
-        data[7] = (byte) status;
+        data[7] = (byte) control;
         data[8] = (byte) hour;
         data[9] = (byte) minute;
         data[10] = (byte) repeat;
@@ -550,123 +367,243 @@ public class CommandManager {
     }
 
 
+
+
+
+
+
+
+
+
     /**
-     * 校准时间
+     * 发送用户信息给手环(使用于我司wearfit1.0的设备，具体情况请咨询我司固件开发人员)
+     * @param stepLength
+     * @param age
+     * @param height
+     * @param weight
+     * @param distanceUnit
+     * @param goal
      */
-    public void setCalibrationTime(int hour, int minute) {
-        Log.i(TAG, "setCalibrationTime: ");
-        byte[] bytes = new byte[8];
+    public void sendUserInfo(int stepLength, int age, int height, int weight,
+                              int distanceUnit, int goal) {
+
+        byte[] bytes = new byte[14];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
-        bytes[2] = (byte) 5;
+        bytes[2] = (byte) 11;
         bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x7D;
+        bytes[4] = (byte) 0x74;
         bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) hour;//小时
-        bytes[7] = (byte) minute;//分
+        bytes[6] = (byte) stepLength;
+        bytes[7] = (byte) age;
+        bytes[8] = (byte) height;
+        bytes[9] = (byte) weight;
+        bytes[10] = (byte) 115;
+        bytes[11] = (byte) 75;
+        bytes[12] = (byte) distanceUnit;
+        bytes[13] = (byte) (goal/1000);
+        broadcastData(bytes);
+    }
+
+
+    /**
+     * 发送用户信息给手环(使用于我司wearfit2.0的设备，具体情况请咨询我司固件开发人员)
+     * @param stepLength
+     * @param age
+     * @param height
+     * @param weight
+     * @param distanceUnit
+     * @param goal
+     */
+    public void sendUserInfo2(int stepLength, int age, int height, int weight,
+                              int distanceUnit, int goal) {
+
+        byte[] bytes = new byte[14];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 11;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x74;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) stepLength;
+        bytes[7] = (byte) age;
+        bytes[8] = (byte) height;
+        bytes[9] = (byte) weight;
+        bytes[10] = (byte) distanceUnit;
+        bytes[11] = (byte) (goal/1000);
         broadcastData(bytes);
     }
 
     /**
-     * 血压参考值
+     * 久坐提醒
      */
-    public void setBloodPressureReference(int control, int systaltic_value, int diastolic_value) {
-        Log.i(TAG, "setBloodPressureReference: ");
-        byte[] data = new byte[9];
-        data[0] = (byte) 0xAB;
-        data[1] = (byte) 0;
-        data[2] = (byte) 6;
-        data[3] = (byte) 0xff;
-        data[4] = (byte) 0x95;
-        data[5] = (byte) 0x80;
-        data[6] = (byte) control;
-        data[7] = (byte) systaltic_value;
-        data[8] = (byte) diastolic_value;
-        broadcastData(data);
+    public void sedentary(int control,int startHour,int startMinute,int endHour,int endMinute,int interval){
+        byte[] bytes = new byte[12];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 9;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x75;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        bytes[7] = (byte) startHour;
+        bytes[8] = (byte) startMinute;
+        bytes[9] = (byte) endHour;
+        bytes[10] = (byte) endMinute;
+        bytes[11] = (byte) interval;
+        broadcastData(bytes);
+
     }
 
 
     /**
-     * 省电模式
+     * 勿扰模式
+     */
+    public void doNotDisturbModel(int control,int startHour,int startMinute,int endHour,int endMinute) {
+        byte[] bytes = new byte[11];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 8;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x76;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;//0关 1开
+        bytes[7] = (byte) startHour;
+        bytes[8] = (byte) startMinute;
+        bytes[9] = (byte) endHour;
+        bytes[10] = (byte) endMinute;
+        broadcastData(bytes);
+    }
+
+
+    /**
+     * 抬手亮屏
      *
      * @param control 0关  1开
      */
-    public void setPowerSaving(int control) {
-        Log.i(TAG, "setPowerSaving: ");
+    public void upHandLightScreen(int control) {
         byte[] bytes = new byte[7];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
         bytes[2] = (byte) 4;
         bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x96;
+        bytes[4] = (byte) 0x77;
         bytes[5] = (byte) 0x80;
         bytes[6] = (byte) control;
         broadcastData(bytes);
     }
 
     /**
-     * 红外参数设置
+     * 摇摇拍照指令
      *
-     * @param num
+     * @param control 0关  1开
      */
-    public void sethongwai(int num) {
-        Log.i(TAG, "红外参数设置: ");
+    public void sharkTakePhoto(int control) {
         byte[] bytes = new byte[7];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
         bytes[2] = (byte) 4;
         bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x98;
+        bytes[4] = (byte) 0x79;
         bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) num;
+        bytes[6] = (byte) control;
         broadcastData(bytes);
     }
 
     /**
-     * 根据byte长度截取消息
+     * 防丢
      *
-     * @param MessageId
-     * @param type
-     * @param content
-     * @param length
+     * @param control 0关  1开
      */
-    public void setSmartWarn2(int MessageId, int type, String content, int length) {
-        Log.i(TAG, "setSmartWarn2");
-
-        if (TextUtils.isEmpty(content)) {
-            Log.i(TAG, "content 空");
-            return;
-        }
-
-        byte[] sendBytes;//要发送的bytes
-
-        byte[] contentBytes = content.getBytes();
-        int contentBytesLength = contentBytes.length;
-
-        Log.i(TAG, "contentBytesLength: " + contentBytesLength + "  length: " + length);
-        if (contentBytesLength > length) {
-            //如果内容的长度大于规定的最大长度，就截取
-            byte[] dest = new byte[length];
-            System.arraycopy(contentBytes, 0, dest, 0, length);
-            Log.i(TAG, "length:" + dest.length);
-            sendBytes = dest;
-        } else {
-            sendBytes = contentBytes;
-        }
-
-
-        byte[] bytes2 = new byte[8];
-        bytes2[0] = (byte) 0xAB;
-        bytes2[1] = (byte) 0;
-        bytes2[2] = (byte) (sendBytes.length + 5);
-        bytes2[3] = (byte) 0xFF;
-        bytes2[4] = (byte) 0x72;
-        bytes2[5] = (byte) 0x80;
-        bytes2[6] = (byte) MessageId;//来电提醒、短信提醒等
-        bytes2[7] = (byte) type;//0开 1关 2来消息通知
-        byte[] bytes = DataHandUtils.addBytes(bytes2, sendBytes);
+    public void antiLostAlert(int control) {
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7A;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
         broadcastData(bytes);
     }
+
+
+    /**
+     * 中英文切换
+     *
+     * @param control 0中文  1英文
+     */
+    public void switchChineseOrEnglish(int control) {
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7B;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 时间制切换
+     *
+     * @param control 0（24小时制）  1(12小时制)
+     */
+    public void switch12Hour(int control) {
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7C;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+    /**
+     * 手环查找手机
+     *
+     * @param control 0（关闭）  1(开启)
+     */
+    public void findPhone(int control) {
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7d;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 睡眠范围设置
+     * @param control 0:关(关则为全天有效）1:开
+     * @param startHour
+     * @param startMinute
+     * @param endHour
+     * @param endMinute
+     */
+    public void sleepRange(int control,int startHour,int startMinute,int endHour,int endMinute ){
+        byte[] bytes = new byte[11];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 8;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7F;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        bytes[7] = (byte) startHour;
+        bytes[8] = (byte) startMinute;
+        bytes[9] = (byte) endHour;
+        bytes[10] = (byte) endMinute;
+        broadcastData(bytes);
+    }
+
+
+
 
     /**
      * @brief Broadcast intent with pointed bytes.
