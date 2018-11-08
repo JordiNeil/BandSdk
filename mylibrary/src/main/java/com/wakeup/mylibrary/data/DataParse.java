@@ -8,6 +8,8 @@ import com.wakeup.mylibrary.bean.BloodPressureBean;
 import com.wakeup.mylibrary.bean.CurrentDataBean;
 import com.wakeup.mylibrary.bean.HeartRateBean;
 import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
+import com.wakeup.mylibrary.bean.OneButtonMeasurementBean;
+import com.wakeup.mylibrary.bean.SleepData;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,6 +37,8 @@ public class DataParse {
         Object object = null;
 
         if (datas.get(0) == 0xAB) {
+
+
 
             switch (datas.get(4)) {
                 case 0x91:
@@ -96,6 +100,7 @@ public class DataParse {
 
 
                 case 0x51:
+
                     //记录数据的时间
                     int year = datas.get(6) + 2000;
                     int month = datas.get(7);
@@ -114,7 +119,6 @@ public class DataParse {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-
 
                     if (Config.hasContinuousHeart) {
                         //如果是连续心率手环
@@ -139,9 +143,11 @@ public class DataParse {
 
                         } else if (datas.get(5) == 0x14) {
                             //单机测量 血压数据
-                            int bloodPressure = datas.get(11);
+                            int bloodPressure_h = datas.get(11);
+                            int bloodPressure_l = datas.get(12);
                             BloodPressureBean bloodPressureBean = new BloodPressureBean();
-                            bloodPressureBean.setBloodPressure(bloodPressure);
+                            bloodPressureBean.setBloodPressureHigh(bloodPressure_h);
+                            bloodPressureBean.setBloodPressureLow(bloodPressure_l);
                             bloodPressureBean.setTimeInMillis(timeInMillis);
 
                             object = bloodPressureBean;
@@ -168,10 +174,10 @@ public class DataParse {
                             hourlyMeasureDataBean.setBloodOxygen(bloodOxygen);
                             hourlyMeasureDataBean.setBloodPressure_high(bloodPressure_high);
                             hourlyMeasureDataBean.setBloodPressure_low(bloodPressure_low);
-                            hourlyMeasureDataBean.setTimeInMillis(timeInMillis+3600*1000);//整点数据时间加一个小时
+                            hourlyMeasureDataBean.setTimeInMillis(timeInMillis + 3600 * 1000);//整点数据时间加一个小时
 
                             int shallowSleep = datas.get(21) * 60 + datas.get(22);
-                            int deepSleep = datas.get(23) * 60 +datas.get(24);
+                            int deepSleep = datas.get(23) * 60 + datas.get(24);
                             int wakeupTimes = datas.get(25);
                             hourlyMeasureDataBean.setShallowSleep(shallowSleep);
                             hourlyMeasureDataBean.setDeepSleep(deepSleep);
@@ -229,9 +235,11 @@ public class DataParse {
 
                         } else if (datas.get(5) == 0x14) {
                             //单机测量 血压数据
-                            int bloodPressure = datas.get(11);
+                            int bloodPressure_h = datas.get(11);
+                            int bloodPressure_l = datas.get(12);
                             BloodPressureBean bloodPressureBean = new BloodPressureBean();
-                            bloodPressureBean.setBloodPressure(bloodPressure);
+                            bloodPressureBean.setBloodPressureHigh(bloodPressure_h);
+                            bloodPressureBean.setBloodPressureLow(bloodPressure_l);
                             bloodPressureBean.setTimeInMillis(timeInMillis);
 
                             object = bloodPressureBean;
@@ -262,7 +270,7 @@ public class DataParse {
 
 
                             int shallowSleep = datas.get(21) * 60 + datas.get(22);
-                            int deepSleep = datas.get(23) * 60 +datas.get(24);
+                            int deepSleep = datas.get(23) * 60 + datas.get(24);
                             int wakeupTimes = datas.get(25);
                             hourlyMeasureDataBean.setShallowSleep(shallowSleep);
                             hourlyMeasureDataBean.setDeepSleep(deepSleep);
@@ -298,6 +306,55 @@ public class DataParse {
 
                     break;
                 case 0x52:
+                    //入睡时间记录
+
+                    //记录数据的时间
+                    int year1 = datas.get(6) + 2000;
+                    int month1 = datas.get(7);
+                    int day1 = datas.get(8);
+                    int hour1 = datas.get(9);
+                    int min1 = datas.get(10);
+                    String time1 = year1 + String.format("%02d", month1)
+                            + String.format("%02d", day1)
+                            + String.format("%02d", hour1)
+                            + String.format("%02d", min1);
+
+                    SimpleDateFormat sdf1 = new SimpleDateFormat("yyyyMMddHHmm");
+                    long timeInMillis1 = 0;
+                    try {
+                        timeInMillis1 = sdf1.parse(time1).getTime();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    int sleepId = datas.get(11);//1睡眠时间  2深睡
+                    int sleepTime = datas.get(12) * 16 * 16 + datas.get(13);
+                    SleepData sleepData = new SleepData();
+                    sleepData.setSleepId(sleepId);
+                    sleepData.setSleepTime(sleepTime);
+                    sleepData.setTimeInMillis(timeInMillis1);
+
+                    object = sleepData;
+
+
+                    break;
+
+
+                case 0x32:
+                    //一键测量
+                    int heartRate = datas.get(6);
+                    int bloodOxygen = datas.get(7);
+                    int bloodPressure_h = datas.get(8);
+                    int bloodPressure_l = datas.get(9);
+
+                    OneButtonMeasurementBean oneButtonMeasurementBean = new OneButtonMeasurementBean();
+                    oneButtonMeasurementBean.setHeartRate(heartRate);
+                    oneButtonMeasurementBean.setBloodOxygen(bloodOxygen);
+                    oneButtonMeasurementBean.setBloodPressure_h(bloodPressure_h);
+                    oneButtonMeasurementBean.setBloodPressure_l(bloodPressure_l);
+                    oneButtonMeasurementBean.setTimeInMillis(System.currentTimeMillis());
+
+                    object = oneButtonMeasurementBean;
+
                     break;
                 default:
 

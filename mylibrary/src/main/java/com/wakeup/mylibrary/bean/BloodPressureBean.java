@@ -3,15 +3,24 @@ package com.wakeup.mylibrary.bean;
 import com.wakeup.mylibrary.utils.CommonUtils;
 
 public class BloodPressureBean {
-    private int bloodPressure;
+    private int bloodPressureHigh;
+    private int bloodPressureLow;
     private long timeInMillis;
 
-    public int getBloodPressure() {
-        return bloodPressure;
+    public int getBloodPressureHigh() {
+        return bloodPressureHigh;
     }
 
-    public void setBloodPressure(int bloodPressure) {
-        this.bloodPressure = bloodPressure;
+    public void setBloodPressureHigh(int bloodPressureHigh) {
+        this.bloodPressureHigh = bloodPressureHigh;
+    }
+
+    public int getBloodPressureLow() {
+        return bloodPressureLow;
+    }
+
+    public void setBloodPressureLow(int bloodPressureLow) {
+        this.bloodPressureLow = bloodPressureLow;
     }
 
     public long getTimeInMillis() {
@@ -25,7 +34,8 @@ public class BloodPressureBean {
     @Override
     public String toString() {
         return "BloodPressureBean{" +
-                "bloodPressure=" + bloodPressure +
+                "bloodPressureHigh=" + bloodPressureHigh +
+                ", bloodPressureLow=" + bloodPressureLow +
                 ", timeInMillis=" + CommonUtils.toStrTime(timeInMillis) +
                 '}';
     }

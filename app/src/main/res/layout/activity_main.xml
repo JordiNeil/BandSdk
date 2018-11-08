@@ -151,20 +151,45 @@
                 />
 
 
+            <!--<Button-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="开启消息通知"-->
+                <!--android:onClick="openMessage"-->
+                <!--/>-->
+
+
+            <!--<Button-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="测试消息通知"-->
+                <!--android:onClick="sendMessage"-->
+                <!--/>-->
+
+
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="开启消息通知"
-                android:onClick="openMessage"
+                android:text="一键测量"
+                android:onClick="one_button_measurement"
                 />
 
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="测试消息通知"
-                android:onClick="sendMessage"
-                />
+
 
 
 

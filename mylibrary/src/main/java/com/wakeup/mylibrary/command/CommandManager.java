@@ -49,30 +49,21 @@ public class CommandManager {
         broadcastData(bytes);
     }
 
-    /**
-     * 恢复手环出厂设置
-     */
-    public void resetBand() {
-        byte[] bytes = new byte[6];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 3;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0xFF;
-        bytes[5] = (byte) 0x80;
-        broadcastData(bytes);
-    }
+
 
 
     /**
      * 单次、实时测量
      *
      * @param status  心率：0X09(单次) 0X0A(实时)
+     *
      *                血氧：0X11(单次) 0X12(实时)
+     *
      *                血压：0X21(单次) 0X22(实时)
+     *
      * @param control 0关  1开
      */
-    public void onceOrRealTimeMeasure(int status, int control) {
+    public void singleRealtimeMeasure(int status, int control) {
         byte[] bytes = new byte[7];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -84,22 +75,7 @@ public class CommandManager {
         broadcastData(bytes);
     }
 
-    /**
-     * 一键测量
-     *
-     * @param control 0(关)  1(开)
-     */
-    public void onceKeyMeasure(int control) {
-        byte[] bytes = new byte[7];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 4;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x32;
-        bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) control;
-        broadcastData(bytes);
-    }
+
 
     /**
      * 同步时间
@@ -602,7 +578,22 @@ public class CommandManager {
         broadcastData(bytes);
     }
 
-
+    /**
+     * 一键测量  一键测量的时间1分钟到后发一个关闭指令这样手环会有一个返回值
+     *
+     * @param control 0(关)  1(开)
+     */
+    public void one_button_measurement(int control) {
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x32;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
 
 
     /**

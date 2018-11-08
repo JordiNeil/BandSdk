@@ -31,9 +31,13 @@ import com.wakeup.bandsdk.activity.DeviceScanActivity;
 import com.wakeup.mylibrary.Config;
 import com.wakeup.mylibrary.bean.BandInfo;
 import com.wakeup.mylibrary.bean.Battery;
+import com.wakeup.mylibrary.bean.BloodOxygenBean;
+import com.wakeup.mylibrary.bean.BloodPressureBean;
 import com.wakeup.mylibrary.bean.CurrentDataBean;
 import com.wakeup.mylibrary.bean.HeartRateBean;
 import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
+import com.wakeup.mylibrary.bean.OneButtonMeasurementBean;
+import com.wakeup.mylibrary.bean.SleepData;
 import com.wakeup.mylibrary.command.CommandManager;
 import com.wakeup.mylibrary.constants.Constants;
 import com.wakeup.mylibrary.constants.MessageID;
@@ -335,11 +339,13 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 case 0x12:
                                     //单机测量 血氧数据
-
+                                    BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodOxygenBean.toString());
                                     break;
                                 case 0x14:
                                     //单机测量 血压数据
-
+                                    BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodPressureBean.toString());
                                     break;
                                 case 0x08:
                                     //当前数据
@@ -353,10 +359,17 @@ public class MainActivity extends AppCompatActivity {
 
                             break;
                         case 0x52:
-
+                            //入睡时间记录
+                            SleepData sleepData = (SleepData) dataPasrse.parseData(datas);
+                            Log.i(TAG, sleepData.toString());
 
                             break;
+                        case 0x32:
+                            //一键测量
+                            OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);
+                            Log.i(TAG, oneButtonMeasurementBean.toString());
 
+                            break;
                         default:
 
                             break;
@@ -473,5 +486,17 @@ public class MainActivity extends AppCompatActivity {
 //
 //        //闹钟id 为2 开启08:00，每天
 //        commandManager.setAlarmClock(2,1,8,0,Constants.ALARM_CLOCK_TYPE3);
+    }
+
+    /**
+     * 一键测量   一键测量的时间1分钟 一分钟之后发送关闭的指令  会有测量结果返回
+     * @param view
+     */
+    public void one_button_measurement(View view) {
+        commandManager.one_button_measurement(1);
+
+        //一分钟之后发送关闭的指令  会有测量结果返回
+//        commandManager.one_button_measurement(0);
+
     }
 }
