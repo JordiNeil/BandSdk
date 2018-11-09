@@ -4,7 +4,7 @@ import com.wakeup.mylibrary.utils.CommonUtils;
 
 public class SleepData {
     private int sleepId;//ID=1:进入睡眠时间 ID=2：进入深睡时间
-    private int sleepTime;//持续时间
+    private int sleepTime;//持续时间 分钟
     private long timeInMillis;//开始时间
 
     public int getSleepId() {

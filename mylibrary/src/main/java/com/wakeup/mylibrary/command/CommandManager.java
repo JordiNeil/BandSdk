@@ -191,7 +191,32 @@ public class CommandManager {
     }
 
 
-
+    /**
+     * 下拉同步睡眠数据
+     */
+    public void syncSleepData(long timeInMillis) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeInMillis);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        byte[] data = new byte[12];
+        data[0] = (byte) 0xAB;
+        data[1] = (byte) 0;
+        data[2] = (byte) 9;
+        data[3] = (byte) 0xff;
+        data[4] = (byte) 0x52;
+        data[5] = (byte) 0x80;
+//        data[6] = (byte)0;//占位符，没意义
+        data[7] = (byte) ((year - 2000));
+        data[8] = (byte) (month);
+        data[9] = (byte) (day);
+        data[10] = (byte) (hour) ;
+        data[11] = (byte) (minute);
+        broadcastData(data);
+    }
 
 
     /**

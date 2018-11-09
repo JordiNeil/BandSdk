@@ -6,7 +6,7 @@ public class BloodOxygenBean {
     private int bloodOxygen;
     private long timeInMillis;
     /**
-     * 0 单机测量 1单次测量 2实时测量
+     * 0单机测量 1单次测量 2实时测量
      */
     private int type;
 

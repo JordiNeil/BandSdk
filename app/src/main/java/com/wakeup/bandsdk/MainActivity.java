@@ -274,37 +274,6 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                //如果是遇到整点数据第一个包，接下来的一个包就要拼接到前一个包上面
-                if (datas.get(0) == 0xAB && datas.get(4) == 0x51 && datas.get(5) == 0x20) {
-                    combineSize = 26;//两个包的总长度20+6
-                    //开始拼接
-                    combine = true;
-                }
-                if (combine) {
-                    byte[] combined = new byte[templeBytes.length + txValue.length];
-                    System.arraycopy(templeBytes, 0, combined, 0, templeBytes.length);
-                    System.arraycopy(txValue, 0, combined, templeBytes.length, txValue.length);
-                    templeBytes = combined;
-
-                    if (combined.length == combineSize) {
-                        List<Integer> combineList = DataHandUtils.bytesToArrayList(combined);
-
-                        //返回整点数据
-                        HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(combineList);
-                        Log.i(TAG, hourlyMeasureDataBean.toString());
-
-
-
-                        //拼接完成 重置状态
-                        combine = false;
-                        //临时数组置空
-                        templeBytes = new byte[0];
-                    }
-
-
-                }
-
-
                 if (datas.get(0) == 0xAB) {
                     switch (datas.get(4)) {
                         case 0x91:
@@ -351,6 +320,13 @@ public class MainActivity extends AppCompatActivity {
                                     //当前数据
                                     CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, currentDataBean.toString());
+                                    break;
+
+                                case 0x20:
+                                    //如果是遇到整点数据第一个包，接下来的一个包就要拼接到前一个包上面
+                                    combineSize = 26;//两个包的总长度20+6
+                                    //开始拼接
+                                    combine = true;
                                     break;
 
 
@@ -414,6 +390,35 @@ public class MainActivity extends AppCompatActivity {
                             break;
                     }
                 }
+
+
+
+                if (combine) {
+                    byte[] combined = new byte[templeBytes.length + txValue.length];
+                    System.arraycopy(templeBytes, 0, combined, 0, templeBytes.length);
+                    System.arraycopy(txValue, 0, combined, templeBytes.length, txValue.length);
+                    templeBytes = combined;
+
+                    if (combined.length == combineSize) {
+                        List<Integer> combineList = DataHandUtils.bytesToArrayList(combined);
+
+                        //返回整点数据
+                        HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(combineList);
+                        Log.i(TAG, hourlyMeasureDataBean.toString());
+
+
+
+                        //拼接完成 重置状态
+                        combine = false;
+                        //临时数组置空
+                        templeBytes = new byte[0];
+                    }
+
+
+                }
+
+
+
 
 
             }
@@ -545,6 +550,8 @@ public class MainActivity extends AppCompatActivity {
      */
     public void single_heartRate(View view) {
         commandManager.singleRealtimeMeasure(0X09,1);
+
+        //       commandManager.singleRealtimeMeasure(0X09,0); 关闭实时测量
     }
 
     /**
@@ -554,5 +561,12 @@ public class MainActivity extends AppCompatActivity {
     public void real_time_heartRate(View view) {
         commandManager.singleRealtimeMeasure(0X0A,1);
 
+//        commandManager.singleRealtimeMeasure(0X0A,0); 关闭实时测量
+
+
+    }
+
+    public void getSleep(View view) {
+        commandManager.syncSleepData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
     }
 }

@@ -151,12 +151,12 @@
                 />
 
 
-            <!--<Button-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="开启消息通知"-->
-                <!--android:onClick="openMessage"-->
-                <!--/>-->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取睡眠数据(ID 52)"
+                android:onClick="getSleep"
+                />
 
 
             <!--<Button-->
