@@ -122,91 +122,7 @@ public class DataParse {
 
                     if (Config.hasContinuousHeart) {
                         //如果是连续心率手环
-                        if (datas.get(5) == 0x11) {
-                            //单机测量 连续心率数据
-                            int hrValue = datas.get(11);
-                            HeartRateBean heartRateBean = new HeartRateBean();
-                            heartRateBean.setTimeInMillis(timeInMillis);
-                            heartRateBean.setHeartRate(hrValue);
-
-                            object = heartRateBean;
-
-                        } else if (datas.get(5) == 0x12) {
-                            //单机测量 血氧数据
-                            int bloodOxygen = datas.get(11);
-                            BloodOxygenBean bloodOxygenBean = new BloodOxygenBean();
-                            bloodOxygenBean.setBloodOxygen(bloodOxygen);
-                            bloodOxygenBean.setTimeInMillis(timeInMillis);
-
-                            object = bloodOxygen;
-
-
-                        } else if (datas.get(5) == 0x14) {
-                            //单机测量 血压数据
-                            int bloodPressure_h = datas.get(11);
-                            int bloodPressure_l = datas.get(12);
-                            BloodPressureBean bloodPressureBean = new BloodPressureBean();
-                            bloodPressureBean.setBloodPressureHigh(bloodPressure_h);
-                            bloodPressureBean.setBloodPressureLow(bloodPressure_l);
-                            bloodPressureBean.setTimeInMillis(timeInMillis);
-
-                            object = bloodPressureBean;
-
-
-                        } else if (datas.get(5) == 0x20) {
-                            //整点数据
-                            int steps = (datas.get(10) << 16) + (datas.get(11) << 8) +
-                                    datas.get(12);
-
-                            int calory = (datas.get(13) << 16) + (datas.get(14) << 8) +
-                                    datas.get(15);
-
-                            int heartRate = datas.get(16);
-                            int bloodOxygen = datas.get(17);
-                            int bloodPressure_high = datas.get(18);
-                            int bloodPressure_low = datas.get(19);
-
-
-                            HourlyMeasureDataBean hourlyMeasureDataBean = new HourlyMeasureDataBean();
-                            hourlyMeasureDataBean.setSteps(steps);
-                            hourlyMeasureDataBean.setCalory(calory);
-                            hourlyMeasureDataBean.setHeartRate(heartRate);
-                            hourlyMeasureDataBean.setBloodOxygen(bloodOxygen);
-                            hourlyMeasureDataBean.setBloodPressure_high(bloodPressure_high);
-                            hourlyMeasureDataBean.setBloodPressure_low(bloodPressure_low);
-                            hourlyMeasureDataBean.setTimeInMillis(timeInMillis + 3600 * 1000);//整点数据时间加一个小时
-
-                            int shallowSleep = datas.get(21) * 60 + datas.get(22);
-                            int deepSleep = datas.get(23) * 60 + datas.get(24);
-                            int wakeupTimes = datas.get(25);
-                            hourlyMeasureDataBean.setShallowSleep(shallowSleep);
-                            hourlyMeasureDataBean.setDeepSleep(deepSleep);
-                            hourlyMeasureDataBean.setWakeupTimes(wakeupTimes);
-
-
-                            object = hourlyMeasureDataBean;
-
-                        } else if (datas.get(5) == 0x08) {
-                            //当前计步、卡路里、睡眠值
-
-                            int steps = (datas.get(6) << 16) + (datas.get(7) << 8) + datas.get(8);
-                            int calory = (datas.get(9) << 16) + (datas.get(10) << 8) + datas.get(11);
-                            int shallowSleep = datas.get(12) * 60 + datas.get(13);//分
-                            int deepSleep = datas.get(14) * 60 + datas.get(15);
-                            int wakeupTimes = datas.get(16);
-
-                            CurrentDataBean currentDataBean = new CurrentDataBean();
-                            currentDataBean.setSteps(steps);
-                            currentDataBean.setCalory(calory);
-                            currentDataBean.setShallowSleep(shallowSleep);
-                            currentDataBean.setDeepSleep(deepSleep);
-                            currentDataBean.setWakeupTimes(wakeupTimes);
-                            currentDataBean.setTimeInMillis(System.currentTimeMillis());
-
-                            object = currentDataBean;
-
-
-                        }
+                        object = parse51(datas, object, timeInMillis);
 
 
                     } else if (Config.hasECG) {
@@ -214,93 +130,7 @@ public class DataParse {
 
                     } else {
                         //如果是普通手环
-                        if (datas.get(5) == 0x11) {
-                            //单机测量 连续心率数据
-                            int hrValue = datas.get(11);
-                            HeartRateBean heartRateBean = new HeartRateBean();
-                            heartRateBean.setTimeInMillis(timeInMillis);
-                            heartRateBean.setHeartRate(hrValue);
-
-                            object = heartRateBean;
-
-                        } else if (datas.get(5) == 0x12) {
-                            //单机测量 血氧数据
-                            int bloodOxygen = datas.get(11);
-                            BloodOxygenBean bloodOxygenBean = new BloodOxygenBean();
-                            bloodOxygenBean.setBloodOxygen(bloodOxygen);
-                            bloodOxygenBean.setTimeInMillis(timeInMillis);
-
-                            object = bloodOxygen;
-
-
-                        } else if (datas.get(5) == 0x14) {
-                            //单机测量 血压数据
-                            int bloodPressure_h = datas.get(11);
-                            int bloodPressure_l = datas.get(12);
-                            BloodPressureBean bloodPressureBean = new BloodPressureBean();
-                            bloodPressureBean.setBloodPressureHigh(bloodPressure_h);
-                            bloodPressureBean.setBloodPressureLow(bloodPressure_l);
-                            bloodPressureBean.setTimeInMillis(timeInMillis);
-
-                            object = bloodPressureBean;
-
-
-                        } else if (datas.get(5) == 0x20) {
-                            //整点数据
-                            int steps = (datas.get(10) << 16) + (datas.get(11) << 8) +
-                                    datas.get(12);
-
-                            int calory = (datas.get(13) << 16) + (datas.get(14) << 8) +
-                                    datas.get(15);
-
-                            int heartRate = datas.get(16);
-                            int bloodOxygen = datas.get(17);
-                            int bloodPressure_high = datas.get(18);
-                            int bloodPressure_low = datas.get(19);
-
-
-                            HourlyMeasureDataBean hourlyMeasureDataBean = new HourlyMeasureDataBean();
-                            hourlyMeasureDataBean.setSteps(steps);
-                            hourlyMeasureDataBean.setCalory(calory);
-                            hourlyMeasureDataBean.setHeartRate(heartRate);
-                            hourlyMeasureDataBean.setBloodOxygen(bloodOxygen);
-                            hourlyMeasureDataBean.setBloodPressure_high(bloodPressure_high);
-                            hourlyMeasureDataBean.setBloodPressure_low(bloodPressure_low);
-                            hourlyMeasureDataBean.setTimeInMillis(timeInMillis);
-
-
-                            int shallowSleep = datas.get(21) * 60 + datas.get(22);
-                            int deepSleep = datas.get(23) * 60 + datas.get(24);
-                            int wakeupTimes = datas.get(25);
-                            hourlyMeasureDataBean.setShallowSleep(shallowSleep);
-                            hourlyMeasureDataBean.setDeepSleep(deepSleep);
-                            hourlyMeasureDataBean.setWakeupTimes(wakeupTimes);
-
-
-                            object = hourlyMeasureDataBean;
-
-                        } else if (datas.get(5) == 0x08) {
-                            //当前计步、卡路里、睡眠值
-
-                            int steps = (datas.get(6) << 16) + (datas.get(7) << 8) + datas.get(8);
-                            int calory = (datas.get(9) << 16) + (datas.get(10) << 8) + datas.get(11);
-                            int shallowSleep = datas.get(12) * 60 + datas.get(13);//分
-                            int deepSleep = datas.get(14) * 60 + datas.get(15);
-                            int wakeupTimes = datas.get(16);
-
-                            CurrentDataBean currentDataBean = new CurrentDataBean();
-                            currentDataBean.setSteps(steps);
-                            currentDataBean.setCalory(calory);
-                            currentDataBean.setShallowSleep(shallowSleep);
-                            currentDataBean.setDeepSleep(deepSleep);
-                            currentDataBean.setWakeupTimes(wakeupTimes);
-                            currentDataBean.setTimeInMillis(System.currentTimeMillis());
-
-                            object = currentDataBean;
-
-
-                        }
-
+                        object = parse51(datas, object, timeInMillis);
                     }
 
 
@@ -338,6 +168,83 @@ public class DataParse {
 
                     break;
 
+                case 0x31:
+                    //单次测量、实时测量
+                    switch (datas.get(5)) {
+                        case 0x09:
+                            //心率（单次）
+                            int hrValue = datas.get(6);
+
+                            HeartRateBean heartRateBean = new HeartRateBean();
+                            heartRateBean.setHeartRate(hrValue);
+                            heartRateBean.setTimeInMillis(System.currentTimeMillis());
+                            heartRateBean.setType(1);
+
+                            object = heartRateBean;
+                            break;
+                        case 0x11:
+                            //血氧（单次）
+                            int bloodOxygen = datas.get(6);
+
+                            BloodOxygenBean bloodOxygenBean = new BloodOxygenBean();
+                            bloodOxygenBean.setBloodOxygen(bloodOxygen);
+                            bloodOxygenBean.setTimeInMillis(System.currentTimeMillis());
+                            bloodOxygenBean.setType(1);
+
+                            object = bloodOxygenBean;
+                            break;
+                        case 0x21:
+                            //血压（单次）
+                            int bloodPressureHigh = datas.get(6);
+                            int bloodPressureLow = datas.get(7);
+
+                            BloodPressureBean bloodPressureBean = new BloodPressureBean();
+                            bloodPressureBean.setBloodPressureHigh(bloodPressureHigh);
+                            bloodPressureBean.setBloodPressureLow(bloodPressureLow);
+                            bloodPressureBean.setType(1);
+
+                            object = bloodPressureBean;
+
+                            break;
+                        case 0X0A:
+                            //心率（实时）
+                            int hrValue1 = datas.get(6);
+
+                            HeartRateBean heartRateBean1 = new HeartRateBean();
+                            heartRateBean1.setHeartRate(hrValue1);
+                            heartRateBean1.setTimeInMillis(System.currentTimeMillis());
+                            heartRateBean1.setType(2);
+
+                            object = heartRateBean1;
+                            break;
+                        case 0x12:
+                            //血氧（实时）
+                            int bloodOxygen1 = datas.get(6);
+
+                            BloodOxygenBean bloodOxygenBean1 = new BloodOxygenBean();
+                            bloodOxygenBean1.setBloodOxygen(bloodOxygen1);
+                            bloodOxygenBean1.setTimeInMillis(System.currentTimeMillis());
+                            bloodOxygenBean1.setType(2);
+
+                            object = bloodOxygenBean1;
+                            break;
+                        case 0x22:
+                            //血压（实时）
+                            int bloodPressureHigh1 = datas.get(6);
+                            int bloodPressureLow1 = datas.get(7);
+
+                            BloodPressureBean bloodPressureBean1 = new BloodPressureBean();
+                            bloodPressureBean1.setBloodPressureHigh(bloodPressureHigh1);
+                            bloodPressureBean1.setBloodPressureLow(bloodPressureLow1);
+                            bloodPressureBean1.setType(2);
+
+                            object = bloodPressureBean1;
+                            break;
+                    }
+
+
+
+                    break;
 
                 case 0x32:
                     //一键测量
@@ -363,6 +270,95 @@ public class DataParse {
         }
 
 
+        return object;
+    }
+
+    private Object parse51(List<Integer> datas, Object object, long timeInMillis) {
+        if (datas.get(5) == 0x11) {
+            //单机测量 连续心率数据
+            int hrValue = datas.get(11);
+            HeartRateBean heartRateBean = new HeartRateBean();
+            heartRateBean.setTimeInMillis(timeInMillis);
+            heartRateBean.setHeartRate(hrValue);
+            heartRateBean.setType(0);
+            object = heartRateBean;
+
+        } else if (datas.get(5) == 0x12) {
+            //单机测量 血氧数据
+            int bloodOxygen = datas.get(11);
+            BloodOxygenBean bloodOxygenBean = new BloodOxygenBean();
+            bloodOxygenBean.setBloodOxygen(bloodOxygen);
+            bloodOxygenBean.setTimeInMillis(timeInMillis);
+            bloodOxygenBean.setType(0);
+            object = bloodOxygen;
+
+
+        } else if (datas.get(5) == 0x14) {
+            //单机测量 血压数据
+            int bloodPressure_h = datas.get(11);
+            int bloodPressure_l = datas.get(12);
+            BloodPressureBean bloodPressureBean = new BloodPressureBean();
+            bloodPressureBean.setBloodPressureHigh(bloodPressure_h);
+            bloodPressureBean.setBloodPressureLow(bloodPressure_l);
+            bloodPressureBean.setTimeInMillis(timeInMillis);
+            bloodPressureBean.setType(0);
+            object = bloodPressureBean;
+
+
+        } else if (datas.get(5) == 0x20) {
+            //整点数据
+            int steps = (datas.get(10) << 16) + (datas.get(11) << 8) +
+                    datas.get(12);
+
+            int calory = (datas.get(13) << 16) + (datas.get(14) << 8) +
+                    datas.get(15);
+
+            int heartRate = datas.get(16);
+            int bloodOxygen = datas.get(17);
+            int bloodPressure_high = datas.get(18);
+            int bloodPressure_low = datas.get(19);
+
+
+            HourlyMeasureDataBean hourlyMeasureDataBean = new HourlyMeasureDataBean();
+            hourlyMeasureDataBean.setSteps(steps);
+            hourlyMeasureDataBean.setCalory(calory);
+            hourlyMeasureDataBean.setHeartRate(heartRate);
+            hourlyMeasureDataBean.setBloodOxygen(bloodOxygen);
+            hourlyMeasureDataBean.setBloodPressure_high(bloodPressure_high);
+            hourlyMeasureDataBean.setBloodPressure_low(bloodPressure_low);
+            hourlyMeasureDataBean.setTimeInMillis(timeInMillis + 3600 * 1000);//整点数据时间加一个小时
+
+            int shallowSleep = datas.get(21) * 60 + datas.get(22);
+            int deepSleep = datas.get(23) * 60 + datas.get(24);
+            int wakeupTimes = datas.get(25);
+            hourlyMeasureDataBean.setShallowSleep(shallowSleep);
+            hourlyMeasureDataBean.setDeepSleep(deepSleep);
+            hourlyMeasureDataBean.setWakeupTimes(wakeupTimes);
+
+
+            object = hourlyMeasureDataBean;
+
+        } else if (datas.get(5) == 0x08) {
+            //当前计步、卡路里、睡眠值
+
+            int steps = (datas.get(6) << 16) + (datas.get(7) << 8) + datas.get(8);
+            int calory = (datas.get(9) << 16) + (datas.get(10) << 8) + datas.get(11);
+            int shallowSleep = datas.get(12) * 60 + datas.get(13);//分
+            int deepSleep = datas.get(14) * 60 + datas.get(15);
+            int wakeupTimes = datas.get(16);
+
+            CurrentDataBean currentDataBean = new CurrentDataBean();
+            currentDataBean.setSteps(steps);
+            currentDataBean.setCalory(calory);
+            currentDataBean.setShallowSleep(shallowSleep);
+            currentDataBean.setDeepSleep(deepSleep);
+            currentDataBean.setWakeupTimes(wakeupTimes);
+            currentDataBean.setTimeInMillis(System.currentTimeMillis());
+
+            object = currentDataBean;
+
+
+        }
         return object;
     }
 

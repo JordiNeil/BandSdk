@@ -1,8 +1,8 @@
 package com.wakeup.mylibrary.bean;
 
 public class BandInfo {
-    private float firmwareVersionCode;
     private int bandVersionCode;
+    private float firmwareVersionCode;
     private boolean canSetStepLength;
     private boolean canSetSleepTime;
     private boolean canSet12Hours;
@@ -41,20 +41,20 @@ public class BandInfo {
     private boolean moreMessage;
 
 
-    public float getFirmwareVersionCode() {
-        return firmwareVersionCode;
-    }
-
-    public void setFirmwareVersionCode(float firmwareVersionCode) {
-        this.firmwareVersionCode = firmwareVersionCode;
-    }
-
     public int getBandVersionCode() {
         return bandVersionCode;
     }
 
     public void setBandVersionCode(int bandVersionCode) {
         this.bandVersionCode = bandVersionCode;
+    }
+
+    public float getFirmwareVersionCode() {
+        return firmwareVersionCode;
+    }
+
+    public void setFirmwareVersionCode(float firmwareVersionCode) {
+        this.firmwareVersionCode = firmwareVersionCode;
     }
 
     public boolean isCanSetStepLength() {
@@ -172,8 +172,8 @@ public class BandInfo {
     @Override
     public String toString() {
         return "BandInfo{" +
-                "firmwareVersionCode=" + firmwareVersionCode +
-                ", bandVersionCode=" + bandVersionCode +
+                "bandVersionCode=" + bandVersionCode +
+                ", firmwareVersionCode=" + firmwareVersionCode +
                 ", canSetStepLength=" + canSetStepLength +
                 ", canSetSleepTime=" + canSetSleepTime +
                 ", canSet12Hours=" + canSet12Hours +

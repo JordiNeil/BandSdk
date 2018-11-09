@@ -180,7 +180,19 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             >
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="单次测量(心率为例)"
+                android:onClick="single_heartRate"
+                />
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="实时测量(心率为例)"
+                android:onClick="real_time_heartRate"
+                />
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -5,6 +5,10 @@ import com.wakeup.mylibrary.utils.CommonUtils;
 public class BloodOxygenBean {
     private int bloodOxygen;
     private long timeInMillis;
+    /**
+     * 0 单机测量 1单次测量 2实时测量
+     */
+    private int type;
 
     public int getBloodOxygen() {
         return bloodOxygen;
@@ -22,11 +26,20 @@ public class BloodOxygenBean {
         this.timeInMillis = timeInMillis;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "BloodOxygenBean{" +
                 "bloodOxygen=" + bloodOxygen +
                 ", timeInMillis=" + CommonUtils.toStrTime(timeInMillis) +
+                ", type=" + type +
                 '}';
     }
 }

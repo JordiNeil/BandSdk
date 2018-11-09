@@ -6,6 +6,10 @@ public class BloodPressureBean {
     private int bloodPressureHigh;
     private int bloodPressureLow;
     private long timeInMillis;
+    /**
+     * 0 单机测量 1单次测量 2实时测量
+     */
+    private int type;
 
     public int getBloodPressureHigh() {
         return bloodPressureHigh;
@@ -31,12 +35,21 @@ public class BloodPressureBean {
         this.timeInMillis = timeInMillis;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "BloodPressureBean{" +
                 "bloodPressureHigh=" + bloodPressureHigh +
                 ", bloodPressureLow=" + bloodPressureLow +
                 ", timeInMillis=" + CommonUtils.toStrTime(timeInMillis) +
+                ", type=" + type +
                 '}';
     }
 }

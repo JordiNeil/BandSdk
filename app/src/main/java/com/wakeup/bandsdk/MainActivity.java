@@ -364,6 +364,45 @@ public class MainActivity extends AppCompatActivity {
                             Log.i(TAG, sleepData.toString());
 
                             break;
+
+                        case 0x31:
+                            //单机测量、实时测量
+                            switch (datas.get(5)) {
+                                case 0x09:
+                                    //心率（单次）
+                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, heartRateBean.toString());
+                                    break;
+                                case 0x11:
+                                    //血氧（单次）
+                                    BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodOxygenBean.toString());
+                                    break;
+                                case 0x21:
+                                    //血压（单次）
+                                    BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodPressureBean.toString());
+
+                                    break;
+                                case 0X0A:
+                                    //心率（实时）
+                                    HeartRateBean heartRateBean1 = (HeartRateBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, heartRateBean1.toString());
+                                    break;
+                                case 0x12:
+                                    //血氧（实时）
+                                    BloodOxygenBean bloodOxygenBean1 = (BloodOxygenBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodOxygenBean1.toString());
+                                    break;
+                                case 0x22:
+                                    //血压（实时）
+                                    BloodPressureBean bloodPressureBean1 = (BloodPressureBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodPressureBean1.toString());
+
+                                    break;
+                            }
+
+                            break;
                         case 0x32:
                             //一键测量
                             OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);
@@ -489,14 +528,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 一键测量   一键测量的时间1分钟 一分钟之后发送关闭的指令  会有测量结果返回
+     * 一键测量   一键测量的时间1分钟 一分钟之后发送关闭的指令  才会有测量结果返回
      * @param view
      */
     public void one_button_measurement(View view) {
         commandManager.one_button_measurement(1);
 
-        //一分钟之后发送关闭的指令  会有测量结果返回
+        //一分钟之后发送关闭的指令  才会有测量结果返回
 //        commandManager.one_button_measurement(0);
+
+    }
+
+    /**
+     * 单次测量(以心率为例)
+     * @param view
+     */
+    public void single_heartRate(View view) {
+        commandManager.singleRealtimeMeasure(0X09,1);
+    }
+
+    /**
+     * 实时测量(以心率为例)
+     * @param view
+     */
+    public void real_time_heartRate(View view) {
+        commandManager.singleRealtimeMeasure(0X0A,1);
 
     }
 }
