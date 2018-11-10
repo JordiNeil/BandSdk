@@ -2,6 +2,9 @@ package com.wakeup.mylibrary.bean;
 
 import com.wakeup.mylibrary.utils.CommonUtils;
 
+/**
+ * 血氧数据
+ */
 public class BloodOxygenBean {
     private int bloodOxygen;
     private long timeInMillis;

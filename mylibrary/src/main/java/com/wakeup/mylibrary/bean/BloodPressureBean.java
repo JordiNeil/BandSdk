@@ -2,6 +2,9 @@ package com.wakeup.mylibrary.bean;
 
 import com.wakeup.mylibrary.utils.CommonUtils;
 
+/**
+ * 血压数据
+ */
 public class BloodPressureBean {
     private int bloodPressureHigh;
     private int bloodPressureLow;

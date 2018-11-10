@@ -2,6 +2,9 @@ package com.wakeup.mylibrary.bean;
 
 import com.wakeup.mylibrary.utils.CommonUtils;
 
+/**
+ * 一键测量返回的数据
+ */
 public class OneButtonMeasurementBean {
     private int heartRate;
     private int bloodOxygen;

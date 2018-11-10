@@ -12,7 +12,7 @@ import java.util.Calendar;
 
 
 /**
- * Created by Harry on 2018/5/22.
+ * 蓝牙指令
  */
 
 public class CommandManager {
@@ -254,17 +254,6 @@ public class CommandManager {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
     /**
      * 挂断电话
      */
@@ -304,7 +293,6 @@ public class CommandManager {
         bytes2[6] = (byte) MessageId;//来电提醒、短信提醒等
         bytes2[7] = (byte) type;//0开 1关 2来消息通知
         byte[] bytes = DataHandUtils.addBytes(bytes2, bytes1);
-        Log.i(TAG, DataHandUtils.bytesToHexStr(bytes));
         broadcastData(bytes);
     }
 
@@ -312,7 +300,6 @@ public class CommandManager {
      * 查看电量
      */
     public void getBatteryInfo() {
-        Log.i(TAG, "getBatteryInfo: ");
         byte[] bytes = new byte[6];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -324,10 +311,9 @@ public class CommandManager {
     }
 
     /**
-     * 查看版本
+     * 查看手环版本
      */
     public void getVersion() {
-        Log.i(TAG, "getVersion: ");
         byte[] bytes = new byte[6];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -366,13 +352,6 @@ public class CommandManager {
         data[10] = (byte) repeat;
         broadcastData(data);
     }
-
-
-
-
-
-
-
 
 
 
@@ -512,7 +491,7 @@ public class CommandManager {
     }
 
     /**
-     * 防丢
+     * 防丢提醒
      *
      * @param control 0关  1开
      */
@@ -631,7 +610,7 @@ public class CommandManager {
         try {
             mContext.sendBroadcast(intent);
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
+
         }
     }
 

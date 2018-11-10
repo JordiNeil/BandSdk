@@ -2,6 +2,9 @@ package com.wakeup.mylibrary.bean;
 
 import com.wakeup.mylibrary.utils.CommonUtils;
 
+/**
+ * 整点测量数据
+ */
 public class HourlyMeasureDataBean {
     private int steps;
     private int calory;

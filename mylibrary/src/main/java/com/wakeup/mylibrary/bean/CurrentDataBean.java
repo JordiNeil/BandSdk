@@ -2,6 +2,9 @@ package com.wakeup.mylibrary.bean;
 
 import com.wakeup.mylibrary.utils.CommonUtils;
 
+/**
+ * 当前数据
+ */
 public class CurrentDataBean {
     private int steps;
     private int calory;

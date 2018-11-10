@@ -2,6 +2,9 @@ package com.wakeup.mylibrary.bean;
 
 import com.wakeup.mylibrary.utils.CommonUtils;
 
+/**
+ * ID = 52 指令获取的睡眠数据(整点测量数据和当前数据里面也有睡眠数据)
+ */
 public class SleepData {
     private int sleepId;//ID=1:进入睡眠时间 ID=2：进入深睡时间
     private int sleepTime;//持续时间 分钟

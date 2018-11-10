@@ -2,6 +2,9 @@ package com.wakeup.mylibrary.bean;
 
 import com.wakeup.mylibrary.utils.CommonUtils;
 
+/**
+ * 心率数据
+ */
 public class HeartRateBean {
     private int heartRate;
     private long timeInMillis;

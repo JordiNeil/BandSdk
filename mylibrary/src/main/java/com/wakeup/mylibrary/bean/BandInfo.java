@@ -1,5 +1,8 @@
 package com.wakeup.mylibrary.bean;
 
+/**
+ * 手环版本信息数据
+ */
 public class BandInfo {
     private int bandVersionCode;
     private float firmwareVersionCode;

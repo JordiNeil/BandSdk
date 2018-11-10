@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
         commandManager = CommandManager.getInstance(this);
+
         dataPasrse = DataParse.getInstance();
 
 
@@ -292,6 +293,7 @@ public class MainActivity extends AppCompatActivity {
                                     || bandInfo.getBandType() == 0x0D
                                     || bandInfo.getBandType() == 0x0E
                                     || bandInfo.getBandType() == 0x0F) {
+
                                 Config.hasContinuousHeart = true;
 
                             }

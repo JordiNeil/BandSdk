@@ -1,5 +1,8 @@
 package com.wakeup.mylibrary.bean;
 
+/**
+ * 电池数据
+ */
 public class Battery {
     private int battery;
 
