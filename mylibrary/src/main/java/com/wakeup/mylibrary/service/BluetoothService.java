@@ -519,7 +519,7 @@ public class BluetoothService extends Service {
      */
     public boolean connect(final String address) {
         //连接之前先断开之前的设备
-        close();
+//        close();
         if (mBluetoothAdapter == null || address == null) {
             Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
             return false;

@@ -387,6 +387,13 @@ public class MainActivity extends AppCompatActivity {
                             Log.i(TAG, oneButtonMeasurementBean.toString());
 
                             break;
+
+                        case 0x84:
+                            //连续心率手环 实时心率返回
+                            HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
+                            Log.i(TAG, heartRateBean.toString());
+
+                            break;
                         default:
 
                             break;
@@ -547,13 +554,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 单次测量(以心率为例)
+     * 单次测量(以心率为例) 单次测量的时间45s 45s之后发送关闭的指令  才会有测量结果返回
      * @param view
      */
     public void single_heartRate(View view) {
         commandManager.singleRealtimeMeasure(0X09,1);
 
-        //       commandManager.singleRealtimeMeasure(0X09,0); 关闭实时测量
+        //       commandManager.singleRealtimeMeasure(0X09,0); 关闭单次测量
     }
 
     /**
@@ -570,5 +577,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void getSleep(View view) {
         commandManager.syncSleepData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
+    }
+
+
+    /**
+     * 连续心率手环获取实时心率
+     * @param view
+     */
+    public void real_time_heartRate2_1(View view) {
+        commandManager.getRealTimeHeartRate(1);
+    }
+    /**
+     * 关闭 连续心率手环获取实时心率
+     * @param view
+     */
+    public void real_time_heartRate2_0(View view) {
+        commandManager.getRealTimeHeartRate(0);
+
     }
 }

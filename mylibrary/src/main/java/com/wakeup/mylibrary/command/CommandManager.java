@@ -599,6 +599,23 @@ public class CommandManager {
         broadcastData(bytes);
     }
 
+    /**
+     * 实时获取心率
+     * @param control 0关闭  1开启
+     */
+    public void getRealTimeHeartRate(int control){
+        byte[] data = new byte[7];
+        data[0] = (byte) 0xAB;
+        data[1] = (byte) 0;
+        data[2] = (byte) 4;
+        data[3] = (byte) 0xff;
+        data[4] = (byte) 0x84;
+        data[5] = (byte) 0x80;
+        data[6] = (byte) control;
+        broadcastData(data);
+    }
+
+
 
     /**
      * @brief Broadcast intent with pointed bytes.

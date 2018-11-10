@@ -263,6 +263,20 @@ public class DataParse {
                     object = oneButtonMeasurementBean;
 
                     break;
+
+
+                case 0x84:
+                    //连续心率手环 实时心率返回
+                    int hrValue1 = datas.get(6);
+
+                    HeartRateBean heartRateBean = new HeartRateBean();
+                    heartRateBean.setHeartRate(hrValue1);
+                    heartRateBean.setTimeInMillis(System.currentTimeMillis());
+                    heartRateBean.setType(3);
+
+                    object = heartRateBean;
+
+                    break;
                 default:
 
                     break;
