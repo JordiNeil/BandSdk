@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
                             break;
 
                         case 0x31:
-                            //单机测量、实时测量
+                            //单次测量、实时测量
                             switch (datas.get(5)) {
                                 case 0x09:
                                     //心率（单次）
