@@ -31,54 +31,23 @@ public class CommandManager {
         return instance;
 
     }
-
-
     /**
-     * 清除数据
+     * 震动手环
      */
-    public void clearData() {
-        Log.i(TAG, "clearData: ");
-        byte[] bytes = new byte[7];
+    public void vibrate() {
+        byte[] bytes = new byte[6];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
-        bytes[2] = (byte) 4;
+        bytes[2] = (byte) 3;
         bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x23;
+        bytes[4] = (byte) 0x71;
         bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) 0x00;
+        Log.i(TAG, "查找手环");
         broadcastData(bytes);
     }
 
-
-
-
     /**
-     * 单次、实时测量
-     *
-     * @param status  心率：0X09(单次) 0X0A(实时)
-     *
-     *                血氧：0X11(单次) 0X12(实时)
-     *
-     *                血压：0X21(单次) 0X22(实时)
-     *
-     * @param control 0关  1开
-     */
-    public void singleRealtimeMeasure(int status, int control) {
-        byte[] bytes = new byte[7];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 4;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x31;
-        bytes[5] = (byte) status;
-        bytes[6] = (byte) control;
-        broadcastData(bytes);
-    }
-
-
-
-    /**
-     * 同步时间
+     * 同步手环时间
      */
     public void setTimeSync() {
         //当前时间
@@ -106,6 +75,51 @@ public class CommandManager {
         bytes[11] = (byte) (hour & 0xff);
         bytes[12] = (byte) (minute & 0xff);
         bytes[13] = (byte) (second & 0xff);
+        broadcastData(bytes);
+    }
+
+    /**
+     * 查看手环版本
+     */
+    public void getVersion() {
+        byte[] bytes = new byte[6];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 3;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x92;
+        bytes[5] = (byte) 0x80;
+        broadcastData(bytes);
+    }
+    /**
+     * 查看手环电量
+     */
+    public void getBatteryInfo() {
+        byte[] bytes = new byte[6];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 3;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x91;
+        bytes[5] = (byte) 0x80;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 控制整点测量功能开关
+     *
+     * @param control 0关  1开
+     */
+    public void openHourlyMeasure(int control) {
+        Log.i(TAG, "openHourlyMeasure: ");
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x78;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) control;
         broadcastData(bytes);
     }
 
@@ -141,8 +155,9 @@ public class CommandManager {
         broadcastData(data);
     }
 
+
     /**
-     * 下拉同步数据 带有连续心率手环
+     * 下拉同步数据(带有连续心率手环)
      *
      * Byte 7-11的时间值为APP发送给手环用来筛选需求的整点存储数据。
      * Byte 12-16的时间值为APP发送给手环用来筛选需求的心率存储数据。
@@ -190,7 +205,6 @@ public class CommandManager {
         broadcastData(data);
     }
 
-
     /**
      * 下拉同步睡眠数据
      */
@@ -218,55 +232,75 @@ public class CommandManager {
         broadcastData(data);
     }
 
-
     /**
-     * 震动手环
-     */
-    public void vibrate() {
-        byte[] bytes = new byte[6];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 3;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x71;
-        bytes[5] = (byte) 0x80;
-        Log.i(TAG, "查找手环");
-        broadcastData(bytes);
-    }
-
-
-    /**
-     * 整点测量
+     * 单次、实时测量
+     *
+     * @param status  心率：0X09(单次) 0X0A(实时)
+     *
+     *                血氧：0X11(单次) 0X12(实时)
+     *
+     *                血压：0X21(单次) 0X22(实时)
      *
      * @param control 0关  1开
      */
-    public void openHourlyMeasure(int control) {
-        Log.i(TAG, "openHourlyMeasure: ");
+    public void singleRealtimeMeasure(int status, int control) {
         byte[] bytes = new byte[7];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
         bytes[2] = (byte) 4;
         bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x78;
+        bytes[4] = (byte) 0x31;
+        bytes[5] = (byte) status;
+        bytes[6] = (byte) control;
+        broadcastData(bytes);
+    }
+    /**
+     * 一键测量(一键测量的时间为1分钟，1分钟到后发一个关闭指令，手环会返回数据)
+     *
+     * @param control 0(关)  1(开)
+     */
+    public void oneButtonMeasurement(int control) {
+        byte[] bytes = new byte[7];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 4;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x32;
         bytes[5] = (byte) 0x80;
         bytes[6] = (byte) control;
         broadcastData(bytes);
     }
-
-
     /**
-     * 挂断电话
+     * 实时获取心率
+     * @param control 0关闭  1开启
      */
-    public void setHangUpPhone() {
-        byte[] bytes = new byte[6];
+    public void getRealTimeHeartRate(int control){
+        byte[] data = new byte[7];
+        data[0] = (byte) 0xAB;
+        data[1] = (byte) 0;
+        data[2] = (byte) 4;
+        data[3] = (byte) 0xff;
+        data[4] = (byte) 0x84;
+        data[5] = (byte) 0x80;
+        data[6] = (byte) control;
+        broadcastData(data);
+    }
+    /**
+     * 清除数据
+     */
+    public void clearData() {
+        Log.i(TAG, "clearData: ");
+        byte[] bytes = new byte[7];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
-        bytes[2] = (byte) 3;
+        bytes[2] = (byte) 4;
         bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x81;
-        bytes[5] = (byte) 0;
+        bytes[4] = (byte) 0x23;
+        bytes[5] = (byte) 0x80;
+        bytes[6] = (byte) 0x00;
         broadcastData(bytes);
     }
+
 
 
 
@@ -297,39 +331,9 @@ public class CommandManager {
     }
 
     /**
-     * 查看电量
-     */
-    public void getBatteryInfo() {
-        byte[] bytes = new byte[6];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 3;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x91;
-        bytes[5] = (byte) 0x80;
-        broadcastData(bytes);
-    }
-
-    /**
-     * 查看手环版本
-     */
-    public void getVersion() {
-        byte[] bytes = new byte[6];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 3;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x92;
-        bytes[5] = (byte) 0x80;
-        broadcastData(bytes);
-    }
-
-
-
-    /**
      * 设置闹钟
      *
-     * @param id     闹钟索引（最多开8个）
+     * @param id     闹钟id（最多开8个）
      * @param control 0：关闭闹钟提醒功能  1：开启闹钟提醒功能
      * @param hour   闹钟提醒时间之小时
      * @param minute 闹钟提醒时间之分钟
@@ -356,7 +360,7 @@ public class CommandManager {
 
 
     /**
-     * 发送用户信息给手环(使用于我司wearfit1.0的设备，具体情况请咨询我司固件开发人员)
+     * 发送用户信息给手环(适用于我司wearfit1.0的设备，具体情况请咨询我司固件开发人员)
      * @param stepLength
      * @param age
      * @param height
@@ -387,7 +391,7 @@ public class CommandManager {
 
 
     /**
-     * 发送用户信息给手环(使用于我司wearfit2.0的设备，具体情况请咨询我司固件开发人员)
+     * 发送用户信息给手环(适用于我司wearfit2.0的设备，具体情况请咨询我司固件开发人员)
      * @param stepLength
      * @param age
      * @param height
@@ -541,22 +545,7 @@ public class CommandManager {
         bytes[6] = (byte) control;
         broadcastData(bytes);
     }
-    /**
-     * 手环查找手机
-     *
-     * @param control 0（关闭）  1(开启)
-     */
-    public void findPhone(int control) {
-        byte[] bytes = new byte[7];
-        bytes[0] = (byte) 0xAB;
-        bytes[1] = (byte) 0;
-        bytes[2] = (byte) 4;
-        bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x7d;
-        bytes[5] = (byte) 0x80;
-        bytes[6] = (byte) control;
-        broadcastData(bytes);
-    }
+
 
     /**
      * 睡眠范围设置
@@ -583,39 +572,38 @@ public class CommandManager {
     }
 
     /**
-     * 一键测量  一键测量的时间1分钟到后发一个关闭指令这样手环会有一个返回值
+     * 手环查找手机
      *
-     * @param control 0(关)  1(开)
+     * @param control 0（关闭）  1(开启)
      */
-    public void one_button_measurement(int control) {
+    public void findPhone(int control) {
         byte[] bytes = new byte[7];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
         bytes[2] = (byte) 4;
         bytes[3] = (byte) 0xFF;
-        bytes[4] = (byte) 0x32;
+        bytes[4] = (byte) 0x7d;
         bytes[5] = (byte) 0x80;
         bytes[6] = (byte) control;
         broadcastData(bytes);
     }
 
+
+
+
     /**
-     * 实时获取心率
-     * @param control 0关闭  1开启
+     * 挂断电话
      */
-    public void getRealTimeHeartRate(int control){
-        byte[] data = new byte[7];
-        data[0] = (byte) 0xAB;
-        data[1] = (byte) 0;
-        data[2] = (byte) 4;
-        data[3] = (byte) 0xff;
-        data[4] = (byte) 0x84;
-        data[5] = (byte) 0x80;
-        data[6] = (byte) control;
-        broadcastData(data);
+    public void setHangUpPhone() {
+        byte[] bytes = new byte[6];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 3;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x81;
+        bytes[5] = (byte) 0;
+        broadcastData(bytes);
     }
-
-
 
     /**
      * @brief Broadcast intent with pointed bytes.

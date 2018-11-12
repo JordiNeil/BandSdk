@@ -546,10 +546,10 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void one_button_measurement(View view) {
-        commandManager.one_button_measurement(1);
+        commandManager.oneButtonMeasurement(1);
 
         //一分钟之后发送关闭的指令  才会有测量结果返回
-//        commandManager.one_button_measurement(0);
+//        commandManager.oneButtonMeasurement(0);
 
     }
 
