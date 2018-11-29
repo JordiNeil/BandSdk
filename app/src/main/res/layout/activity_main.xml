@@ -38,7 +38,7 @@
                 android:id="@+id/connect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="连接"
+                android:text="@string/connect"
                 android:layout_marginLeft="20dp"
                 android:onClick="connect"
                 />
@@ -61,20 +61,20 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="同步时间"
+                android:text="@string/sync_time"
                 android:onClick="syncTime"
                 />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="震动手环"
+                android:text="@string/vibrate"
                 android:onClick="vibrate"
                 />
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="获取手环信息"
+                android:text="@string/get_band_info"
                 android:onClick="version"
                 />
 
@@ -89,21 +89,21 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="电量"
+                android:text="@string/battery"
                 android:onClick="battery"
                 />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="开启整点测量"
+                android:text="@string/open_hourly_measure"
                 android:onClick="openMeasure"
                 />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="获取数据"
+                android:text="@string/get_data"
                 android:onClick="syncData"
                 />
 
@@ -119,7 +119,7 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="清除手环数据"
+                android:text="@string/clear_data"
                 android:onClick="clearData"
                 />
 
@@ -127,7 +127,7 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="开启消息通知"
+                android:text="@string/open_message"
                 android:onClick="openMessage"
                 />
 
@@ -135,7 +135,7 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="测试消息通知"
+                android:text="@string/test_message"
                 android:onClick="sendMessage"
                 />
 
@@ -151,7 +151,7 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置闹钟"
+                android:text="@string/set_alarm_clock"
                 android:onClick="alarm_clock"
                 />
 
@@ -159,7 +159,7 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="获取睡眠数据(ID 52)"
+                android:text="@string/get_sleep_data"
                 android:onClick="getSleep"
                 />
 
@@ -188,14 +188,14 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="单次测量(心率为例)"
+                android:text="@string/single_measure"
                 android:onClick="single_heartRate"
                 />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="实时测量(心率为例)"
+                android:text="@string/real_time_measure"
                 android:onClick="real_time_heartRate"
                 />
 
@@ -214,7 +214,7 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="一键测量"
+                android:text="@string/one_button_measurement"
                 android:onClick="one_button_measurement"
                 />
 
@@ -235,13 +235,13 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="连续心率手环获取实时心率"
+                android:text="@string/get_real_heartrate"
                 android:onClick="real_time_heartRate2_1"
                 />
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="关闭 连续心率手环获取实时心率"
+                android:text="@string/turn_off_real_heartrate"
                 android:onClick="real_time_heartRate2_0"
                 />
 

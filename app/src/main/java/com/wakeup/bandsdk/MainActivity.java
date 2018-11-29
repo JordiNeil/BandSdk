@@ -517,6 +517,7 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void sendMessage(View view) {
+        //以QQ消息为例，可以传入不同的MessageID  例如MessageID.WECHAT
         commandManager.sendMessage(MessageID.QQ,MessageType.COMING_MESSAGES,"测试消息通知");
     }
 
