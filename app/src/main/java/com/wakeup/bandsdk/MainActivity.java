@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wakeup.bandsdk.activity.DeviceScanActivity;
+import com.wakeup.bandsdk.activity.SendPicActivity;
 import com.wakeup.mylibrary.Config;
 import com.wakeup.mylibrary.bean.BandInfo;
 import com.wakeup.mylibrary.bean.Battery;
@@ -61,22 +61,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_SEARCH = 1;
     private BluetoothService mBluetoothLeService;
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    return true;
-                case R.id.navigation_dashboard:
-                    return true;
-                case R.id.navigation_notifications:
-                    return true;
-            }
-            return false;
-        }
-    };
     private String address;
     private Button connectBt;
     private ProgressBar progressBar;
@@ -96,8 +80,6 @@ public class MainActivity extends AppCompatActivity {
         mTextMessage = (TextView) findViewById(R.id.message);
         connectBt = findViewById(R.id.connect);
         progressBar = findViewById(R.id.progressBar);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         isBLESupported();
 
@@ -626,5 +608,13 @@ public class MainActivity extends AppCompatActivity {
         TextView weatherTx = findViewById(R.id.weather);
         weatherTx.setText(weatherInfoList.toString());
         commandManager.sendWeatherInfo(weatherInfoList);
+    }
+
+    /**
+     * 发送图片
+     * @param view
+     */
+    public void sendPic(View view) {
+        startActivity(new Intent(MainActivity.this,SendPicActivity.class));
     }
 }
