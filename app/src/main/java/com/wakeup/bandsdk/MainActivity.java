@@ -38,6 +38,7 @@ import com.wakeup.mylibrary.bean.HeartRateBean;
 import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
 import com.wakeup.mylibrary.bean.OneButtonMeasurementBean;
 import com.wakeup.mylibrary.bean.SleepData;
+import com.wakeup.mylibrary.bean.WeatherInfo;
 import com.wakeup.mylibrary.command.CommandManager;
 import com.wakeup.mylibrary.constants.Constants;
 import com.wakeup.mylibrary.constants.MessageID;
@@ -47,7 +48,9 @@ import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -80,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
     private CommandManager commandManager;
     private DataParse dataPasrse;
     private BandInfo bandInfo;
+    //测试发送天气，初始化7天天气。
+    private String[] weatherType = new String[]{"0","1","2","3","4","5","6","7"};
+    private String[] weatherType1 = new String[]{"0","1"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +121,18 @@ public class MainActivity extends AppCompatActivity {
 
         dataPasrse = DataParse.getInstance();
 
+    }
 
+    private int getTemperature() {
+        int temperature = (new Random().nextInt(35));
+        return temperature;
+    }
+
+    @NonNull
+    private String getWeatherInfo() {
+        int i = new Random().nextInt(weatherType.length);
+        int i1 = new Random().nextInt(weatherType1.length);
+        return weatherType[i]+weatherType1[i1];
     }
 
     //Code to manage Service lifecycle
@@ -595,5 +612,19 @@ public class MainActivity extends AppCompatActivity {
     public void real_time_heartRate2_0(View view) {
         commandManager.getRealTimeHeartRate(0);
 
+    }
+
+    /**
+     * 发送天气
+     * @param view
+     */
+    public void sendWeather(View view) {
+        List<WeatherInfo> weatherInfoList = new ArrayList<>();
+        for (int j = 0; j < 7; j++) {
+            weatherInfoList.add(new WeatherInfo(getWeatherInfo(),getTemperature()));
+        }
+        TextView weatherTx = findViewById(R.id.weather);
+        weatherTx.setText(weatherInfoList.toString());
+        commandManager.sendWeatherInfo(weatherInfoList);
     }
 }

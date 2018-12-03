@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.wakeup.mylibrary.bean.WeatherInfo;
 import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
 
 import java.util.Calendar;
+import java.util.List;
 
 
 /**
@@ -602,6 +604,27 @@ public class CommandManager {
         bytes[3] = (byte) 0xFF;
         bytes[4] = (byte) 0x81;
         bytes[5] = (byte) 0;
+        broadcastData(bytes);
+    }
+
+    /**
+     * 发送天气
+     */
+    public void sendWeatherInfo(List<WeatherInfo> weatherInfoList) {
+        Log.i(TAG,weatherInfoList.toString());
+        byte[] bytes = new byte[20];
+        bytes[0] = (byte) 0xAB;
+        bytes[1] = (byte) 0;
+        bytes[2] = (byte) 17;
+        bytes[3] = (byte) 0xFF;
+        bytes[4] = (byte) 0x7E;
+        bytes[5] = (byte) 0X80;
+        for (int i = 0; i < weatherInfoList.size(); i++) {
+            WeatherInfo weatherInfo = weatherInfoList.get(i);
+            bytes[i*2+6] =(byte) (Integer.parseInt(weatherInfo.getWeatherType(),16));
+            bytes[i*2+7] =(byte) (weatherInfo.getTemperature());
+        }
+
         broadcastData(bytes);
     }
 

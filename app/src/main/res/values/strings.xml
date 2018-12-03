@@ -29,5 +29,6 @@
     <string name="one_button_measurement">一键测量</string>
     <string name="get_real_heartrate">连续心率手环获取实时心率</string>
     <string name="turn_off_real_heartrate">关闭 连续心率手环获取实时心率</string>
+    <string name="send_weather">发送天气</string>
 
 </resources>
