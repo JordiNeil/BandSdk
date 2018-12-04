@@ -2,11 +2,20 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
-    android:padding="20dp"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             android:padding="20dp"
     >
 <ImageView
+    android:id="@+id/pic"
     android:layout_width="240px"
     android:layout_height="240px"
     android:src="@mipmap/kobe"
     />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="发送"
+        app:layout_constraintTop_toBottomOf="@+id/pic"
+        android:onClick="sendPic"
+        />
 </android.support.constraint.ConstraintLayout>

@@ -399,9 +399,7 @@ public class BluetoothService extends Service {
             String action = intent.getAction();
             if (action.equals(ACTION_SEND_DATA_TO_BLE)) {//from commandManager
                 byte[] send_data = intent.getByteArrayExtra(EXTRA_SEND_DATA_TO_BLE);
-                Log.i(TAG, DataHandUtils.bytesToHexStr(send_data));
                 if (send_data != null) {
-                    Log.i(TAG, "from commandManager");
                     BLE_send_data_set(send_data, false);
                 }
 
@@ -770,7 +768,7 @@ public class BluetoothService extends Service {
                     break;
                 }
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(2);//控制发送数据间隔
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

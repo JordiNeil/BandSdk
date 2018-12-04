@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.wakeup.mylibrary.bean.WeatherInfo;
 import com.wakeup.mylibrary.service.BluetoothService;
+import com.wakeup.mylibrary.utils.CommonUtils;
 import com.wakeup.mylibrary.utils.DataHandUtils;
 
 import java.util.Calendar;
@@ -33,6 +34,7 @@ public class CommandManager {
         return instance;
 
     }
+
     /**
      * 震动手环
      */
@@ -93,6 +95,7 @@ public class CommandManager {
         bytes[5] = (byte) 0x80;
         broadcastData(bytes);
     }
+
     /**
      * 查看手环电量
      */
@@ -160,7 +163,7 @@ public class CommandManager {
 
     /**
      * 下拉同步数据(带有连续心率手环)
-     *
+     * <p>
      * Byte 7-11的时间值为APP发送给手环用来筛选需求的整点存储数据。
      * Byte 12-16的时间值为APP发送给手环用来筛选需求的心率存储数据。
      * 如2017/12/12 12:00，手环会将这时间之后的数据发送给APP
@@ -229,7 +232,7 @@ public class CommandManager {
         data[7] = (byte) ((year - 2000));
         data[8] = (byte) (month);
         data[9] = (byte) (day);
-        data[10] = (byte) (hour) ;
+        data[10] = (byte) (hour);
         data[11] = (byte) (minute);
         broadcastData(data);
     }
@@ -238,11 +241,10 @@ public class CommandManager {
      * 单次、实时测量
      *
      * @param status  心率：0X09(单次) 0X0A(实时)
-     *
+     *                <p>
      *                血氧：0X11(单次) 0X12(实时)
-     *
+     *                <p>
      *                血压：0X21(单次) 0X22(实时)
-     *
      * @param control 0关  1开
      */
     public void singleRealtimeMeasure(int status, int control) {
@@ -256,6 +258,7 @@ public class CommandManager {
         bytes[6] = (byte) control;
         broadcastData(bytes);
     }
+
     /**
      * 一键测量(一键测量的时间为1分钟，1分钟到后发一个关闭指令，手环会返回数据)
      *
@@ -272,11 +275,13 @@ public class CommandManager {
         bytes[6] = (byte) control;
         broadcastData(bytes);
     }
+
     /**
      * 实时获取心率
+     *
      * @param control 0关闭  1开启
      */
-    public void getRealTimeHeartRate(int control){
+    public void getRealTimeHeartRate(int control) {
         byte[] data = new byte[7];
         data[0] = (byte) 0xAB;
         data[1] = (byte) 0;
@@ -287,6 +292,7 @@ public class CommandManager {
         data[6] = (byte) control;
         broadcastData(data);
     }
+
     /**
      * 清除数据
      */
@@ -302,8 +308,6 @@ public class CommandManager {
         bytes[6] = (byte) 0x00;
         broadcastData(bytes);
     }
-
-
 
 
     /**
@@ -335,10 +339,10 @@ public class CommandManager {
     /**
      * 设置闹钟
      *
-     * @param id     闹钟id（最多开8个）
+     * @param id      闹钟id（最多开8个）
      * @param control 0：关闭闹钟提醒功能  1：开启闹钟提醒功能
-     * @param hour   闹钟提醒时间之小时
-     * @param minute 闹钟提醒时间之分钟
+     * @param hour    闹钟提醒时间之小时
+     * @param minute  闹钟提醒时间之分钟
      * @param repeat
      */
     public void setAlarmClock(int id, int control, int hour, int minute, int repeat) {
@@ -360,9 +364,9 @@ public class CommandManager {
     }
 
 
-
     /**
      * 发送用户信息给手环(适用于我司wearfit1.0的设备，具体情况请咨询我司固件开发人员)
+     *
      * @param stepLength
      * @param age
      * @param height
@@ -371,7 +375,7 @@ public class CommandManager {
      * @param goal
      */
     public void sendUserInfo(int stepLength, int age, int height, int weight,
-                              int distanceUnit, int goal) {
+                             int distanceUnit, int goal) {
 
         byte[] bytes = new byte[14];
         bytes[0] = (byte) 0xAB;
@@ -387,13 +391,14 @@ public class CommandManager {
         bytes[10] = (byte) 115;
         bytes[11] = (byte) 75;
         bytes[12] = (byte) distanceUnit;
-        bytes[13] = (byte) (goal/1000);
+        bytes[13] = (byte) (goal / 1000);
         broadcastData(bytes);
     }
 
 
     /**
      * 发送用户信息给手环(适用于我司wearfit2.0的设备，具体情况请咨询我司固件开发人员)
+     *
      * @param stepLength
      * @param age
      * @param height
@@ -416,14 +421,14 @@ public class CommandManager {
         bytes[8] = (byte) height;
         bytes[9] = (byte) weight;
         bytes[10] = (byte) distanceUnit;
-        bytes[11] = (byte) (goal/1000);
+        bytes[11] = (byte) (goal / 1000);
         broadcastData(bytes);
     }
 
     /**
      * 久坐提醒
      */
-    public void sedentary(int control,int startHour,int startMinute,int endHour,int endMinute,int interval){
+    public void sedentary(int control, int startHour, int startMinute, int endHour, int endMinute, int interval) {
         byte[] bytes = new byte[12];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -445,7 +450,7 @@ public class CommandManager {
     /**
      * 勿扰模式
      */
-    public void doNotDisturbModel(int control,int startHour,int startMinute,int endHour,int endMinute) {
+    public void doNotDisturbModel(int control, int startHour, int startMinute, int endHour, int endMinute) {
         byte[] bytes = new byte[11];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -551,13 +556,14 @@ public class CommandManager {
 
     /**
      * 睡眠范围设置
-     * @param control 0:关(关则为全天有效）1:开
+     *
+     * @param control     0:关(关则为全天有效）1:开
      * @param startHour
      * @param startMinute
      * @param endHour
      * @param endMinute
      */
-    public void sleepRange(int control,int startHour,int startMinute,int endHour,int endMinute ){
+    public void sleepRange(int control, int startHour, int startMinute, int endHour, int endMinute) {
         byte[] bytes = new byte[11];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -591,8 +597,6 @@ public class CommandManager {
     }
 
 
-
-
     /**
      * 挂断电话
      */
@@ -611,7 +615,7 @@ public class CommandManager {
      * 发送天气
      */
     public void sendWeatherInfo(List<WeatherInfo> weatherInfoList) {
-        Log.i(TAG,weatherInfoList.toString());
+        Log.i(TAG, weatherInfoList.toString());
         byte[] bytes = new byte[20];
         bytes[0] = (byte) 0xAB;
         bytes[1] = (byte) 0;
@@ -621,11 +625,50 @@ public class CommandManager {
         bytes[5] = (byte) 0X80;
         for (int i = 0; i < weatherInfoList.size(); i++) {
             WeatherInfo weatherInfo = weatherInfoList.get(i);
-            bytes[i*2+6] =(byte) (Integer.parseInt(weatherInfo.getWeatherType(),16));
-            bytes[i*2+7] =(byte) (weatherInfo.getTemperature());
+            bytes[i * 2 + 6] = (byte) (Integer.parseInt(weatherInfo.getWeatherType(), 16));
+            bytes[i * 2 + 7] = (byte) (weatherInfo.getTemperature());
         }
 
         broadcastData(bytes);
+    }
+
+    /**
+     * 开始发送图片
+     *
+     * @param dataLength
+     * @param req
+     * @param crc
+     * @param end
+     */
+    public void startSendPic(int dataLength, int req, int crc, int end) {
+        byte[] bytes = new byte[8];
+        bytes[0] = (byte) 0xAC;
+        bytes[1] = (byte) (dataLength / 256);
+        bytes[2] = (byte) (dataLength % 256);
+        bytes[3] = (byte) (req / 256);
+        bytes[4] = (byte) (req % 256);
+        bytes[5] = (byte) (crc / 256);
+        bytes[6] = (byte) (crc % 256);
+        bytes[7] = (byte) (end);
+        broadcastData(bytes);
+
+    }
+
+    /**
+     * 发送图片信息
+     *
+     * @param dataID
+     * @param data
+     */
+    public void sendImageContent(int dataID, byte[] data) {
+        int length = data.length;
+        byte[] bytes = new byte[4];
+        bytes[0] = (byte) 0xAD;
+        bytes[1] = (byte) (length + 2);
+        bytes[2] = (byte) (dataID / 256);
+        bytes[3] = (byte) (dataID % 256);
+        byte[] bytes2 = CommonUtils.addBytes(bytes, data);
+        broadcastData(bytes2);
     }
 
     /**

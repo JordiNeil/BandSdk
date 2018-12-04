@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private DataParse dataPasrse;
     private BandInfo bandInfo;
     //测试发送天气，初始化7天天气。
-    private String[] weatherType = new String[]{"0","1","2","3","4","5","6","7"};
-    private String[] weatherType1 = new String[]{"0","1"};
+    private String[] weatherType = new String[]{"0", "1", "2", "3", "4", "5", "6", "7"};
+    private String[] weatherType1 = new String[]{"0", "1"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     private String getWeatherInfo() {
         int i = new Random().nextInt(weatherType.length);
         int i1 = new Random().nextInt(weatherType1.length);
-        return weatherType[i]+weatherType1[i1];
+        return weatherType[i] + weatherType1[i1];
     }
 
     //Code to manage Service lifecycle
@@ -400,7 +400,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
-
                 if (combine) {
                     byte[] combined = new byte[templeBytes.length + txValue.length];
                     System.arraycopy(templeBytes, 0, combined, 0, templeBytes.length);
@@ -413,7 +412,6 @@ public class MainActivity extends AppCompatActivity {
                         //返回整点数据
                         HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(combineList);
                         Log.i(TAG, hourlyMeasureDataBean.toString());
-
 
 
                         //拼接完成 重置状态
@@ -497,6 +495,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 开启整点测量
+     *
      * @param view
      */
     public void openMeasure(View view) {
@@ -505,6 +504,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 清除手环数据
+     *
      * @param view
      */
     public void clearData(View view) {
@@ -513,26 +513,28 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 发送消息
+     *
      * @param view
      */
     public void sendMessage(View view) {
         //以QQ消息为例，可以传入不同的MessageID  例如MessageID.WECHAT
-        commandManager.sendMessage(MessageID.QQ,MessageType.COMING_MESSAGES,"测试消息通知");
+        commandManager.sendMessage(MessageID.QQ, MessageType.COMING_MESSAGES, "测试消息通知");
     }
 
     public void openMessage(View view) {
-        commandManager.sendMessage(MessageID.QQ,MessageType.ON,null);
+        commandManager.sendMessage(MessageID.QQ, MessageType.ON, null);
 
     }
 
 
     /**
      * 设置闹钟
+     *
      * @param view
      */
     public void alarm_clock(View view) {
         //闹钟id 为0 开启18:00闹钟，只响一次
-        commandManager.setAlarmClock(0,1,18,0,Constants.ALARM_CLOCK_TYPE1);
+        commandManager.setAlarmClock(0, 1, 18, 0, Constants.ALARM_CLOCK_TYPE1);
 
 //        //闹钟id 为1 开启06:30闹钟，周一至周五
 //        commandManager.setAlarmClock(1,1,6,30,Constants.ALARM_CLOCK_TYPE2);
@@ -543,6 +545,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 一键测量   一键测量的时间1分钟 一分钟之后发送关闭的指令  才会有测量结果返回
+     *
      * @param view
      */
     public void one_button_measurement(View view) {
@@ -555,20 +558,22 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 单次测量(以心率为例) 单次测量的时间45s 45s之后发送关闭的指令  才会有测量结果返回
+     *
      * @param view
      */
     public void single_heartRate(View view) {
-        commandManager.singleRealtimeMeasure(0X09,1);
+        commandManager.singleRealtimeMeasure(0X09, 1);
 
         //       commandManager.singleRealtimeMeasure(0X09,0); 关闭单次测量
     }
 
     /**
      * 实时测量(以心率为例)
+     *
      * @param view
      */
     public void real_time_heartRate(View view) {
-        commandManager.singleRealtimeMeasure(0X0A,1);
+        commandManager.singleRealtimeMeasure(0X0A, 1);
 
 //        commandManager.singleRealtimeMeasure(0X0A,0); 关闭实时测量
 
@@ -582,13 +587,16 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 连续心率手环获取实时心率
+     *
      * @param view
      */
     public void real_time_heartRate2_1(View view) {
         commandManager.getRealTimeHeartRate(1);
     }
+
     /**
      * 关闭 连续心率手环获取实时心率
+     *
      * @param view
      */
     public void real_time_heartRate2_0(View view) {
@@ -598,12 +606,13 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 发送天气
+     *
      * @param view
      */
     public void sendWeather(View view) {
         List<WeatherInfo> weatherInfoList = new ArrayList<>();
         for (int j = 0; j < 7; j++) {
-            weatherInfoList.add(new WeatherInfo(getWeatherInfo(),getTemperature()));
+            weatherInfoList.add(new WeatherInfo(getWeatherInfo(), getTemperature()));
         }
         TextView weatherTx = findViewById(R.id.weather);
         weatherTx.setText(weatherInfoList.toString());
@@ -612,9 +621,10 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 发送图片
+     *
      * @param view
      */
     public void sendPic(View view) {
-        startActivity(new Intent(MainActivity.this,SendPicActivity.class));
+        startActivity(new Intent(MainActivity.this, SendPicActivity.class));
     }
 }
