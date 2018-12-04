@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.wakeup.bandsdk.R;
 import com.wakeup.mylibrary.command.CommandManager;
@@ -28,12 +29,14 @@ public class SendPicActivity extends AppCompatActivity {
     private CommandManager commandManager;
     private List<List<String>> sourceList;
     private int req;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_pic);
         commandManager = CommandManager.getInstance(this);
+        progressBar = findViewById(R.id.progressBar2);
 
 
     }
@@ -164,12 +167,7 @@ public class SendPicActivity extends AppCompatActivity {
     }
 
     private void handleSendPic() {
-//        try {
-//            Thread.sleep(30);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
+        progressBar.setProgress((int) ((100 * req / 113f)));
         //根据sourList 和 req 得到当前应该发送的数据1024个
         byte[] byteArray = getByteArray(sourceList, req);
 
@@ -183,7 +181,7 @@ public class SendPicActivity extends AppCompatActivity {
         //每1024字节64个包，其中第一个包的id为 req*64
         int firstId = req * (1024 / 16);
 
-        if (byteArray.length==1024){
+        if (byteArray.length == 1024) {
             //发送开始的指令
             commandManager.startSendPic(dataLength, req, crc, 0);
             byte[] data;
@@ -193,11 +191,11 @@ public class SendPicActivity extends AppCompatActivity {
                 commandManager.sendImageContent(firstId, data);
                 firstId++;
             }
-        }else {
+        } else {
             //最后一个包 512个字节
             //发送开始的指令
             commandManager.startSendPic(dataLength, req, crc, 1);
-            Log.i(TAG,"最后一个包的长度："+byteArray.length);
+            Log.i(TAG, "最后一个包的长度：" + byteArray.length);
             byte[] data;
             for (int i = 0; i < 32; i++) {
                 data = new byte[16];
@@ -209,6 +207,7 @@ public class SendPicActivity extends AppCompatActivity {
         }
 
     }
+
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         /**拼接包的长度**/
         private int combineSize;
@@ -225,7 +224,6 @@ public class SendPicActivity extends AppCompatActivity {
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
-
 
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
@@ -245,15 +243,16 @@ public class SendPicActivity extends AppCompatActivity {
                     buffer.append(datas.get(2));
                     buffer.append(datas.get(3));
                     req = Integer.parseInt(buffer.toString());
-                    Log.i(TAG,"req:"+req);
+                    Log.i(TAG, "req:" + req);
                     if (datas.get(4) == 0) {
                         //继续请求数据
-                        Log.i(TAG,"继续请求数据");
+                        Log.i(TAG, "继续请求数据");
                         handleSendPic();
 
                     } else if (datas.get(4) == 1) {
                         //结束发送数据
-                        Log.i(TAG,"结束发送数据");
+                        Log.i(TAG, "结束发送数据");
+                        req = 0;
                     }
 
 
@@ -263,6 +262,7 @@ public class SendPicActivity extends AppCompatActivity {
             }
         }
     };
+
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothService.ACTION_GATT_CONNECTED);
@@ -271,6 +271,7 @@ public class SendPicActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothService.ACTION_DATA_AVAILABLE);
         return intentFilter;
     }
+
     @Override
     protected void onResume() {
         super.onResume();

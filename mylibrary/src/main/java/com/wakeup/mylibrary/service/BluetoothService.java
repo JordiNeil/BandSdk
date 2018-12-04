@@ -274,7 +274,7 @@ public class BluetoothService extends Service {
             final boolean notifications = cccd == null || cccd.getValue() == null || cccd.getValue().length != 2 || cccd.getValue()[0] == 0x01;
 
             if (notifications) {
-                Log.i(TAG, "Notification received from " + characteristic.getUuid() + ", value: " + data);
+//                Log.i(TAG, "Notification received from " + characteristic.getUuid() + ", value: " + data);
                 //发送广播
                 broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
                 //汉天下
