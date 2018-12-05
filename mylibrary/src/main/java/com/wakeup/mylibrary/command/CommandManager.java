@@ -641,6 +641,7 @@ public class CommandManager {
      * @param end
      */
     public void startSendPic(int dataLength, int req, int crc, int end) {
+        Log.i(TAG,"startSendPic");
         byte[] bytes = new byte[8];
         bytes[0] = (byte) 0xAC;
         bytes[1] = (byte) (dataLength / 256);
@@ -661,6 +662,7 @@ public class CommandManager {
      * @param data
      */
     public void sendImageContent(int dataID, byte[] data) {
+        Log.i(TAG,"sendImageContent");
         int length = data.length;
         byte[] bytes = new byte[4];
         bytes[0] = (byte) 0xAD;

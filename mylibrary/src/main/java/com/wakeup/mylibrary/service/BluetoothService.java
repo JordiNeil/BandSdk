@@ -400,7 +400,12 @@ public class BluetoothService extends Service {
             if (action.equals(ACTION_SEND_DATA_TO_BLE)) {//from commandManager
                 byte[] send_data = intent.getByteArrayExtra(EXTRA_SEND_DATA_TO_BLE);
                 if (send_data != null) {
-                    BLE_send_data_set(send_data, false);
+//                    if (send_data.length<=20) {
+//                        writeCharacteristic(send_data);
+//                    }else {
+                        BLE_send_data_set(send_data, false);
+
+//                    }
                 }
 
                 //发送数据
@@ -409,6 +414,81 @@ public class BluetoothService extends Service {
             }
         }
     };
+
+
+    /**
+     *发送蓝牙数据
+     * @param send_data
+     */
+    private void writeCharacteristic(byte[] send_data) {
+        if (mBluetoothGatt!=null) {
+            BluetoothGattService service = mBluetoothGatt.getService(SERVICE_UUID);
+            BluetoothGattCharacteristic mCH = service.getCharacteristic(RX_CHARACTERISTIC_UUID);
+            mCH.setValue(send_data);
+            boolean b = mBluetoothGatt.writeCharacteristic(mCH);
+            Log.d(TAG, "write TXchar - status=" + b + DataHandUtils.bytesToHexStr(send_data));
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }else {
+            Log.e(TAG,"mBluetoothGatt 空");
+        }
+
+
+    }
+    /**
+     * 汉天下
+     *
+     * @param characteristic
+     * @return
+     */
+    public boolean writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+        try {
+            write_characer_lock.acquire(1);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        if (mBluetoothGatt == null) {
+            Log.i(TAG, "mBluetoothGatt == null");
+            return false;
+        }
+        boolean b = mBluetoothGatt.writeCharacteristic(characteristic);
+        Log.i(TAG, "汉天下 writeCharacteristic: " + b);
+
+        return b;
+    }
+
+
+    /**
+     * 向蓝牙设备写入字节数据
+     *
+     * @param value
+     */
+    public boolean writeRXCharacteristic(byte[] value) {
+//        Log.i(TAG, "writeRXCharacteristic: " + value.length);
+        if (mRXCharacteristic == null) {
+            Log.e(TAG, " mRXCharacteristic==null");
+            return false;
+        }
+
+        mRXCharacteristic.setValue(value);
+        //如果设置WRITE_TYPE_DEFAULT 需要回应。 第一个包发送成功，后面所有的包都发送失败。
+//        mRXCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+        mRXCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+        if (mBluetoothGatt == null) {
+            Log.e(TAG, "mBluetoothGatt == null");
+            return false;
+        }
+        boolean status = mBluetoothGatt.writeCharacteristic(mRXCharacteristic);
+
+        Log.d(TAG, "write TXchar - status=" + status + DataHandUtils.bytesToHexStr(value));
+        return status;
+
+    }
 
     private boolean internalEnableNotifications(final BluetoothGattCharacteristic characteristic) {
         final BluetoothGatt gatt = mBluetoothGatt;
@@ -549,28 +629,6 @@ public class BluetoothService extends Service {
         return true;
     }
 
-    /**
-     * 汉天下
-     *
-     * @param characteristic
-     * @return
-     */
-    public boolean writeCharacteristic(BluetoothGattCharacteristic characteristic) {
-        try {
-            write_characer_lock.acquire(1);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        if (mBluetoothGatt == null) {
-            Log.i(TAG, "mBluetoothGatt == null");
-            return false;
-        }
-        boolean b = mBluetoothGatt.writeCharacteristic(characteristic);
-        Log.i(TAG, "汉天下 writeCharacteristic: " + b);
-
-        return b;
-    }
 
     /**
      * 汉天下
@@ -768,7 +826,7 @@ public class BluetoothService extends Service {
                     break;
                 }
                 try {
-                    Thread.sleep(2);//控制发送数据间隔
+                    Thread.sleep(10);//控制发送数据间隔
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -814,31 +872,6 @@ public class BluetoothService extends Service {
         return;
     }
 
-    /**
-     * 向蓝牙设备写入字节数据
-     *
-     * @param value
-     */
-    public boolean writeRXCharacteristic(byte[] value) {
-//        Log.i(TAG, "writeRXCharacteristic: " + value.length);
-        if (mRXCharacteristic == null) {
-            Log.e(TAG, " mRXCharacteristic==null");
-            return false;
-        }
-
-        mRXCharacteristic.setValue(value);
-        //如果设置WRITE_TYPE_DEFAULT 需要回应。 第一个包发送成功，后面所有的包都发送失败。
-//        mRXCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        if (mBluetoothGatt == null) {
-            Log.e(TAG, "mBluetoothGatt == null");
-            return false;
-        }
-        boolean status = mBluetoothGatt.writeCharacteristic(mRXCharacteristic);
-
-        Log.d(TAG, "write TXchar - status=" + status + DataHandUtils.bytesToHexStr(value));
-        return status;
-
-    }
 
     /**
      * @brief enableTXNotification
