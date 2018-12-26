@@ -304,7 +304,7 @@ public class DataParse {
             bloodOxygenBean.setBloodOxygen(bloodOxygen);
             bloodOxygenBean.setTimeInMillis(timeInMillis);
             bloodOxygenBean.setType(0);
-            object = bloodOxygen;
+            object = bloodOxygenBean;
 
 
         } else if (datas.get(5) == 0x14) {
