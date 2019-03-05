@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -27,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wakeup.bandsdk.activity.DeviceScanActivity;
-import com.wakeup.bandsdk.activity.SendPicActivity;
 import com.wakeup.mylibrary.Config;
 import com.wakeup.mylibrary.bean.BandInfo;
 import com.wakeup.mylibrary.bean.Battery;
@@ -38,7 +36,6 @@ import com.wakeup.mylibrary.bean.HeartRateBean;
 import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
 import com.wakeup.mylibrary.bean.OneButtonMeasurementBean;
 import com.wakeup.mylibrary.bean.SleepData;
-import com.wakeup.mylibrary.bean.WeatherInfo;
 import com.wakeup.mylibrary.command.CommandManager;
 import com.wakeup.mylibrary.constants.Constants;
 import com.wakeup.mylibrary.constants.MessageID;
@@ -67,9 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private CommandManager commandManager;
     private DataParse dataPasrse;
     private BandInfo bandInfo;
-    //测试发送天气，初始化7天天气。
-    private String[] weatherType = new String[]{"0", "1", "2", "3", "4", "5", "6", "7"};
-    private String[] weatherType1 = new String[]{"0", "1"};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,18 +98,6 @@ public class MainActivity extends AppCompatActivity {
 
         dataPasrse = DataParse.getInstance();
 
-    }
-
-    private int getTemperature() {
-        int temperature = (new Random().nextInt(35));
-        return temperature;
-    }
-
-    @NonNull
-    private String getWeatherInfo() {
-        int i = new Random().nextInt(weatherType.length);
-        int i1 = new Random().nextInt(weatherType1.length);
-        return weatherType[i] + weatherType1[i1];
     }
 
     //Code to manage Service lifecycle
@@ -216,6 +199,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) {
+            return;
+        }
         if (requestCode == REQUEST_SEARCH && resultCode == RESULT_OK) {
             address = data.getStringExtra("address");
             String name = data.getStringExtra("name");
@@ -324,10 +310,9 @@ public class MainActivity extends AppCompatActivity {
                                     break;
 
                                 case 0x20:
-                                    //如果是遇到整点数据第一个包，接下来的一个包就要拼接到前一个包上面
-                                    combineSize = 26;//两个包的总长度20+6
-                                    //开始拼接
-                                    combine = true;
+                                    //返回整点数据
+                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, hourlyMeasureDataBean.toString());
                                     break;
 
 
@@ -398,34 +383,6 @@ public class MainActivity extends AppCompatActivity {
                             break;
                     }
                 }
-
-
-                if (combine) {
-                    byte[] combined = new byte[templeBytes.length + txValue.length];
-                    System.arraycopy(templeBytes, 0, combined, 0, templeBytes.length);
-                    System.arraycopy(txValue, 0, combined, templeBytes.length, txValue.length);
-                    templeBytes = combined;
-
-                    if (combined.length == combineSize) {
-                        List<Integer> combineList = DataHandUtils.bytesToArrayList(combined);
-
-                        //返回整点数据
-                        HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(combineList);
-                        Log.i(TAG, hourlyMeasureDataBean.toString());
-
-
-                        //拼接完成 重置状态
-                        combine = false;
-                        //临时数组置空
-                        templeBytes = new byte[0];
-                    }
-
-
-                }
-
-
-
-
 
             }
         }
@@ -604,27 +561,4 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * 发送天气
-     *
-     * @param view
-     */
-    public void sendWeather(View view) {
-        List<WeatherInfo> weatherInfoList = new ArrayList<>();
-        for (int j = 0; j < 7; j++) {
-            weatherInfoList.add(new WeatherInfo(getWeatherInfo(), getTemperature()));
-        }
-        TextView weatherTx = findViewById(R.id.weather);
-        weatherTx.setText(weatherInfoList.toString());
-        commandManager.sendWeatherInfo(weatherInfoList);
-    }
-
-    /**
-     * 发送图片
-     *
-     * @param view
-     */
-    public void sendPic(View view) {
-        startActivity(new Intent(MainActivity.this, SendPicActivity.class));
-    }
 }
