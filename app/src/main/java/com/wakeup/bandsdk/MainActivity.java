@@ -485,14 +485,14 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void alarm_clock(View view) {
-        //闹钟id 为0 开启18:00闹钟，只响一次
-        commandManager.setAlarmClock(0, 1, 10, 0, Constants.ALARM_CLOCK_TYPE1);
+        //闹钟id 为0 开启18:01闹钟，只响一次
+        commandManager.setAlarmClock(0, 1, 18, 1, Constants.ALARM_CLOCK_TYPE1);
 
 //        //闹钟id 为1 开启06:30闹钟，周一至周五
 //        commandManager.setAlarmClock(1,1,6,30,Constants.ALARM_CLOCK_TYPE2);
 //
-//        //闹钟id 为2 开启08:00，每天
-//        commandManager.setAlarmClock(2,1,8,0,Constants.ALARM_CLOCK_TYPE3);
+//        //闹钟id 为2 开启08:03，每天
+//        commandManager.setAlarmClock(2,1,8,3,Constants.ALARM_CLOCK_TYPE3);
     }
 
     /**
