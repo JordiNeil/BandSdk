@@ -227,12 +227,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-        /**拼接包的长度**/
-        private int combineSize;
-        /**开始拼接包**/
-        private boolean combine;
-        /**临时包**/
-        private byte[] templeBytes = new byte[0];
+
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -491,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void alarm_clock(View view) {
         //闹钟id 为0 开启18:00闹钟，只响一次
-        commandManager.setAlarmClock(0, 1, 18, 0, Constants.ALARM_CLOCK_TYPE1);
+        commandManager.setAlarmClock(0, 1, 10, 0, Constants.ALARM_CLOCK_TYPE1);
 
 //        //闹钟id 为1 开启06:30闹钟，周一至周五
 //        commandManager.setAlarmClock(1,1,6,30,Constants.ALARM_CLOCK_TYPE2);

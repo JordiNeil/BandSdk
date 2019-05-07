@@ -12,9 +12,7 @@ public class HourlyMeasureDataBean {
     private int bloodOxygen;
     private int bloodPressure_high;
     private int bloodPressure_low;
-    private int shallowSleep;
-    private int deepSleep;
-    private int wakeupTimes;
+
 
     private long timeInMillis;
 
@@ -67,29 +65,7 @@ public class HourlyMeasureDataBean {
         this.bloodPressure_low = bloodPressure_low;
     }
 
-    public int getShallowSleep() {
-        return shallowSleep;
-    }
 
-    public void setShallowSleep(int shallowSleep) {
-        this.shallowSleep = shallowSleep;
-    }
-
-    public int getDeepSleep() {
-        return deepSleep;
-    }
-
-    public void setDeepSleep(int deepSleep) {
-        this.deepSleep = deepSleep;
-    }
-
-    public int getWakeupTimes() {
-        return wakeupTimes;
-    }
-
-    public void setWakeupTimes(int wakeupTimes) {
-        this.wakeupTimes = wakeupTimes;
-    }
 
     public long getTimeInMillis() {
         return timeInMillis;
@@ -108,9 +84,6 @@ public class HourlyMeasureDataBean {
                 ", bloodOxygen=" + bloodOxygen +
                 ", bloodPressure_high=" + bloodPressure_high +
                 ", bloodPressure_low=" + bloodPressure_low +
-                ", shallowSleep=" + shallowSleep +
-                ", deepSleep=" + deepSleep +
-                ", wakeupTimes=" + wakeupTimes +
                 ", timeInMillis=" + CommonUtils.toStrTime(timeInMillis) +
                 '}';
     }
