@@ -342,12 +342,12 @@ public class DataParse {
             hourlyMeasureDataBean.setBloodPressure_low(bloodPressure_low);
             hourlyMeasureDataBean.setTimeInMillis(timeInMillis + 3600 * 1000);//整点数据时间加一个小时
 
-            int shallowSleep = datas.get(21) * 60 + datas.get(22);
-            int deepSleep = datas.get(23) * 60 + datas.get(24);
-            int wakeupTimes = datas.get(25);
-            hourlyMeasureDataBean.setShallowSleep(shallowSleep);
-            hourlyMeasureDataBean.setDeepSleep(deepSleep);
-            hourlyMeasureDataBean.setWakeupTimes(wakeupTimes);
+//            int shallowSleep = datas.get(21) * 60 + datas.get(22);
+//            int deepSleep = datas.get(23) * 60 + datas.get(24);
+//            int wakeupTimes = datas.get(25);
+//            hourlyMeasureDataBean.setShallowSleep(shallowSleep);
+//            hourlyMeasureDataBean.setDeepSleep(deepSleep);
+//            hourlyMeasureDataBean.setWakeupTimes(wakeupTimes);
 
 
             object = hourlyMeasureDataBean;

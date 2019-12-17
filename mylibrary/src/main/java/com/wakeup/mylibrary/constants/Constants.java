@@ -2,15 +2,15 @@ package com.wakeup.mylibrary.constants;
 
 public class Constants {
     /**
-     * 只响一次
+     * 只响一次 repeat once
      */
-    public static final int ALARM_CLOCK_TYPE1 = Integer.parseInt("10000000",2);
+    public static final int ALARM_CLOCK_TYPE1 = 0b10000000;
     /**
-     * 周一至周五
+     * 周一至周五 from monday to friday
      */
-    public static final int ALARM_CLOCK_TYPE2 = Integer.parseInt("00011111",2);
+    public static final int ALARM_CLOCK_TYPE2 = 0b00011111;
     /**
-     * 每天
+     * 每天 repeat daily
      */
-    public static final int ALARM_CLOCK_TYPE3 = Integer.parseInt("01111111",2);
+    public static final int ALARM_CLOCK_TYPE3 = 0b01111111;
 }
