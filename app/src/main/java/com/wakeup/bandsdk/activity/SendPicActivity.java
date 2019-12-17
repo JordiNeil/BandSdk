@@ -184,6 +184,14 @@ public class SendPicActivity extends AppCompatActivity {
         if (byteArray.length == 1024) {
             //发送开始的指令
             commandManager.startSendPic(dataLength, req, crc, 0);
+            if (req == 0){
+                Log.i(TAG,"req: "+"sleep 3s");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             byte[] data;
             for (int i = 0; i < 64; i++) {
                 data = new byte[16];
@@ -238,7 +246,7 @@ public class SendPicActivity extends AppCompatActivity {
                     return;
                 }
                 //处理屏保返回的数据
-                if (datas.get(0) == 0xAC) {
+                if (datas.get(0) == 0xAD) {
                     StringBuffer buffer = new StringBuffer();
                     buffer.append(datas.get(2));
                     buffer.append(datas.get(3));
