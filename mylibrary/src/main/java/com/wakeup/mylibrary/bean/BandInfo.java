@@ -13,6 +13,10 @@ public class BandInfo {
     private boolean hasHeartWarn;
     private boolean nordic;
     private boolean needPhoneSerialNumber;
+    //是否有体温
+    private boolean hasTiwen;
+    //是否有连续体温
+    private boolean hasLianxuTiwen;
 
 
     /**
@@ -172,6 +176,22 @@ public class BandInfo {
         this.moreMessage = moreMessage;
     }
 
+    public boolean isHasTiwen() {
+        return hasTiwen;
+    }
+
+    public void setHasTiwen(boolean hasTiwen) {
+        this.hasTiwen = hasTiwen;
+    }
+
+    public boolean isHasLianxuTiwen() {
+        return hasLianxuTiwen;
+    }
+
+    public void setHasLianxuTiwen(boolean hasLianxuTiwen) {
+        this.hasLianxuTiwen = hasLianxuTiwen;
+    }
+
     @Override
     public String toString() {
         return "BandInfo{" +
@@ -191,6 +211,8 @@ public class BandInfo {
                 ", heartRateSaveBattery=" + heartRateSaveBattery +
                 ", heartRateHongwai=" + heartRateHongwai +
                 ", moreMessage=" + moreMessage +
+                ", hasTiwen=" + hasTiwen +
+                ", hasLianxuTiwen=" + hasLianxuTiwen +
                 '}';
     }
 }

@@ -51,15 +51,17 @@ public class DataParse {
                     BandInfo bandInfo = new BandInfo();
                     bandInfo.setFirmwareVersionCode(datas.get(6) + (float) datas.get(7) / 100);
                     bandInfo.setBandVersionCode(datas.get(8));
+                    if (datas.size() > 15) {
+                        int type = datas.get(15);
+                        bandInfo.setCanSetStepLength(((type >> 0) & 0x01) == 0);
+                        bandInfo.setCanSetSleepTime(((type >> 1) & 0x01) == 0);
+                        bandInfo.setCanSet12Hours(((type >> 2) & 0x01) == 0);
+                        bandInfo.setHasWeixinSport(((type >> 3) & 0x01) == 0);
+                        bandInfo.setHasHeartWarn(((type >> 4) & 0x01) == 1);
+                        bandInfo.setNordic(((type >> 5) & 0x01) == 0);
+                        bandInfo.setNeedPhoneSerialNumber(((type >> 6) & 0x01) == 1);
+                    }
 
-                    int type = datas.get(15);
-                    bandInfo.setCanSetStepLength(((type >> 0) & 0x01) == 0);
-                    bandInfo.setCanSetSleepTime(((type >> 1) & 0x01) == 0);
-                    bandInfo.setCanSet12Hours(((type >> 2) & 0x01) == 0);
-                    bandInfo.setHasWeixinSport(((type >> 3) & 0x01) == 0);
-                    bandInfo.setHasHeartWarn(((type >> 4) & 0x01) == 1);
-                    bandInfo.setNordic(((type >> 5) & 0x01) == 0);
-                    bandInfo.setNeedPhoneSerialNumber(((type >> 6) & 0x01) == 1);
 
                     //长度超过16字节
                     if (datas.size() > 16) {
@@ -97,7 +99,20 @@ public class DataParse {
                     object = bandInfo;
 
                     break;
-
+                case 0x9B:
+                    BandInfo bandInfo1 = new BandInfo();
+                    //判断有没有体温，免疫力
+                    int a = datas.get(5);
+                    //bit0 判断免疫力功能
+                    boolean hasMianyi = (a & 0x01) == 0x01;
+                    //bit1 判断体温功能
+                    boolean hasTiWen = (a & 0x02) == 0x02;
+                    //bit2 判断连续体温功能
+                    boolean hasNewTiWen = (a & 0x04) == 0x04;
+                    bandInfo1.setHasTiwen(hasTiWen);
+                    bandInfo1.setHasLianxuTiwen(hasNewTiWen);
+                    object = bandInfo1;
+                    break;
 
                 case 0x51:
 
