@@ -31,9 +31,11 @@ import com.wakeup.mylibrary.bean.BandInfo;
 import com.wakeup.mylibrary.bean.Battery;
 import com.wakeup.mylibrary.bean.BloodOxygenBean;
 import com.wakeup.mylibrary.bean.BloodPressureBean;
+import com.wakeup.mylibrary.bean.BodyTempBean;
 import com.wakeup.mylibrary.bean.CurrentDataBean;
 import com.wakeup.mylibrary.bean.HeartRateBean;
 import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
+import com.wakeup.mylibrary.bean.MianyiBean;
 import com.wakeup.mylibrary.bean.OneButtonMeasurementBean;
 import com.wakeup.mylibrary.bean.SleepData;
 import com.wakeup.mylibrary.command.CommandManager;
@@ -45,9 +47,7 @@ import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -309,7 +309,30 @@ public class MainActivity extends AppCompatActivity {
                                     HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, hourlyMeasureDataBean.toString());
                                     break;
+                                case 0x21:
+                                    //返回整点数据
+                                    Object data = dataPasrse.parseData(datas);
+                                    if (data instanceof MianyiBean) {
+                                        MianyiBean mianyiBean = (MianyiBean) data;
+                                        Log.i(TAG, mianyiBean.toString());
+                                    } else if (data instanceof BodyTempBean) {
+                                        BodyTempBean bodyTempBean = (BodyTempBean) data;
+                                        Log.i(TAG, bodyTempBean.toString());
+                                    }
 
+                                    break;
+
+                                case 0x13:
+                                    //返回单机测量体温
+                                    BodyTempBean bodyTempBean = (BodyTempBean) data;
+                                    Log.i(TAG, bodyTempBean.toString());
+                                    break;
+
+                                case 0x18:
+                                    //返回单机测量免疫力
+                                    MianyiBean mianyiBean = (MianyiBean) data;
+                                    Log.i(TAG, mianyiBean.toString());
+                                    break;
 
                             }
 
@@ -355,6 +378,17 @@ public class MainActivity extends AppCompatActivity {
                                     //血压（实时）
                                     BloodPressureBean bloodPressureBean1 = (BloodPressureBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bloodPressureBean1.toString());
+
+                                    break;
+                                case 0x81:
+                                    //单次测量体温
+                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bodyTempBean.toString());
+                                    break;
+                                case 0x41:
+                                    //单次测量免疫力
+                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, mianyiBean.toString());
 
                                     break;
                             }

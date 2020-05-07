@@ -259,6 +259,29 @@ public class DataParse {
 
                             object = bloodPressureBean1;
                             break;
+
+                        case 0x81:
+                            //体温 单次测量
+                            int bodyTemp1 = datas.get(6);
+                            int bodyTemp2 = datas.get(7);
+                            if (bodyTemp1 != 0) {
+                                BodyTempBean bodyTempBean = new BodyTempBean(bodyTemp1 + (bodyTemp2 / 10f),
+                                        System.currentTimeMillis());
+                                object = bodyTempBean;
+
+                            }
+
+                            break;
+
+                        case 0x41:
+                            //免疫 单次测量
+                            int mianYi = datas.get(6);
+                            if (mianYi!=0){
+                                MianyiBean mianyiBean = new MianyiBean(mianYi, System.currentTimeMillis());
+                                object = mianyiBean;
+
+                            }
+                            break;
                     }
 
 
