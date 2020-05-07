@@ -402,10 +402,6 @@ public class DataParse {
 
         }else if (datas.get(5) == 0x13) {
             //体温单机测量数据
-
-
-
-
             int bodyTemp1 = datas.get(11);
             int bodyTemp2 = datas.get(12);
             if (bodyTemp1 != 0) {
@@ -423,7 +419,7 @@ public class DataParse {
 
             }
         } else if (datas.get(5) == 0x21) {
-            //整点测量体温和免疫力
+            //体温和免疫力 整点数据
             int year = datas.get(6) + 2000;
             int month = datas.get(7);
             int day = datas.get(8);
@@ -444,7 +440,7 @@ public class DataParse {
             int bodyTemp2 = datas.get(12);
             if (bodyTemp1 != 0) {
                 BodyTempBean bodyTempBean = new BodyTempBean(bodyTemp1 + (bodyTemp2 / 10f),
-                        timeInMillis);
+                        timeInMillis1);
                 object = bodyTempBean;
             }
 
