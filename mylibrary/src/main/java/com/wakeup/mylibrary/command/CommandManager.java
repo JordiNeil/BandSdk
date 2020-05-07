@@ -241,10 +241,10 @@ public class CommandManager {
      * 单次、实时测量
      *
      * @param status  心率：0X09(单次) 0X0A(实时)
-     *                <p>
      *                血氧：0X11(单次) 0X12(实时)
-     *                <p>
      *                血压：0X21(单次) 0X22(实时)
+     *                体温：0x81(单次)
+     *                免疫值：0x41(单次)
      * @param control 0关  1开
      */
     public void singleRealtimeMeasure(int status, int control) {

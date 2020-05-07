@@ -7,6 +7,7 @@ import com.wakeup.mylibrary.bean.Battery;
 import com.wakeup.mylibrary.bean.BloodOxygenBean;
 import com.wakeup.mylibrary.bean.BloodPressureBean;
 import com.wakeup.mylibrary.bean.BodyTempBean;
+import com.wakeup.mylibrary.bean.BodytempAndMianyiBean;
 import com.wakeup.mylibrary.bean.CurrentDataBean;
 import com.wakeup.mylibrary.bean.HeartRateBean;
 import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
@@ -451,20 +452,13 @@ public class DataParse {
                     String.format("%02d", day) + String.format("%02d", hour) + 00);
 
 
-            int data = datas.get(10);
-            if (data != 0) {
-                MianyiBean mianyiBean = new MianyiBean((float) data,
-                        timeInMillis1);
-                object = mianyiBean;
-            }
-
-
+            int mianyi = datas.get(10);
             int bodyTemp1 = datas.get(11);
             int bodyTemp2 = datas.get(12);
-            if (bodyTemp1 != 0) {
-                BodyTempBean bodyTempBean = new BodyTempBean(bodyTemp1 + (bodyTemp2 / 10f),
-                        timeInMillis1);
-                object = bodyTempBean;
+            if (bodyTemp1 != 0 || mianyi!=0) {
+                BodytempAndMianyiBean bodytempAndMianyiBean = new BodytempAndMianyiBean(bodyTemp1 + (bodyTemp2 / 10f),
+                        (float) mianyi,timeInMillis1);
+                object = bodytempAndMianyiBean;
             }
 
 

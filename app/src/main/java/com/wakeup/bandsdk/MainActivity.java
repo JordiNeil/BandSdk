@@ -32,6 +32,7 @@ import com.wakeup.mylibrary.bean.Battery;
 import com.wakeup.mylibrary.bean.BloodOxygenBean;
 import com.wakeup.mylibrary.bean.BloodPressureBean;
 import com.wakeup.mylibrary.bean.BodyTempBean;
+import com.wakeup.mylibrary.bean.BodytempAndMianyiBean;
 import com.wakeup.mylibrary.bean.CurrentDataBean;
 import com.wakeup.mylibrary.bean.HeartRateBean;
 import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
@@ -311,26 +312,19 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 case 0x21:
                                     //返回整点数据
-                                    Object data = dataPasrse.parseData(datas);
-                                    if (data instanceof MianyiBean) {
-                                        MianyiBean mianyiBean = (MianyiBean) data;
-                                        Log.i(TAG, mianyiBean.toString());
-                                    } else if (data instanceof BodyTempBean) {
-                                        BodyTempBean bodyTempBean = (BodyTempBean) data;
-                                        Log.i(TAG, bodyTempBean.toString());
-                                    }
-
+                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean)dataPasrse.parseData(datas);
+                                    Log.i(TAG, bodytempAndMianyiBean.toString());
                                     break;
 
                                 case 0x13:
                                     //返回单机测量体温
-                                    BodyTempBean bodyTempBean = (BodyTempBean) data;
+                                    BodyTempBean bodyTempBean = (BodyTempBean)dataPasrse.parseData(datas);
                                     Log.i(TAG, bodyTempBean.toString());
                                     break;
 
                                 case 0x18:
                                     //返回单机测量免疫力
-                                    MianyiBean mianyiBean = (MianyiBean) data;
+                                    MianyiBean mianyiBean = (MianyiBean)dataPasrse.parseData(datas);
                                     Log.i(TAG, mianyiBean.toString());
                                     break;
 
