@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
                                     Log.i(TAG, hourlyMeasureDataBean.toString());
                                     break;
                                 case 0x21:
-                                    //返回整点数据
+                                    //返回整点 体温、免疫力数据
                                     BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean)dataPasrse.parseData(datas);
                                     Log.i(TAG, bodytempAndMianyiBean.toString());
                                     break;
