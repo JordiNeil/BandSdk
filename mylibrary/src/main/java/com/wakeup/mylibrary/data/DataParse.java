@@ -1,15 +1,19 @@
 package com.wakeup.mylibrary.data;
 
+
 import com.wakeup.mylibrary.Config;
 import com.wakeup.mylibrary.bean.BandInfo;
 import com.wakeup.mylibrary.bean.Battery;
 import com.wakeup.mylibrary.bean.BloodOxygenBean;
 import com.wakeup.mylibrary.bean.BloodPressureBean;
+import com.wakeup.mylibrary.bean.BodyTempBean;
 import com.wakeup.mylibrary.bean.CurrentDataBean;
 import com.wakeup.mylibrary.bean.HeartRateBean;
 import com.wakeup.mylibrary.bean.HourlyMeasureDataBean;
+import com.wakeup.mylibrary.bean.MianyiBean;
 import com.wakeup.mylibrary.bean.OneButtonMeasurementBean;
 import com.wakeup.mylibrary.bean.SleepData;
+import com.wakeup.mylibrary.utils.DateUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -137,7 +141,7 @@ public class DataParse {
 
                     if (Config.hasContinuousHeart) {
                         //如果是连续心率手环
-                        object = parse51(datas, object, timeInMillis);
+                        object = parse51(datas, timeInMillis);
 
 
                     } else if (Config.hasECG) {
@@ -145,7 +149,7 @@ public class DataParse {
 
                     } else {
                         //如果是普通手环
-                        object = parse51(datas, object, timeInMillis);
+                        object = parse51(datas, timeInMillis);
                     }
 
 
@@ -302,7 +306,8 @@ public class DataParse {
         return object;
     }
 
-    private Object parse51(List<Integer> datas, Object object, long timeInMillis) {
+    private Object parse51(List<Integer> datas, long timeInMillis) {
+        Object object = null;
         if (datas.get(5) == 0x11) {
             //单机测量 连续心率数据
             int hrValue = datas.get(11);
@@ -336,6 +341,14 @@ public class DataParse {
 
         } else if (datas.get(5) == 0x20) {
             //整点数据
+            int year = datas.get(6) + 2000;
+            int month = datas.get(7);
+            int day = datas.get(8);
+            int hour = datas.get(9);
+            long timeInMillis1 = DateUtils.getMilliSecondFromTime(year + String.format("%02d", month) +
+                    String.format("%02d", day) + String.format("%02d", hour) + 00);
+
+
             int steps = (datas.get(10) << 16) + (datas.get(11) << 8) +
                     datas.get(12);
 
@@ -355,7 +368,7 @@ public class DataParse {
             hourlyMeasureDataBean.setBloodOxygen(bloodOxygen);
             hourlyMeasureDataBean.setBloodPressure_high(bloodPressure_high);
             hourlyMeasureDataBean.setBloodPressure_low(bloodPressure_low);
-            hourlyMeasureDataBean.setTimeInMillis(timeInMillis + 3600 * 1000);//整点数据时间加一个小时
+            hourlyMeasureDataBean.setTimeInMillis(timeInMillis1 + 3600 * 1000);//整点数据时间加一个小时
 
 //            int shallowSleep = datas.get(21) * 60 + datas.get(22);
 //            int deepSleep = datas.get(23) * 60 + datas.get(24);
@@ -385,6 +398,55 @@ public class DataParse {
             currentDataBean.setTimeInMillis(System.currentTimeMillis());
 
             object = currentDataBean;
+
+
+        }else if (datas.get(5) == 0x13) {
+            //体温单机测量数据
+
+
+
+
+            int bodyTemp1 = datas.get(11);
+            int bodyTemp2 = datas.get(12);
+            if (bodyTemp1 != 0) {
+                BodyTempBean bodyTempBean = new BodyTempBean(bodyTemp1 + (bodyTemp2 / 10f),
+                        timeInMillis);
+                object = bodyTempBean;
+            }
+        } else if (datas.get(5) == 0x18) {
+            //免疫力单机测量数据
+            int data = datas.get(11);
+            if (data != 0) {
+                MianyiBean mianyiBean = new MianyiBean((float) data,
+                        timeInMillis);
+                object = mianyiBean;
+
+            }
+        } else if (datas.get(5) == 0x21) {
+            //整点测量体温和免疫力
+            int year = datas.get(6) + 2000;
+            int month = datas.get(7);
+            int day = datas.get(8);
+            int hour = datas.get(9);
+            long timeInMillis1 = DateUtils.getMilliSecondFromTime(year + String.format("%02d", month) +
+                    String.format("%02d", day) + String.format("%02d", hour) + 00);
+
+
+            int data = datas.get(10);
+            if (data != 0) {
+                MianyiBean mianyiBean = new MianyiBean((float) data,
+                        timeInMillis1);
+                object = mianyiBean;
+            }
+
+
+            int bodyTemp1 = datas.get(11);
+            int bodyTemp2 = datas.get(12);
+            if (bodyTemp1 != 0) {
+                BodyTempBean bodyTempBean = new BodyTempBean(bodyTemp1 + (bodyTemp2 / 10f),
+                        timeInMillis);
+                object = bodyTempBean;
+            }
 
 
         }

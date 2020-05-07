@@ -13,9 +13,9 @@ public class BandInfo {
     private boolean hasHeartWarn;
     private boolean nordic;
     private boolean needPhoneSerialNumber;
-    //是否有体温
+    //是否有体温(0x92指令不会返回这个信息，有体温功能的手环会在0x9B指令下返回这个信息)
     private boolean hasTiwen;
-    //是否有连续体温
+    //是否有连续体温(0x92指令不会返回这个信息，有连续体温功能的手环会在0x9B指令下返回这个信息)
     private boolean hasLianxuTiwen;
 
 
