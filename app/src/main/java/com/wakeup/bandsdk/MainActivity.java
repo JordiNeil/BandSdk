@@ -216,14 +216,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void connect(View view) {
-        if (connectBt.getText().toString().equals("连接")) {
+        mBluetoothLeService.connect(address);
+        progressBar.setVisibility(View.VISIBLE);
+        /*if (!TextUtils.isEmpty(address)) {
+            mBluetoothLeService.connect(address);
+            progressBar.setVisibility(View.VISIBLE);
+        }*/
+        /*if (connectBt.getText().toString().equals("连接")) {
             if (!TextUtils.isEmpty(address)) {
                 mBluetoothLeService.connect(address);
                 progressBar.setVisibility(View.VISIBLE);
             }
         } else if (connectBt.getText().toString().equals("断开连接")) {
             mBluetoothLeService.disconnect();
-        }
+        }*/
     }
 
 
@@ -528,11 +534,11 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param view
      */
-    public void one_button_measurement(View view) {
+    public void one_button_measurement(View view) throws InterruptedException {
         commandManager.oneButtonMeasurement(1);
-
+        Thread.sleep(60000);
         //一分钟之后发送关闭的指令  才会有测量结果返回
-//        commandManager.oneButtonMeasurement(0);
+        commandManager.oneButtonMeasurement(0);
 
     }
 
@@ -541,10 +547,22 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param view
      */
-    public void single_heartRate(View view) {
+    private boolean transfer = true;
+    public synchronized void single_heartRate(View view) {
+        while (!transfer){
+            try{
+                wait();
+            }catch (InterruptedException e){
+                Thread.currentThread().interrupt();
+                Log.i(TAG, "Thread Interrupted");
+            }
+        }
+        transfer = false;
+        //commandManager.getRealTimeHeartRate(1);
         commandManager.singleRealtimeMeasure(0X09, 1);
-
-        //       commandManager.singleRealtimeMeasure(0X09,0); 关闭单次测量
+        notifyAll();
+        //Thread.sleep(45000);
+        //commandManager.singleRealtimeMeasure(0X09,0); // 关闭单次测量
     }
 
     /**
@@ -552,10 +570,10 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param view
      */
-    public void real_time_heartRate(View view) {
+    public void real_time_heartRate(View view) throws InterruptedException {
         commandManager.singleRealtimeMeasure(0X0A, 1);
-
-//        commandManager.singleRealtimeMeasure(0X0A,0); 关闭实时测量
+        Thread.sleep(10000);
+        commandManager.singleRealtimeMeasure(0X0A,0); //关闭实时测量
 
 
     }
@@ -570,8 +588,20 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param view
      */
-    public void real_time_heartRate2_1(View view) {
+
+
+    public synchronized void real_time_heartRate2_1(View view) {
+        while (!transfer){
+            try{
+                wait();
+            }catch (InterruptedException e){
+                Thread.currentThread().interrupt();
+                Log.i(TAG, "Thread Interrupted");
+            }
+        }
+        transfer = false;
         commandManager.getRealTimeHeartRate(1);
+        notifyAll();
     }
 
     /**
@@ -579,9 +609,20 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param view
      */
-    public void real_time_heartRate2_0(View view) {
-        commandManager.getRealTimeHeartRate(0);
-
+    public synchronized void real_time_heartRate2_0(View view){
+        while (transfer){
+            try{
+                wait();
+            }catch (InterruptedException e){
+                Thread.currentThread().interrupt();
+                Log.i(TAG, "Thread Interrupted");
+            }
+        }
+        transfer = true;
+        notifyAll();
+        commandManager.singleRealtimeMeasure(0X09,0);
+        //commandManager.getRealTimeHeartRate(0);
     }
 
 }
+

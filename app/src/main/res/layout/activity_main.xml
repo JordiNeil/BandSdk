@@ -110,35 +110,31 @@
 
 
         </LinearLayout>
+
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/clear_data"
                 android:onClick="clearData"
-                />
+                android:text="@string/clear_data" />
 
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/open_message"
                 android:onClick="openMessage"
-                />
+                android:text="@string/open_message" />
 
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/test_message"
                 android:onClick="sendMessage"
-                />
-
+                android:text="@string/test_message" />
 
 
         </LinearLayout>
@@ -215,7 +211,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/one_button_measurement"
-                android:onClick="one_button_measurement"
+                android:onClick="real_time_heartRate2_0"
                 />
 
 
@@ -238,12 +234,12 @@
                 android:text="@string/get_real_heartrate"
                 android:onClick="real_time_heartRate2_1"
                 />
+
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/turn_off_real_heartrate"
                 android:onClick="real_time_heartRate2_0"
-                />
+                android:text="@string/turn_off_real_heartrate" />
 
 
 
