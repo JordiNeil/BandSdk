@@ -537,9 +537,8 @@ public class MainActivity extends AppCompatActivity {
      */
     public void one_button_measurement(View view) throws InterruptedException {
         commandManager.oneButtonMeasurement(1);
-//        Thread.sleep(60000);
+        Thread.sleep(60000);
         //ONE MINUTE AFTER SENDING THE CLOSE COMMAND, THE MEASUREMENT WILL BE SENT
-        pause(4500);
         commandManager.oneButtonMeasurement(0);
 
     }
@@ -548,25 +547,23 @@ public class MainActivity extends AppCompatActivity {
      *SINGLE MEASUREMENT-AFTER 45S MEASUREMENT RESULTS WILL BE RETURNED
      * @param view
      */
-//    private boolean transfer = true;
+    private boolean transfer = true;
     public synchronized void single_heartRate(View view) {
-//        while (!transfer){
-//            try{
-//                wait();
-//            }catch (InterruptedException e){
-//                Thread.currentThread().interrupt();
-//                Log.i(TAG, "Thread Interrupted");
-//            }
-//        }
-//        transfer = false;
-        //commandManager.getRealTimeHeartRate(1);
-        commandManager.singleRealtimeMeasure(0X11, 1);
+        while (!transfer){
+            try{
+                wait();
+            }catch (InterruptedException e){
+                Thread.currentThread().interrupt();
+                Log.i(TAG, "Thread Interrupted");
+            }
+        }
+        transfer = false;
+        commandManager.getRealTimeHeartRate(1);
+//        commandManager.singleRealtimeMeasure(0X11, 1);
         notifyAll();
-        Log.i(TAG, "------------MEASUREMENT STARTED-------------------------");
-        pause(60000);
-        Log.i(TAG, "------------MEASUREMENT FINISHED------------------------");
+//        TimeUnit.MINUTES.sleep(1);
         commandManager.singleRealtimeMeasure(0X09,0); // 关闭单次测量
-        commandManager.oneButtonMeasurement(1);
+//        commandManager.oneButtonMeasurement(1);
     }
 
     /**
@@ -595,15 +592,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     public synchronized void real_time_heartRate2_1(View view) {
-//        while (!transfer){
-//            try{
-//                wait();
-//            }catch (InterruptedException e){
-//                Thread.currentThread().interrupt();
-//                Log.i(TAG, "Thread Interrupted");
-//            }
-//        }
-//        transfer = false;
+        while (!transfer){
+            try{
+                wait();
+            }catch (InterruptedException e){
+                Thread.currentThread().interrupt();
+                Log.i(TAG, "Thread Interrupted");
+            }
+        }
+        transfer = false;
         commandManager.getRealTimeHeartRate(1);
         notifyAll();
     }
@@ -614,30 +611,22 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public synchronized void real_time_heartRate2_0(View view){
-//        while (transfer){
-//            try{
-//                wait();
-//            }catch (InterruptedException e){
-//                Thread.currentThread().interrupt();
-//                Log.i(TAG, "Thread Interrupted");
-//            }
-//        }
-//        transfer = true;
+        while (transfer){
+            try{
+                wait();
+            }catch (InterruptedException e){
+                Thread.currentThread().interrupt();
+                Log.i(TAG, "Thread Interrupted");
+            }
+        }
+        transfer = true;
         notifyAll();
         commandManager.singleRealtimeMeasure(0X09,0);
         //commandManager.getRealTimeHeartRate(0);
     }
 
 
-//    -----------------FUNCTIONS------------------------------------
-
-    public static void pause(int ms) {
-        try {
-            TimeUnit.MILLISECONDS.sleep(ms);
-        } catch (InterruptedException e) {
-            System.err.format("IOException: %s%n", e);
-        }
-    }
+//
 
 }
 
