@@ -238,13 +238,13 @@ public class CommandManager {
     }
 
     /**
-     * 单次、实时测量
+     * SINGLE, REAL-TIME
      *
-     * @param status  心率：0X09(单次) 0X0A(实时)
-     *                血氧：0X11(单次) 0X12(实时)
-     *                血压：0X21(单次) 0X22(实时)
-     *                体温：0x81(单次)
-     *                免疫值：0x41(单次)
+     * @param status  HEART RATE：0X09(SINGLE) 0X0A(REAL TIME)
+     *                BLOOD OXYGEN：0X11(SINGLE) 0X12(REAL TIME)
+     *                BLOOD PRESSURE：0X21(SINGLE) 0X22(REAL TIME)
+     *                BODY TEMPERATURE：0x81(SINGLE)
+     *                IMMUNE VALUE：0x41(SINGLE)
      * @param control 0关  1开
      */
     public void singleRealtimeMeasure(int status, int control) {

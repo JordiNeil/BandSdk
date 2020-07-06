@@ -49,6 +49,7 @@ import com.wakeup.mylibrary.utils.DataHandUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -241,12 +242,12 @@ public class MainActivity extends AppCompatActivity {
             final String action = intent.getAction();
             if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
-                connectBt.setText("断开连接");
+                connectBt.setText("DISCONNECT");
                 progressBar.setVisibility(View.GONE);
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
-                connectBt.setText("连接");
+                connectBt.setText("CONNECTION");
                 progressBar.setVisibility(View.GONE);
 
 
@@ -256,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
 
             } else if (BluetoothService.ACTION_DATA_AVAILABLE.equals(action)) {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
-                Log.d(TAG, "接收的数据：" + DataHandUtils.bytesToHexStr(txValue));
+                Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue));
                 List<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
                 if (datas.size() == 0) {
                     return;
@@ -265,12 +266,12 @@ public class MainActivity extends AppCompatActivity {
                 if (datas.get(0) == 0xAB) {
                     switch (datas.get(4)) {
                         case 0x91:
-                            //电池电量
+                            //BATTERY POWER
                             Battery battery = (Battery) dataPasrse.parseData(datas);
                             Log.i(TAG, battery.toString());
                             break;
                         case 0x92:
-                            //手环信息
+                            //BRACELET DATA
                             bandInfo = (BandInfo) dataPasrse.parseData(datas);
                             Log.i(TAG, bandInfo.toString());
                             Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
@@ -291,45 +292,45 @@ public class MainActivity extends AppCompatActivity {
 
                             switch (datas.get(5)) {
                                 case 0x11:
-                                    //单机测量 心率数据
+                                    //STAND-ALONE MEASUREMENT OF HEART RATE DATA
                                     HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, heartRateBean.toString());
                                     break;
                                 case 0x12:
-                                    //单机测量 血氧数据
+                                    //STAND-ALONE MEASUREMENT OF BLOOD OXYGEN RATE DATA
                                     BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bloodOxygenBean.toString());
                                     break;
                                 case 0x14:
-                                    //单机测量 血压数据
+                                    //STAND-ALONE MEASUREMENT OF BLOOD PREASURE
                                     BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bloodPressureBean.toString());
                                     break;
                                 case 0x08:
-                                    //当前数据
+                                    //CURRENT DATA
                                     CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, currentDataBean.toString());
                                     break;
 
                                 case 0x20:
-                                    //返回整点数据
+                                    //RETURN HOURLY DATA
                                     HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, hourlyMeasureDataBean.toString());
                                     break;
                                 case 0x21:
-                                    //返回整点 体温、免疫力数据
+                                    //BODY TEMPERATURE AND IMMUNITY DATA
                                     BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean)dataPasrse.parseData(datas);
                                     Log.i(TAG, bodytempAndMianyiBean.toString());
                                     break;
 
                                 case 0x13:
-                                    //返回单机测量体温
+                                    //STAND-ALONE BODY TEMPERATURE MEASUREMENT
                                     BodyTempBean bodyTempBean = (BodyTempBean)dataPasrse.parseData(datas);
                                     Log.i(TAG, bodyTempBean.toString());
                                     break;
 
                                 case 0x18:
-                                    //返回单机测量免疫力
+                                    //RETURN TO STAND-ALONE IMMUNITY MEASUREMENT
                                     MianyiBean mianyiBean = (MianyiBean)dataPasrse.parseData(datas);
                                     Log.i(TAG, mianyiBean.toString());
                                     break;
@@ -339,54 +340,54 @@ public class MainActivity extends AppCompatActivity {
 
                             break;
                         case 0x52:
-                            //入睡时间记录
+                            //SLEEP TIME RECORD
                             SleepData sleepData = (SleepData) dataPasrse.parseData(datas);
                             Log.i(TAG, sleepData.toString());
 
                             break;
 
                         case 0x31:
-                            //单次测量、实时测量
+                            //SINGLE MEASUREMENT, REAL TIME MEASUREMENT
                             switch (datas.get(5)) {
                                 case 0x09:
-                                    //心率（单次）
+                                    //HEART RATE(SINGLE)
                                     HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, heartRateBean.toString());
                                     break;
                                 case 0x11:
-                                    //血氧（单次）
+                                    //BLOOD OXYGEN (SINGLE)
                                     BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bloodOxygenBean.toString());
                                     break;
                                 case 0x21:
-                                    //血压（单次）
+                                    //BLOOD PRESSURE (SINGLE)
                                     BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bloodPressureBean.toString());
 
                                     break;
                                 case 0X0A:
-                                    //心率（实时）
+                                    //HEART RATE (REAL-TIME)
                                     HeartRateBean heartRateBean1 = (HeartRateBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, heartRateBean1.toString());
                                     break;
                                 case 0x12:
-                                    //血氧（实时）
+                                    //BLOOD OXYGEN(REAL-TIME)
                                     BloodOxygenBean bloodOxygenBean1 = (BloodOxygenBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bloodOxygenBean1.toString());
                                     break;
                                 case 0x22:
-                                    //血压（实时）
+                                    //BLOOD PRESSURE(REAL-TIME)
                                     BloodPressureBean bloodPressureBean1 = (BloodPressureBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bloodPressureBean1.toString());
 
                                     break;
                                 case 0x81:
-                                    //单次测量体温
+                                    //SINGLE TEMPERATURE MEASUREMENT
                                     BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bodyTempBean.toString());
                                     break;
                                 case 0x41:
-                                    //单次测量免疫力
+                                    //SINGLE MEASUREMENT OF IMMUNITY
                                     MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, mianyiBean.toString());
 
@@ -395,14 +396,14 @@ public class MainActivity extends AppCompatActivity {
 
                             break;
                         case 0x32:
-                            //一键测量
+                            //ONE-CLICK MEASUREMENT
                             OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);
                             Log.i(TAG, oneButtonMeasurementBean.toString());
 
                             break;
 
                         case 0x84:
-                            //连续心率手环 实时心率返回
+                            //CONTINUOUS HEART RATE, BRACELET REAL-TIME HEART RATE RETURN
                             HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
                             Log.i(TAG, heartRateBean.toString());
 
@@ -462,10 +463,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void syncData(View view) {
         if (bandInfo == null) {
-            Toast.makeText(MainActivity.this, "请先获取手环的信息", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "GET INFO OF BRACELET FIRST", Toast.LENGTH_SHORT).show();
             return;
         }
-        //带连续心率的手环的同步数据的方式
+        //DATA SYNCHRONIZATION METHOD OF BRACELET WITH CONTINUOUS HEART RATE
         if (Config.hasContinuousHeart) {
             Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
 
@@ -473,14 +474,14 @@ public class MainActivity extends AppCompatActivity {
                     System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
 
         } else {
-            //不带连续心率的手环的同步数据的方式
+            //WAY OF SYNCHRONIZING DATA WITH BRACELET WITHOUT CONTINUOUS HEART RATE
             commandManager.syncData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
 
         }
     }
 
     /**
-     * 开启整点测量
+     * TURN ON HOURLY MEASUREMENT
      *
      * @param view
      */
@@ -489,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 清除手环数据
+     * CLEAR BRACELET DATA
      *
      * @param view
      */
@@ -498,7 +499,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 发送消息
+     * SEND MESSAGE
      *
      * @param view
      */
@@ -514,7 +515,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * 设置闹钟
+     * SET ALARM
      *
      * @param view
      */
@@ -530,43 +531,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 一键测量   一键测量的时间1分钟 一分钟之后发送关闭的指令  才会有测量结果返回
+     * ONE-CLICK MEASUREMENT   ONE-CLICK MEASUREMENT. AFTER 1 MINUTE, THE SHUT DOWN COMMAND WILL BE SENT AND THE RESULT WILL BE RETURNED
      *
      * @param view
      */
     public void one_button_measurement(View view) throws InterruptedException {
         commandManager.oneButtonMeasurement(1);
-        Thread.sleep(60000);
-        //一分钟之后发送关闭的指令  才会有测量结果返回
+//        Thread.sleep(60000);
+        //ONE MINUTE AFTER SENDING THE CLOSE COMMAND, THE MEASUREMENT WILL BE SENT
+        pause(4500);
         commandManager.oneButtonMeasurement(0);
 
     }
 
     /**
-     * 单次测量(以心率为例) 单次测量的时间45s 45s之后发送关闭的指令  才会有测量结果返回
-     *
+     *SINGLE MEASUREMENT-AFTER 45S MEASUREMENT RESULTS WILL BE RETURNED
      * @param view
      */
-    private boolean transfer = true;
+//    private boolean transfer = true;
     public synchronized void single_heartRate(View view) {
-        while (!transfer){
-            try{
-                wait();
-            }catch (InterruptedException e){
-                Thread.currentThread().interrupt();
-                Log.i(TAG, "Thread Interrupted");
-            }
-        }
-        transfer = false;
+//        while (!transfer){
+//            try{
+//                wait();
+//            }catch (InterruptedException e){
+//                Thread.currentThread().interrupt();
+//                Log.i(TAG, "Thread Interrupted");
+//            }
+//        }
+//        transfer = false;
         //commandManager.getRealTimeHeartRate(1);
-        commandManager.singleRealtimeMeasure(0X09, 1);
+        commandManager.singleRealtimeMeasure(0X11, 1);
         notifyAll();
-        //Thread.sleep(45000);
-        //commandManager.singleRealtimeMeasure(0X09,0); // 关闭单次测量
+        Log.i(TAG, "------------MEASUREMENT STARTED-------------------------");
+        pause(60000);
+        Log.i(TAG, "------------MEASUREMENT FINISHED------------------------");
+        commandManager.singleRealtimeMeasure(0X09,0); // 关闭单次测量
+        commandManager.oneButtonMeasurement(1);
     }
 
     /**
-     * 实时测量(以心率为例)
+     * REAL TIME MEASUREMENT
      *
      * @param view
      */
@@ -584,44 +588,55 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * 连续心率手环获取实时心率
+     * CONTINUOUS HEART RATE BRACELET FOR REAL-TIME HEART RATE
      *
      * @param view
      */
 
 
     public synchronized void real_time_heartRate2_1(View view) {
-        while (!transfer){
-            try{
-                wait();
-            }catch (InterruptedException e){
-                Thread.currentThread().interrupt();
-                Log.i(TAG, "Thread Interrupted");
-            }
-        }
-        transfer = false;
+//        while (!transfer){
+//            try{
+//                wait();
+//            }catch (InterruptedException e){
+//                Thread.currentThread().interrupt();
+//                Log.i(TAG, "Thread Interrupted");
+//            }
+//        }
+//        transfer = false;
         commandManager.getRealTimeHeartRate(1);
         notifyAll();
     }
 
     /**
-     * 关闭 连续心率手环获取实时心率
+     * 关闭 CLOSE CONTINUOUS HEART RATE BRACELET FOR REAL-TIME HEART RATE
      *
      * @param view
      */
     public synchronized void real_time_heartRate2_0(View view){
-        while (transfer){
-            try{
-                wait();
-            }catch (InterruptedException e){
-                Thread.currentThread().interrupt();
-                Log.i(TAG, "Thread Interrupted");
-            }
-        }
-        transfer = true;
+//        while (transfer){
+//            try{
+//                wait();
+//            }catch (InterruptedException e){
+//                Thread.currentThread().interrupt();
+//                Log.i(TAG, "Thread Interrupted");
+//            }
+//        }
+//        transfer = true;
         notifyAll();
         commandManager.singleRealtimeMeasure(0X09,0);
         //commandManager.getRealTimeHeartRate(0);
+    }
+
+
+//    -----------------FUNCTIONS------------------------------------
+
+    public static void pause(int ms) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(ms);
+        } catch (InterruptedException e) {
+            System.err.format("IOException: %s%n", e);
+        }
     }
 
 }
