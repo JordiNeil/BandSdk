@@ -18,7 +18,6 @@ import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.wakeup.mylibrary.utils.DataHandUtils;
@@ -386,7 +385,6 @@ public class BluetoothService extends Service {
         unregisterReceiver(mServiceReceiver);
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;

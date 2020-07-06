@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">BandSdk</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
@@ -29,7 +29,15 @@
     <string name="one_button_measurement">One button measurement</string>
     <string name="get_real_heartrate">Continuous Heart Rate Hand Ring for Real-time Heart Rate Acquisition</string>
     <string name="turn_off_real_heartrate">Closing Continuous Heart Rate Bracelet for Real-time Heart Rate Acquisition</string>
+    <string name="login_username" tools:ignore="MissingTranslation">Usuario</string>
+    <string name="login_password" tools:ignore="MissingTranslation">Contraseña</string>
+    <string name="direct_access" tools:ignore="MissingTranslation">Acceso directo</string>
+    <string name="forgot_password" tools:ignore="MissingTranslation">Olvidé mi contraseña</string>
+    <string name="login_btn_text" tools:ignore="MissingTranslation">Iniciar Sesión</string>
+    <string name="register_btn_text" tools:ignore="MissingTranslation">Registrarme</string>
+    <string name="register_heading" tools:ignore="MissingTranslation">Registro</string>
+    <string name="register_username" tools:ignore="MissingTranslation">Ingrese el nombre de la cuenta</string>
+    <string name="register_password" tools:ignore="MissingTranslation">Ingrese la contraseña de la cuenta</string>
     <string name="send_weather">* 发送天气</string>
     <string name="send_pic">* 发送图片</string>
-
 </resources>

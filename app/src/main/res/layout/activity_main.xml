@@ -28,21 +28,20 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             >
+
             <TextView
                 android:id="@+id/message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 />
 
+
             <Button
                 android:id="@+id/connect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/connect"
-                android:layout_marginLeft="20dp"
                 android:onClick="connect"
-                />
-
+                android:text="@string/connect" />
 
             <ProgressBar
                 android:id="@+id/progressBar"
@@ -51,6 +50,13 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 />
+
+            <Button
+                android:id="@+id/goToLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Login"
+                android:layout_marginStart="20dp"/>
         </LinearLayout>
 
         <LinearLayout
