@@ -49,7 +49,10 @@ import com.wakeup.mylibrary.utils.DataHandUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -319,19 +322,19 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 case 0x21:
                                     //BODY TEMPERATURE AND IMMUNITY DATA
-                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean)dataPasrse.parseData(datas);
+                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bodytempAndMianyiBean.toString());
                                     break;
 
                                 case 0x13:
                                     //STAND-ALONE BODY TEMPERATURE MEASUREMENT
-                                    BodyTempBean bodyTempBean = (BodyTempBean)dataPasrse.parseData(datas);
+                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bodyTempBean.toString());
                                     break;
 
                                 case 0x18:
                                     //RETURN TO STAND-ALONE IMMUNITY MEASUREMENT
-                                    MianyiBean mianyiBean = (MianyiBean)dataPasrse.parseData(datas);
+                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, mianyiBean.toString());
                                     break;
 
@@ -544,26 +547,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     *SINGLE MEASUREMENT-AFTER 45S MEASUREMENT RESULTS WILL BE RETURNED
+     * SINGLE MEASUREMENT-AFTER 45S MEASUREMENT RESULTS WILL BE RETURNED
+     *
      * @param view
      */
     private boolean transfer = true;
+
     public synchronized void single_heartRate(View view) {
-        while (!transfer){
-            try{
-                wait();
-            }catch (InterruptedException e){
-                Thread.currentThread().interrupt();
-                Log.i(TAG, "Thread Interrupted");
-            }
+//        while (!transfer){
+//            try{
+//                wait();
+//            }catch (InterruptedException e){
+//                Thread.currentThread().interrupt();
+//                Log.i(TAG, "Thread Interrupted");
+//            }
+//        }
+//        transfer = false;
+//        commandManager.getRealTimeHeartRate(1);
+        commandManager.singleRealtimeMeasure(0X0A, 1);
+        long startTime = System.currentTimeMillis();
+        for (int count = 0; ;count++) {
+            long now = System.currentTimeMillis();
+            if(now-startTime >= 10000) break;
         }
-        transfer = false;
-        commandManager.getRealTimeHeartRate(1);
-//        commandManager.singleRealtimeMeasure(0X11, 1);
-        notifyAll();
+
+
+
+        Timer timer;
+        timer=new Timer();
+        TimerTask task=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X0A, 0);
+            }
+        };
+        timer.schedule(task,10000);
+
+
+
+
+//        while(System.currentTimeMillis()-startTime<=60000) {
+//            Log.i(TAG, "---------MEASUREMENT IN PROGRESS------------");
+//            notifyAll();
+//        }
+//        Log.i(TAG,"-----------MEASUREMENT FINISHED-----------");
+//        pause(60000);
 //        TimeUnit.MINUTES.sleep(1);
-        commandManager.singleRealtimeMeasure(0X09,0); // 关闭单次测量
 //        commandManager.oneButtonMeasurement(1);
+//        commandManager.getRealTimeHeartRate(1);
+
     }
 
     /**
@@ -572,9 +604,9 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void real_time_heartRate(View view) throws InterruptedException {
-        commandManager.singleRealtimeMeasure(0X0A, 1);
-        Thread.sleep(10000);
-        commandManager.singleRealtimeMeasure(0X0A,0); //关闭实时测量
+        commandManager.singleRealtimeMeasure(0X09, 1);
+//        commandManager.singleRealtimeMeasure(0X09, 0);
+//        commandManager.singleRealtimeMeasure(0X0A,0); //关闭实时测量
 
 
     }
@@ -592,17 +624,22 @@ public class MainActivity extends AppCompatActivity {
 
 
     public synchronized void real_time_heartRate2_1(View view) {
-        while (!transfer){
-            try{
-                wait();
-            }catch (InterruptedException e){
-                Thread.currentThread().interrupt();
-                Log.i(TAG, "Thread Interrupted");
-            }
-        }
-        transfer = false;
+//        while (!transfer){
+//            try{
+//                wait();
+//            }catch (InterruptedException e){
+//                Thread.currentThread().interrupt();
+//                Log.i(TAG, "Thread Interrupted");
+//            }
+//        }
+//        transfer = false;
         commandManager.getRealTimeHeartRate(1);
         notifyAll();
+
+
+
+
+
     }
 
     /**
@@ -610,23 +647,32 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param view
      */
-    public synchronized void real_time_heartRate2_0(View view){
-        while (transfer){
-            try{
+    public synchronized void real_time_heartRate2_0(View view) {
+        while (transfer) {
+            try {
                 wait();
-            }catch (InterruptedException e){
+            } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 Log.i(TAG, "Thread Interrupted");
             }
         }
         transfer = true;
         notifyAll();
-        commandManager.singleRealtimeMeasure(0X09,0);
+        commandManager.singleRealtimeMeasure(0X09, 0);
         //commandManager.getRealTimeHeartRate(0);
     }
 
 
-//
+    //-------------------------------------------OWN FUNCTIONS------------------------------------------
+    public static void pause(int ms) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(ms);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+    }
 
 }
+
+
 
