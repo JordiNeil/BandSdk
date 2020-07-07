@@ -243,7 +243,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
         final Call<List<DataFisiometria>> dataResponse = service.getStudiesSubjes("Bearer "+token,1101);
 
         dataResponse.enqueue(new Callback<List<DataFisiometria>>() {
-            @Override
+             @Override
             public void onResponse(Call<List<DataFisiometria>> call, Response<List<DataFisiometria>> response) {
                 if (response.isSuccessful()){
                     System.out.println(response.body().get(0).getoximetria());
