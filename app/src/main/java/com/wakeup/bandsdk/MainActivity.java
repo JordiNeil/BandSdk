@@ -53,7 +53,10 @@ import com.wakeup.mylibrary.utils.DataHandUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -327,19 +330,19 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 case 0x21:
                                     //BODY TEMPERATURE AND IMMUNITY DATA
-                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean)dataPasrse.parseData(datas);
+                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bodytempAndMianyiBean.toString());
                                     break;
 
                                 case 0x13:
                                     //STAND-ALONE BODY TEMPERATURE MEASUREMENT
-                                    BodyTempBean bodyTempBean = (BodyTempBean)dataPasrse.parseData(datas);
+                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bodyTempBean.toString());
                                     break;
 
                                 case 0x18:
                                     //RETURN TO STAND-ALONE IMMUNITY MEASUREMENT
-                                    MianyiBean mianyiBean = (MianyiBean)dataPasrse.parseData(datas);
+                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, mianyiBean.toString());
                                     break;
 
@@ -545,36 +548,92 @@ public class MainActivity extends AppCompatActivity {
      */
     public void one_button_measurement(View view) throws InterruptedException {
         commandManager.oneButtonMeasurement(1);
-//        Thread.sleep(60000);
+        Thread.sleep(60000);
         //ONE MINUTE AFTER SENDING THE CLOSE COMMAND, THE MEASUREMENT WILL BE SENT
-        pause(4500);
         commandManager.oneButtonMeasurement(0);
 
     }
 
     /**
-     *SINGLE MEASUREMENT-AFTER 45S MEASUREMENT RESULTS WILL BE RETURNED
+     * SINGLE MEASUREMENT-AFTER 45S MEASUREMENT RESULTS WILL BE RETURNED
+     *
      * @param view
      */
-//    private boolean transfer = true;
+    private boolean transfer = true;
+
     public synchronized void single_heartRate(View view) {
-//        while (!transfer){
-//            try{
-//                wait();
-//            }catch (InterruptedException e){
-//                Thread.currentThread().interrupt();
-//                Log.i(TAG, "Thread Interrupted");
-//            }
+
+        /**
+         *
+         * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
+         */
+        Timer timer;
+        timer=new Timer();
+
+        /**
+         *
+         * DECLARACIÓN DE LAS TAREAS PARA INICIAR Y FINALIZAR CADA UNA DE LAS MEDICIONES.
+         */
+
+        TimerTask startHeartRate=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X09, 1);
+            }
+        };
+        TimerTask finishHeartRate=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X09, 0);
+                commandManager.singleRealtimeMeasure(0X11, 1);
+            }
+        };
+        TimerTask finishBloodOxygen=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X11, 0);
+                commandManager.singleRealtimeMeasure(0X21, 1);
+            }
+        };
+        TimerTask finishBloodPressure=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X21, 0);
+                commandManager.singleRealtimeMeasure(0X81, 1);
+            }
+        };
+        TimerTask finishTemperature=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X81, 0);
+            }
+        };
+
+        /**
+         *
+         * PROGRAMACIÓN DE TAREAS PARA INICIAR Y FINALIZAR LAS MEDICIONES
+         */
+
+
+        timer.schedule(startHeartRate,0);
+        timer.schedule(finishHeartRate,45000);
+        timer.schedule(finishBloodOxygen,90000);
+        timer.schedule(finishBloodPressure,135000);
+        timer.schedule(finishTemperature,180000);
+
+
+
+
+//        while(System.currentTimeMillis()-|Time<=60000) {
+//            Log.i(TAG, "---------MEASUREMENT IN PROGRESS------------");
+//            notifyAll();
 //        }
-//        transfer = false;
-        //commandManager.getRealTimeHeartRate(1);
-        commandManager.singleRealtimeMeasure(0X11, 1);
-        notifyAll();
-        Log.i(TAG, "------------MEASUREMENT STARTED-------------------------");
-        pause(60000);
-        Log.i(TAG, "------------MEASUREMENT FINISHED------------------------");
-        commandManager.singleRealtimeMeasure(0X09,0); // 关闭单次测量
-        commandManager.oneButtonMeasurement(1);
+//        Log.i(TAG,"-----------MEASUREMENT FINISHED-----------");
+//        pause(60000);
+//        TimeUnit.MINUTES.sleep(1);
+//        commandManager.oneButtonMeasurement(1);
+//        commandManager.getRealTimeHeartRate(1);
+
     }
 
     /**
@@ -583,9 +642,9 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void real_time_heartRate(View view) throws InterruptedException {
-        commandManager.singleRealtimeMeasure(0X0A, 1);
-        Thread.sleep(10000);
-        commandManager.singleRealtimeMeasure(0X0A,0); //关闭实时测量
+        commandManager.singleRealtimeMeasure(0X09, 1);
+//        commandManager.singleRealtimeMeasure(0X09, 0);
+//        commandManager.singleRealtimeMeasure(0X0A,0); //关闭实时测量
 
 
     }
@@ -614,6 +673,11 @@ public class MainActivity extends AppCompatActivity {
 //        transfer = false;
         commandManager.getRealTimeHeartRate(1);
         notifyAll();
+
+
+
+
+
     }
 
     /**
@@ -621,31 +685,32 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param view
      */
-    public synchronized void real_time_heartRate2_0(View view){
-//        while (transfer){
-//            try{
-//                wait();
-//            }catch (InterruptedException e){
-//                Thread.currentThread().interrupt();
-//                Log.i(TAG, "Thread Interrupted");
-//            }
-//        }
-//        transfer = true;
+    public synchronized void real_time_heartRate2_0(View view) {
+        while (transfer) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Log.i(TAG, "Thread Interrupted");
+            }
+        }
+        transfer = true;
         notifyAll();
-        commandManager.singleRealtimeMeasure(0X09,0);
+        commandManager.singleRealtimeMeasure(0X09, 0);
         //commandManager.getRealTimeHeartRate(0);
     }
 
 
-//    -----------------FUNCTIONS------------------------------------
-
+    //-------------------------------------------OWN FUNCTIONS------------------------------------------
     public static void pause(int ms) {
         try {
             TimeUnit.MILLISECONDS.sleep(ms);
-        } catch (InterruptedException e) {
-            System.err.format("IOException: %s%n", e);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
         }
     }
 
 }
+
+
 

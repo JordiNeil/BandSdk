@@ -19,14 +19,29 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
+import com.wakeup.bandsdk.Pojos.Fisiometria.ResponseFisiometria;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import com.wakeup.bandsdk.R;
+import com.wakeup.bandsdk.Services.ServiceFisiometria;
 import com.wakeup.bandsdk.adapter.LeDeviceListAdapter;
+import com.wakeup.bandsdk.configVar.ConfigGeneral;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
 
 /**
  * @author Harry
@@ -43,6 +58,10 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
     private static final long SCAN_PERIOD = 10000;
     private LeDeviceListAdapter leDeviceListAdapter;
     private ArrayList<BluetoothDevice> bluetoothDevices;
+    private Button getFisiometria;
+    private Retrofit retrofit;
+    private ServiceFisiometria service;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,6 +71,8 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
         getSupportActionBar().setTitle(R.string.device_list);
 
         mHandler = new Handler();
+
+        getFisiometria = findViewById(R.id.getFisiometria);
 
 
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -72,6 +93,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
         listView.setAdapter(leDeviceListAdapter);
 
         listView.setOnItemClickListener(this);
+
 
 
     }
@@ -213,5 +235,27 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
             mScanning = false;
         }
         finish();
+    }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void getFisiometria(View view){
+        service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
+        String token="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTU5NDE0NDkyNH0.Km8OADd3QHBUsi0nSaxkIS2eqhICZPMvJMdnoFP4n5TtMXoTiMoP9UCASpDdMSeKrdKco3k3Z00Bhs5RGxAcxA";
+        final Call<List<DataFisiometria>> dataResponse = service.getStudiesSubjes("Bearer "+token,1101);
+
+        dataResponse.enqueue(new Callback<List<DataFisiometria>>() {
+            @Override
+            public void onResponse(Call<List<DataFisiometria>> call, Response<List<DataFisiometria>> response) {
+                if (response.isSuccessful()){
+                    System.out.println(response.body().get(0).getoximetria());
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<DataFisiometria>> call, Throwable t) {
+                System.out.println(t.getMessage());
+            }
+        });
+
     }
 }
