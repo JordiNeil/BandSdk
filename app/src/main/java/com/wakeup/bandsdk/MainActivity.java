@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -68,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
     private String address;
     private Button connectBt;
-    private Button loginBtn;
     private ProgressBar progressBar;
     private CommandManager commandManager;
     private DataParse dataPasrse;
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         mTextMessage = (TextView) findViewById(R.id.message);
         connectBt = findViewById(R.id.connect);
-        loginBtn = findViewById(R.id.goToLogin);
+        Button loginBtn = findViewById(R.id.goToLogin);
         progressBar = findViewById(R.id.progressBar);
 
         isBLESupported();
@@ -100,14 +100,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        loginBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setContentView(R.layout.activity_login);
-            }
-        })
+        loginBtn.setOnClickListener(v -> setContentView(R.layout.activity_login));
 
-        ;
-
+        @Nullable
         //启动蓝牙服务
         Intent gattServiceIntent = new Intent(this, BluetoothService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -567,39 +562,69 @@ public class MainActivity extends AppCompatActivity {
     private boolean transfer = true;
 
     public synchronized void single_heartRate(View view) {
-//        while (!transfer){
-//            try{
-//                wait();
-//            }catch (InterruptedException e){
-//                Thread.currentThread().interrupt();
-//                Log.i(TAG, "Thread Interrupted");
-//            }
-//        }
-//        transfer = false;
-//        commandManager.getRealTimeHeartRate(1);
-        commandManager.singleRealtimeMeasure(0X0A, 1);
-        long startTime = System.currentTimeMillis();
-        for (int count = 0; ;count++) {
-            long now = System.currentTimeMillis();
-            if(now-startTime >= 10000) break;
-        }
 
-
-
+        /**
+         *
+         * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
+         */
         Timer timer;
         timer=new Timer();
-        TimerTask task=new TimerTask() {
+
+        /**
+         *
+         * DECLARACIÓN DE LAS TAREAS PARA INICIAR Y FINALIZAR CADA UNA DE LAS MEDICIONES.
+         */
+
+        TimerTask startHeartRate=new TimerTask() {
             @Override
             public void run() {
-                commandManager.singleRealtimeMeasure(0X0A, 0);
+                commandManager.singleRealtimeMeasure(0X09, 1);
             }
         };
-        timer.schedule(task,10000);
+        TimerTask finishHeartRate=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X09, 0);
+                commandManager.singleRealtimeMeasure(0X11, 1);
+            }
+        };
+        TimerTask finishBloodOxygen=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X11, 0);
+                commandManager.singleRealtimeMeasure(0X21, 1);
+            }
+        };
+        TimerTask finishBloodPressure=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X21, 0);
+                commandManager.singleRealtimeMeasure(0X81, 1);
+            }
+        };
+        TimerTask finishTemperature=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X81, 0);
+            }
+        };
+
+        /**
+         *
+         * PROGRAMACIÓN DE TAREAS PARA INICIAR Y FINALIZAR LAS MEDICIONES
+         */
+
+
+        timer.schedule(startHeartRate,0);
+        timer.schedule(finishHeartRate,45000);
+        timer.schedule(finishBloodOxygen,90000);
+        timer.schedule(finishBloodPressure,135000);
+        timer.schedule(finishTemperature,180000);
 
 
 
 
-//        while(System.currentTimeMillis()-startTime<=60000) {
+//        while(System.currentTimeMillis()-|Time<=60000) {
 //            Log.i(TAG, "---------MEASUREMENT IN PROGRESS------------");
 //            notifyAll();
 //        }
