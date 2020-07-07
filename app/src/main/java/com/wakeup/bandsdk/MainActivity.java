@@ -569,57 +569,57 @@ public class MainActivity extends AppCompatActivity {
          */
         Timer timer;
         timer=new Timer();
-
-        /**
-         *
-         * DECLARACIÓN DE LAS TAREAS PARA INICIAR Y FINALIZAR CADA UNA DE LAS MEDICIONES.
-         */
-
-        TimerTask startHeartRate=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X09, 1);
-            }
-        };
-        TimerTask finishHeartRate=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X09, 0);
-                commandManager.singleRealtimeMeasure(0X11, 1);
-            }
-        };
-        TimerTask finishBloodOxygen=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X11, 0);
-                commandManager.singleRealtimeMeasure(0X21, 1);
-            }
-        };
-        TimerTask finishBloodPressure=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X21, 0);
-                commandManager.singleRealtimeMeasure(0X81, 1);
-            }
-        };
-        TimerTask finishTemperature=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X81, 0);
-            }
-        };
-
-        /**
-         *
-         * PROGRAMACIÓN DE TAREAS PARA INICIAR Y FINALIZAR LAS MEDICIONES
-         */
-
-
-        timer.schedule(startHeartRate,0);
-        timer.schedule(finishHeartRate,45000);
-        timer.schedule(finishBloodOxygen,90000);
-        timer.schedule(finishBloodPressure,135000);
-        timer.schedule(finishTemperature,180000);
+//
+//        /**
+//         *
+//         * DECLARACIÓN DE LAS TAREAS PARA INICIAR Y FINALIZAR CADA UNA DE LAS MEDICIONES.
+//         */
+//
+//        TimerTask startHeartRate=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.singleRealtimeMeasure(0X09, 1);
+//            }
+//        };
+//        TimerTask finishHeartRate=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.singleRealtimeMeasure(0X09, 0);
+//                commandManager.singleRealtimeMeasure(0X11, 1);
+//            }
+//        };
+//        TimerTask finishBloodOxygen=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.singleRealtimeMeasure(0X11, 0);
+//                commandManager.singleRealtimeMeasure(0X21, 1);
+//            }
+//        };
+//        TimerTask finishBloodPressure=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.singleRealtimeMeasure(0X21, 0);
+//                commandManager.singleRealtimeMeasure(0X81, 1);
+//            }
+//        };
+//        TimerTask finishTemperature=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.singleRealtimeMeasure(0X81, 0);
+//            }
+//        };
+//
+//        /**
+//         *
+//         * PROGRAMACIÓN DE TAREAS PARA INICIAR Y FINALIZAR LAS MEDICIONES
+//         */
+//
+//
+//        timer.schedule(startHeartRate,0);
+//        timer.schedule(finishHeartRate,45000);
+//        timer.schedule(finishBloodOxygen,90000);
+//        timer.schedule(finishBloodPressure,135000);
+//        timer.schedule(finishTemperature,180000);
 
 
 
@@ -633,6 +633,42 @@ public class MainActivity extends AppCompatActivity {
 //        TimeUnit.MINUTES.sleep(1);
 //        commandManager.oneButtonMeasurement(1);
 //        commandManager.getRealTimeHeartRate(1);
+
+        /**
+         *
+         *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
+         */
+
+
+
+
+        TimerTask startTemperature=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement( 0);
+                commandManager.singleRealtimeMeasure(0X81, 1);
+            }
+        };
+        TimerTask finishMeasure=new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.singleRealtimeMeasure(0X81, 0);
+            }
+        };
+
+        /**
+         *
+         * INICIO DE LA MEDICIÓN
+         */
+        commandManager.oneButtonMeasurement(1);
+
+        /**
+         *
+         * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
+         */
+        timer.schedule(startTemperature,45000);
+        timer.schedule(finishMeasure,90000);
+
 
     }
 
