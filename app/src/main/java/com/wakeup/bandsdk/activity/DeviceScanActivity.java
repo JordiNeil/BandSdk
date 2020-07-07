@@ -12,8 +12,10 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,8 +27,10 @@ import android.widget.Toast;
 
 import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
 import com.wakeup.bandsdk.Pojos.Fisiometria.ResponseFisiometria;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
 import com.wakeup.bandsdk.R;
 import com.wakeup.bandsdk.Services.ServiceFisiometria;
 import com.wakeup.bandsdk.adapter.LeDeviceListAdapter;
@@ -95,8 +99,8 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
         listView.setOnItemClickListener(this);
 
 
-
     }
+
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             // Stops scanning after a pre-defined scan period.
@@ -124,13 +128,13 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.device_list,menu);
+        getMenuInflater().inflate(R.menu.device_list, menu);
 
-        if (!mScanning){
+        if (!mScanning) {
             menu.findItem(R.id.search).setVisible(true);
             menu.findItem(R.id.menu_refresh).setActionView(null);
 
-        }else {
+        } else {
             menu.findItem(R.id.search).setVisible(false);
             menu.findItem(R.id.menu_refresh).setActionView(R.layout.actionbar_indeterminate_progress);
 
@@ -141,7 +145,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.search:
                 leDeviceListAdapter.clear();
                 scanLeDevice(true);
@@ -210,7 +214,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                   Log.i(TAG,bluetoothDevice.getAddress());
+                    Log.i(TAG, bluetoothDevice.getAddress());
                     leDeviceListAdapter.addDevice(bluetoothDevice);
                     leDeviceListAdapter.notifyDataSetChanged();
                 }
@@ -236,17 +240,26 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
         }
         finish();
     }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void getFisiometria(View view){
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void getFisiometria(View view) {
         service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
-        String token="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTU5NDE0NDkyNH0.Km8OADd3QHBUsi0nSaxkIS2eqhICZPMvJMdnoFP4n5TtMXoTiMoP9UCASpDdMSeKrdKco3k3Z00Bhs5RGxAcxA";
-        final Call<List<DataFisiometria>> dataResponse = service.getStudiesSubjes("Bearer "+token,1101);
+        String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTU5NDE0NDkyNH0.Km8OADd3QHBUsi0nSaxkIS2eqhICZPMvJMdnoFP4n5TtMXoTiMoP9UCASpDdMSeKrdKco3k3Z00Bhs5RGxAcxA";
+        final Call<List<DataFisiometria>> dataResponse = service.getStudiesSubjes("Bearer " + token, 3);
 
         dataResponse.enqueue(new Callback<List<DataFisiometria>>() {
              @Override
             public void onResponse(Call<List<DataFisiometria>> call, Response<List<DataFisiometria>> response) {
-                if (response.isSuccessful()){
-                    System.out.println(response.body().get(0).getoximetria());
+                if (response.isSuccessful()) {
+                    System.out.println(response.body().get(0));
+                    /*for (int i = 0; response.body() > i; i++){
+
+                    }*/
+                    List<DataFisiometria> res = response.body();
+                    for (DataFisiometria c : res) {
+                        System.out.println(c.getdataUser().firstNameget());
+
+                    }
                 }
 
             }
