@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -65,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
     private String address;
     private Button connectBt;
-    private Button loginBtn;
     private ProgressBar progressBar;
     private CommandManager commandManager;
     private DataParse dataPasrse;
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         mTextMessage = (TextView) findViewById(R.id.message);
         connectBt = findViewById(R.id.connect);
-        loginBtn = findViewById(R.id.goToLogin);
+        Button loginBtn = findViewById(R.id.goToLogin);
         progressBar = findViewById(R.id.progressBar);
 
         isBLESupported();
@@ -97,14 +97,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        loginBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setContentView(R.layout.activity_login);
-            }
-        })
+        loginBtn.setOnClickListener(v -> setContentView(R.layout.activity_login));
 
-        ;
-
+        @Nullable
         //启动蓝牙服务
         Intent gattServiceIntent = new Intent(this, BluetoothService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
