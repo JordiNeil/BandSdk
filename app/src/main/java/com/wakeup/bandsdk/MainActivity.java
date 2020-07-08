@@ -52,6 +52,7 @@ import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -298,7 +299,12 @@ public class MainActivity extends AppCompatActivity {
 
             } else if (BluetoothService.ACTION_DATA_AVAILABLE.equals(action)) {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
-                Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue));
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(System.currentTimeMillis());
+                Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                +" at "+(calendar.get(Calendar.HOUR_OF_DAY)) +":"+
+                        (calendar.get(Calendar.MINUTE))+":"+
+                        (calendar.get(Calendar.SECOND)));
                 List<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
                 if (datas.size() == 0) {
                     return;
