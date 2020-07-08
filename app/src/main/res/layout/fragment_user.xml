@@ -224,13 +224,13 @@
                 </RelativeLayout>
             </LinearLayout>
 
-            <TextView
+            <!--<TextView
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:layout_alignParentBottom="true"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
-                android:background="@color/common_dividercolor" />
+                android:background="@color/common_dividercolor" />-->
 
 
         </LinearLayout>

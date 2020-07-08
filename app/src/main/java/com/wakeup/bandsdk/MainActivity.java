@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -25,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1;
 
-    private TextView mTextMessage;
+    private TextView mTextMessage,tv_connect_state;
     private static final int REQUEST_SEARCH = 1;
     private BluetoothService mBluetoothLeService;
 
@@ -73,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private CommandManager commandManager;
     private DataParse dataPasrse;
     private BandInfo bandInfo;
+    private ImageView imgConecct;
 
 
     @Override
@@ -83,8 +86,11 @@ public class MainActivity extends AppCompatActivity {
 
         mTextMessage = (TextView) findViewById(R.id.message);
         connectBt = findViewById(R.id.connect);
-        Button loginBtn = findViewById(R.id.goToLogin);
-        progressBar = findViewById(R.id.progressBar);
+        imgConecct=findViewById(R.id.iv_band_connected);
+        tv_connect_state=findViewById(R.id.tv_connect_state);
+
+       // Button loginBtn = findViewById(R.id.goToLogin);
+        //progressBar = findViewById(R.id.progressBar);
 
         isBLESupported();
 
@@ -100,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        loginBtn.setOnClickListener(v -> setContentView(R.layout.activity_login));
+        //loginBtn.setOnClickListener(v -> setContentView(R.layout.activity_login));
 
         @Nullable
         //启动蓝牙服务
@@ -229,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void connect(View view) {
         mBluetoothLeService.connect(address);
-        progressBar.setVisibility(View.VISIBLE);
+       // progressBar.setVisibility(View.VISIBLE);
         /*if (!TextUtils.isEmpty(address)) {
             mBluetoothLeService.connect(address);
             progressBar.setVisibility(View.VISIBLE);
@@ -254,12 +260,17 @@ public class MainActivity extends AppCompatActivity {
             if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
                 connectBt.setText("DISCONNECT");
-                progressBar.setVisibility(View.GONE);
+                imgConecct.setBackgroundResource(R.drawable.band_connected);
+                tv_connect_state.setText("Conectado");
+//                progressBar.setVisibility(View.GONE);
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
                 connectBt.setText("CONNECTION");
-                progressBar.setVisibility(View.GONE);
+                imgConecct.setBackgroundResource(R.drawable.band_unconnect);
+                tv_connect_state.setText("Desconectado");
+
+                //progressBar.setVisibility(View.GONE);
 
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
@@ -409,6 +420,7 @@ public class MainActivity extends AppCompatActivity {
                         case 0x32:
                             //ONE-CLICK MEASUREMENT
                             OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);
+                            System.out.println("-----------"+datas);
                             Log.i(TAG, oneButtonMeasurementBean.toString());
 
                             break;
@@ -417,10 +429,8 @@ public class MainActivity extends AppCompatActivity {
                             //CONTINUOUS HEART RATE, BRACELET REAL-TIME HEART RATE RETURN
                             HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
                             Log.i(TAG, heartRateBean.toString());
-
                             break;
                         default:
-
                             break;
                     }
                 }

@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.RadioButton;
 
 import com.wakeup.bandsdk.Fragments.HomeFragment;
+import com.wakeup.bandsdk.Fragments.UserFragment;
 import com.wakeup.bandsdk.R;
 
 public class HomeActivity extends AppCompatActivity {
@@ -42,7 +43,9 @@ public class HomeActivity extends AppCompatActivity {
             System.out.println("cambio a home");
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.fl_fragment_container, fragmentHome);
+            fragmentTransaction.replace(R.id.fl_fragment_container, fragmentHome);
+            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
 
         }
@@ -51,23 +54,22 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void fragmentInfo(View view) {
-        Fragment fragmentHome = new HomeFragment();
-        Bundle args = new Bundle();
-        if (radioButtonInfo.isChecked() == true) {
-            System.out.println("cambio a info");
-            args.putString("a","");
-        }
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.fl_fragment_container, fragmentHome);
-        fragmentTransaction.commit();
-        fragmentHome.setArguments(args);
     }
 
     public void fragmentUser(View view) {
+        Fragment fragmentUser = new UserFragment();
+        Bundle args = new Bundle();
         if (radioButtonUser.isChecked() == true) {
-            System.out.println("cambio user");
+            System.out.println("cambio a user");
+            args.putString("a", "");
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.fl_fragment_container, fragmentUser);
+            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+
         }
     }
 
