@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         mTextMessage = (TextView) findViewById(R.id.message);
         connectBt = findViewById(R.id.connect);
-        Button loginBtn = findViewById(R.id.goToLogin);
+        Button goToLoginBtn = findViewById(R.id.goToLogin);
         progressBar = findViewById(R.id.progressBar);
 
         isBLESupported();
@@ -100,7 +100,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        loginBtn.setOnClickListener(v -> setContentView(R.layout.activity_login));
+        goToLoginBtn.setOnClickListener(v -> {
+            Log.d(TAG, "To Login Activity...");
+            setContentView(R.layout.activity_login);
+        });
 
         @Nullable
         //启动蓝牙服务
