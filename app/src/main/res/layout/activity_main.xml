@@ -104,7 +104,15 @@
                     android:text="@string/get_data" />
 
 
+<<<<<<< HEAD
             </LinearLayout>
+=======
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="battery"
+                android:text="@string/battery" />
+>>>>>>> aa4c952527f1b22b7ec6faad03a138af5116a215
 
             <LinearLayout
                 android:layout_width="wrap_content"

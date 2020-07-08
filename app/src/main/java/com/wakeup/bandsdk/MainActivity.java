@@ -19,6 +19,7 @@ import android.provider.Settings;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.TextUtils;
 import android.app.AlertDialog.Builder;
 import android.util.Log;
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1;
 
-    private TextView mTextMessage,tv_connect_state;
+    private TextView mTextMessage, tv_connect_state;
     private static final int REQUEST_SEARCH = 1;
     private BluetoothService mBluetoothLeService;
 
@@ -86,10 +87,10 @@ public class MainActivity extends AppCompatActivity {
 
         mTextMessage = (TextView) findViewById(R.id.message);
         connectBt = findViewById(R.id.connect);
-        imgConecct=findViewById(R.id.iv_band_connected);
-        tv_connect_state=findViewById(R.id.tv_connect_state);
+        imgConecct = findViewById(R.id.iv_band_connected);
+        tv_connect_state = findViewById(R.id.tv_connect_state);
 
-       // Button loginBtn = findViewById(R.id.goToLogin);
+        // Button loginBtn = findViewById(R.id.goToLogin);
         //progressBar = findViewById(R.id.progressBar);
 
         isBLESupported();
@@ -110,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Nullable
         //启动蓝牙服务
-        Intent gattServiceIntent = new Intent(this, BluetoothService.class);
+                Intent gattServiceIntent = new Intent(this, BluetoothService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
         commandManager = CommandManager.getInstance(this);
@@ -235,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void connect(View view) {
         mBluetoothLeService.connect(address);
-       // progressBar.setVisibility(View.VISIBLE);
+        // progressBar.setVisibility(View.VISIBLE);
         /*if (!TextUtils.isEmpty(address)) {
             mBluetoothLeService.connect(address);
             progressBar.setVisibility(View.VISIBLE);
@@ -250,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         }*/
     }
 
-
+    public boolean medicionCorrecta = false;
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
 
@@ -263,6 +264,36 @@ public class MainActivity extends AppCompatActivity {
                 imgConecct.setBackgroundResource(R.drawable.band_connected);
                 tv_connect_state.setText("Conectado");
 //                progressBar.setVisibility(View.GONE);
+
+                /**
+                 *
+                 * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+                 */
+                Timer timer;
+                timer = new Timer();
+
+                TimerTask batteryInfo = new TimerTask() {
+                    @Override
+                    public void run() {
+                        commandManager.getBatteryInfo();
+                    }
+                };
+                timer.schedule(batteryInfo, 0, 600000);
+
+                /**
+                 *
+                 * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
+                 */
+
+                commandManager.openHourlyMeasure(1);
+
+                /**
+                 *
+                 * SINCRONIZACIÓN DE TIEMPO
+                 *
+                 */
+                commandManager.setTimeSync();
+
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
@@ -420,7 +451,11 @@ public class MainActivity extends AppCompatActivity {
                         case 0x32:
                             //ONE-CLICK MEASUREMENT
                             OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);
-                            System.out.println("-----------"+datas);
+
+                            System.out.println("-----------" + datas);
+
+                            System.out.println("---------" + datas);
+
                             Log.i(TAG, oneButtonMeasurementBean.toString());
 
                             break;
@@ -573,12 +608,81 @@ public class MainActivity extends AppCompatActivity {
 
     public synchronized void single_heartRate(View view) {
 
+        Meassure();
+
+
+    }
+
+    /**
+     * REAL TIME MEASUREMENT
+     *
+     * @param view
+     */
+    public void real_time_heartRate(View view) throws InterruptedException {
+        commandManager.singleRealtimeMeasure(0X09, 1);
+//        commandManager.singleRealtimeMeasure(0X09, 0);
+//        commandManager.singleRealtimeMeasure(0X0A,0); //关闭实时测量
+
+
+    }
+
+    public void getSleep(View view) {
+        commandManager.syncSleepData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
+    }
+
+
+    /**
+     * CONTINUOUS HEART RATE BRACELET FOR REAL-TIME HEART RATE
+     *
+     * @param view
+     */
+
+
+    public synchronized void real_time_heartRate2_1(View view) {
+//        while (!transfer){
+//            try{
+//                wait();
+//            }catch (InterruptedException e){
+//                Thread.currentThread().interrupt();
+//                Log.i(TAG, "Thread Interrupted");
+//            }
+//        }
+//        transfer = false;
+        commandManager.getRealTimeHeartRate(1);
+        notifyAll();
+
+
+    }
+
+    /**
+     * 关闭 CLOSE CONTINUOUS HEART RATE BRACELET FOR REAL-TIME HEART RATE
+     *
+     * @param view
+     */
+    public synchronized void real_time_heartRate2_0(View view) {
+        while (transfer) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Log.i(TAG, "Thread Interrupted");
+            }
+        }
+        transfer = true;
+        notifyAll();
+        commandManager.singleRealtimeMeasure(0X09, 0);
+        //commandManager.getRealTimeHeartRate(0);
+    }
+
+
+    //-------------------------------------------OWN FUNCTIONS------------------------------------------
+    public synchronized void Meassure() {
         /**
          *
          * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
          */
         Timer timer;
-        timer=new Timer();
+        timer = new Timer();
 //
 //        /**
 //         *
@@ -632,8 +736,6 @@ public class MainActivity extends AppCompatActivity {
 //        timer.schedule(finishTemperature,180000);
 
 
-
-
 //        while(System.currentTimeMillis()-|Time<=60000) {
 //            Log.i(TAG, "---------MEASUREMENT IN PROGRESS------------");
 //            notifyAll();
@@ -650,19 +752,17 @@ public class MainActivity extends AppCompatActivity {
          */
 
 
-
-
-        TimerTask startTemperature=new TimerTask() {
+//        TimerTask startTemperature=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.oneButtonMeasurement( 0);
+//                commandManager.singleRealtimeMeasure(0X81, 1);
+//            }
+//        };
+        TimerTask finishMeasure = new TimerTask() {
             @Override
             public void run() {
-                commandManager.oneButtonMeasurement( 0);
-                commandManager.singleRealtimeMeasure(0X81, 1);
-            }
-        };
-        TimerTask finishMeasure=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X81, 0);
+                commandManager.oneButtonMeasurement(0);
             }
         };
 
@@ -676,84 +776,10 @@ public class MainActivity extends AppCompatActivity {
          *
          * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
          */
-        timer.schedule(startTemperature,45000);
-        timer.schedule(finishMeasure,90000);
+//        timer.schedule(startTemperature,45000);
+        timer.schedule(finishMeasure, 45000);
 
 
-    }
-
-    /**
-     * REAL TIME MEASUREMENT
-     *
-     * @param view
-     */
-    public void real_time_heartRate(View view) throws InterruptedException {
-        commandManager.singleRealtimeMeasure(0X09, 1);
-//        commandManager.singleRealtimeMeasure(0X09, 0);
-//        commandManager.singleRealtimeMeasure(0X0A,0); //关闭实时测量
-
-
-    }
-
-    public void getSleep(View view) {
-        commandManager.syncSleepData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
-    }
-
-
-    /**
-     * CONTINUOUS HEART RATE BRACELET FOR REAL-TIME HEART RATE
-     *
-     * @param view
-     */
-
-
-    public synchronized void real_time_heartRate2_1(View view) {
-//        while (!transfer){
-//            try{
-//                wait();
-//            }catch (InterruptedException e){
-//                Thread.currentThread().interrupt();
-//                Log.i(TAG, "Thread Interrupted");
-//            }
-//        }
-//        transfer = false;
-        commandManager.getRealTimeHeartRate(1);
-        notifyAll();
-
-
-
-
-
-    }
-
-    /**
-     * 关闭 CLOSE CONTINUOUS HEART RATE BRACELET FOR REAL-TIME HEART RATE
-     *
-     * @param view
-     */
-    public synchronized void real_time_heartRate2_0(View view) {
-        while (transfer) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                Log.i(TAG, "Thread Interrupted");
-            }
-        }
-        transfer = true;
-        notifyAll();
-        commandManager.singleRealtimeMeasure(0X09, 0);
-        //commandManager.getRealTimeHeartRate(0);
-    }
-
-
-    //-------------------------------------------OWN FUNCTIONS------------------------------------------
-    public static void pause(int ms) {
-        try {
-            TimeUnit.MILLISECONDS.sleep(ms);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
     }
 
 }
