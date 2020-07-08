@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity">
+    tools:context=".activity.LoginActivity">
 
     <Button
         android:id="@+id/directAccess"
@@ -32,6 +32,8 @@
         android:background="@android:color/transparent"
         android:hint="@string/login_username"
         android:textColorHint="#000000"
+        app:errorEnabled="true"
+        app:errorTextColor="@color/design_default_color_error"
         app:boxStrokeColor="@android:color/holo_blue_dark"
         app:layout_constraintBottom_toTopOf="@id/loginPasswordField"
         app:layout_constraintEnd_toEndOf="parent"
@@ -61,6 +63,8 @@
         android:textColorHint="#000000"
         app:boxStrokeColor="@android:color/holo_blue_dark"
         app:endIconMode="password_toggle"
+        app:errorEnabled="true"
+        app:errorTextColor="@color/design_default_color_error"
         app:endIconTint="#000000"
         app:layout_constraintBottom_toTopOf="@id/forgotPassword"
         app:layout_constraintEnd_toEndOf="parent"
