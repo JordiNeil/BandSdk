@@ -24,8 +24,8 @@
     <string name="test_message">Test message notification</string>
     <string name="set_alarm_clock">set alarm</string>
     <string name="get_sleep_data">Getting Sleep Data (ID 52)</string>
-    <string name="single_measure">Single measurement (heart rate as an example)</string>
-    <string name="real_time_measure">Real-time measurement (heart rate as an example)</string>
+    <string name="single_measure">MEASUREMENT</string>
+    <string name="real_time_measure">REAL-TIME MEASUREMENT</string>
     <string name="one_button_measurement">One button measurement</string>
     <string name="get_real_heartrate">Continuous Heart Rate Hand Ring for Real-time Heart Rate Acquisition</string>
     <string name="turn_off_real_heartrate">Closing Continuous Heart Rate Bracelet for Real-time Heart Rate Acquisition</string>
