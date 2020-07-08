@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -18,6 +19,7 @@ import android.provider.Settings;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.TextUtils;
 import android.app.AlertDialog.Builder;
 import android.util.Log;
@@ -25,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1;
 
-    private TextView mTextMessage;
+    private TextView mTextMessage, tv_connect_state;
     private static final int REQUEST_SEARCH = 1;
     private BluetoothService mBluetoothLeService;
 
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private CommandManager commandManager;
     private DataParse dataPasrse;
     private BandInfo bandInfo;
+    private ImageView imgConecct;
 
 
     @Override
@@ -84,8 +88,11 @@ public class MainActivity extends AppCompatActivity {
 
         mTextMessage = (TextView) findViewById(R.id.message);
         connectBt = findViewById(R.id.connect);
-        Button loginBtn = findViewById(R.id.goToLogin);
-        progressBar = findViewById(R.id.progressBar);
+        imgConecct = findViewById(R.id.iv_band_connected);
+        tv_connect_state = findViewById(R.id.tv_connect_state);
+
+        // Button loginBtn = findViewById(R.id.goToLogin);
+        //progressBar = findViewById(R.id.progressBar);
 
         isBLESupported();
 
@@ -101,11 +108,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        loginBtn.setOnClickListener(v -> setContentView(R.layout.activity_login));
+        //loginBtn.setOnClickListener(v -> setContentView(R.layout.activity_login));
 
         @Nullable
         //启动蓝牙服务
-        Intent gattServiceIntent = new Intent(this, BluetoothService.class);
+                Intent gattServiceIntent = new Intent(this, BluetoothService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
         commandManager = CommandManager.getInstance(this);
@@ -230,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void connect(View view) {
         mBluetoothLeService.connect(address);
-        progressBar.setVisibility(View.VISIBLE);
+        // progressBar.setVisibility(View.VISIBLE);
         /*if (!TextUtils.isEmpty(address)) {
             mBluetoothLeService.connect(address);
             progressBar.setVisibility(View.VISIBLE);
@@ -244,7 +251,8 @@ public class MainActivity extends AppCompatActivity {
             mBluetoothLeService.disconnect();
         }*/
     }
-    public boolean medicionCorrecta=false;
+
+    public boolean medicionCorrecta = false;
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
 
@@ -254,22 +262,24 @@ public class MainActivity extends AppCompatActivity {
             if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
                 connectBt.setText("DISCONNECT");
-                progressBar.setVisibility(View.GONE);
+                imgConecct.setBackgroundResource(R.drawable.band_connected);
+                tv_connect_state.setText("Conectado");
+//                progressBar.setVisibility(View.GONE);
 
                 /**
                  *
                  * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
                  */
                 Timer timer;
-                timer=new Timer();
+                timer = new Timer();
 
-                TimerTask batteryInfo=new TimerTask() {
+                TimerTask batteryInfo = new TimerTask() {
                     @Override
                     public void run() {
                         commandManager.getBatteryInfo();
                     }
                 };
-                timer.schedule(batteryInfo,0,600000);
+                timer.schedule(batteryInfo, 0, 600000);
 
                 /**
                  *
@@ -286,11 +296,13 @@ public class MainActivity extends AppCompatActivity {
                 commandManager.setTimeSync();
 
 
-
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
                 connectBt.setText("CONNECTION");
-                progressBar.setVisibility(View.GONE);
+                imgConecct.setBackgroundResource(R.drawable.band_unconnect);
+                tv_connect_state.setText("Desconectado");
+
+                //progressBar.setVisibility(View.GONE);
 
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
@@ -445,7 +457,11 @@ public class MainActivity extends AppCompatActivity {
                         case 0x32:
                             //ONE-CLICK MEASUREMENT
                             OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);
-                            System.out.println("---------"+datas);
+
+                            System.out.println("-----------" + datas);
+
+                            System.out.println("---------" + datas);
+
                             Log.i(TAG, oneButtonMeasurementBean.toString());
 
                             break;
@@ -454,10 +470,8 @@ public class MainActivity extends AppCompatActivity {
                             //CONTINUOUS HEART RATE, BRACELET REAL-TIME HEART RATE RETURN
                             HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
                             Log.i(TAG, heartRateBean.toString());
-
                             break;
                         default:
-
                             break;
                     }
                 }
@@ -600,7 +614,7 @@ public class MainActivity extends AppCompatActivity {
 
     public synchronized void single_heartRate(View view) {
 
-       Meassure();
+        Meassure();
 
 
     }
@@ -644,9 +658,6 @@ public class MainActivity extends AppCompatActivity {
         notifyAll();
 
 
-
-
-
     }
 
     /**
@@ -671,13 +682,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
-    public synchronized void Meassure(){
+    public synchronized void Meassure() {
         /**
          *
          * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
          */
         Timer timer;
-        timer=new Timer();
+        timer = new Timer();
 //
 //        /**
 //         *
@@ -731,8 +742,6 @@ public class MainActivity extends AppCompatActivity {
 //        timer.schedule(finishTemperature,180000);
 
 
-
-
 //        while(System.currentTimeMillis()-|Time<=60000) {
 //            Log.i(TAG, "---------MEASUREMENT IN PROGRESS------------");
 //            notifyAll();
@@ -749,8 +758,6 @@ public class MainActivity extends AppCompatActivity {
          */
 
 
-
-
 //        TimerTask startTemperature=new TimerTask() {
 //            @Override
 //            public void run() {
@@ -758,7 +765,7 @@ public class MainActivity extends AppCompatActivity {
 //                commandManager.singleRealtimeMeasure(0X81, 1);
 //            }
 //        };
-        TimerTask finishMeasure=new TimerTask() {
+        TimerTask finishMeasure = new TimerTask() {
             @Override
             public void run() {
                 commandManager.oneButtonMeasurement(0);
@@ -776,7 +783,7 @@ public class MainActivity extends AppCompatActivity {
          * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
          */
 //        timer.schedule(startTemperature,45000);
-        timer.schedule(finishMeasure,45000);
+        timer.schedule(finishMeasure, 45000);
 
 
     }

@@ -44,6 +44,7 @@ dependencies {
     //GSON
 
     implementation 'com.google.code.gson:gson:2.8.6'
+//fragment
 
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')

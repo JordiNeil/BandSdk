@@ -76,7 +76,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
 
         mHandler = new Handler();
 
-        getFisiometria = findViewById(R.id.getFisiometria);
+        //getFisiometria = findViewById(R.id.getFisiometria);
 
 
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
