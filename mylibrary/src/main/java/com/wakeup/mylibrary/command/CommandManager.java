@@ -129,9 +129,9 @@ public class CommandManager {
     }
 
     /**
-     * 下拉同步数据
+     * DOWNLOAD SYNC DATA
      *
-     * @param timeInMillis 同步数据起始时间毫秒值
+     * @param timeInMillis SYNCHRONIZATION DATA IN MILISECONDS
      */
     public void syncData(long timeInMillis) {
         Log.i(TAG, "syncData: ");

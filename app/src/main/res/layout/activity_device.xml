@@ -1,17 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-    <Button
-        android:id="@+id/getFisiometria"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="obtener"
-        android:layout_marginLeft="20dp"
-        android:onClick="getFisiometria"/>
-    <ListView
-        android:id="@+id/listview"
+        android:layout_height="200dp"
+        android:background="@color/topbar_step">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true">
+
+            <ImageView
+                android:id="@+id/iv_search_anim1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:scaleType="fitXY"
+                android:src="@drawable/search_anim" />
+
+            <ImageView
+                android:id="@+id/iv_search_anim2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:scaleType="fitXY"
+                android:src="@drawable/search_anim" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/band_unconnect" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_device_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textSize14" />
+    </RelativeLayout>
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:choiceMode="singleChoice" />
+
+
+    </FrameLayout>
 </LinearLayout>

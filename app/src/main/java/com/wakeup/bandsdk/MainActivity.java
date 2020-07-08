@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -18,6 +19,7 @@ import android.provider.Settings;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.TextUtils;
 import android.app.AlertDialog.Builder;
 import android.util.Log;
@@ -25,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1;
 
-    private TextView mTextMessage;
+    private TextView mTextMessage, tv_connect_state;
     private static final int REQUEST_SEARCH = 1;
     private BluetoothService mBluetoothLeService;
 
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private CommandManager commandManager;
     private DataParse dataPasrse;
     private BandInfo bandInfo;
+    private ImageView imgConecct;
 
 
     @Override
@@ -83,8 +87,11 @@ public class MainActivity extends AppCompatActivity {
 
         mTextMessage = (TextView) findViewById(R.id.message);
         connectBt = findViewById(R.id.connect);
-        Button goToLoginBtn = findViewById(R.id.goToLogin);
-        progressBar = findViewById(R.id.progressBar);
+        imgConecct = findViewById(R.id.iv_band_connected);
+        tv_connect_state = findViewById(R.id.tv_connect_state);
+
+        // Button loginBtn = findViewById(R.id.goToLogin);
+        //progressBar = findViewById(R.id.progressBar);
 
         isBLESupported();
 
@@ -100,14 +107,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        goToLoginBtn.setOnClickListener(v -> {
+        /*goToLoginBtn.setOnClickListener(v -> {
             Log.d(TAG, "To Login Activity...");
             setContentView(R.layout.activity_login);
-        });
+        });*/
 
         @Nullable
         //启动蓝牙服务
-        Intent gattServiceIntent = new Intent(this, BluetoothService.class);
+                Intent gattServiceIntent = new Intent(this, BluetoothService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
         commandManager = CommandManager.getInstance(this);
@@ -232,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void connect(View view) {
         mBluetoothLeService.connect(address);
-        progressBar.setVisibility(View.VISIBLE);
+        // progressBar.setVisibility(View.VISIBLE);
         /*if (!TextUtils.isEmpty(address)) {
             mBluetoothLeService.connect(address);
             progressBar.setVisibility(View.VISIBLE);
@@ -247,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
         }*/
     }
 
-
+    public boolean medicionCorrecta = false;
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
 
@@ -257,12 +264,47 @@ public class MainActivity extends AppCompatActivity {
             if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
                 connectBt.setText("DISCONNECT");
-                progressBar.setVisibility(View.GONE);
+                imgConecct.setBackgroundResource(R.drawable.band_connected);
+                tv_connect_state.setText("Conectado");
+//                progressBar.setVisibility(View.GONE);
+
+                /**
+                 *
+                 * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+                 */
+                Timer timer;
+                timer = new Timer();
+
+                TimerTask batteryInfo = new TimerTask() {
+                    @Override
+                    public void run() {
+                        commandManager.getBatteryInfo();
+                    }
+                };
+                timer.schedule(batteryInfo, 0, 600000);
+
+                /**
+                 *
+                 * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
+                 */
+
+                commandManager.openHourlyMeasure(1);
+
+                /**
+                 *
+                 * SINCRONIZACIÓN DE TIEMPO
+                 *
+                 */
+                commandManager.setTimeSync();
+
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
                 connectBt.setText("CONNECTION");
-                progressBar.setVisibility(View.GONE);
+                imgConecct.setBackgroundResource(R.drawable.band_unconnect);
+                tv_connect_state.setText("Desconectado");
+
+                //progressBar.setVisibility(View.GONE);
 
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
@@ -412,6 +454,11 @@ public class MainActivity extends AppCompatActivity {
                         case 0x32:
                             //ONE-CLICK MEASUREMENT
                             OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);
+
+                            System.out.println("-----------" + datas);
+
+                            System.out.println("---------" + datas);
+
                             Log.i(TAG, oneButtonMeasurementBean.toString());
 
                             break;
@@ -420,10 +467,8 @@ public class MainActivity extends AppCompatActivity {
                             //CONTINUOUS HEART RATE, BRACELET REAL-TIME HEART RATE RETURN
                             HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
                             Log.i(TAG, heartRateBean.toString());
-
                             break;
                         default:
-
                             break;
                     }
                 }
@@ -566,76 +611,8 @@ public class MainActivity extends AppCompatActivity {
 
     public synchronized void single_heartRate(View view) {
 
-        /**
-         *
-         * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
-         */
-        Timer timer;
-        timer=new Timer();
+        Meassure();
 
-        /**
-         *
-         * DECLARACIÓN DE LAS TAREAS PARA INICIAR Y FINALIZAR CADA UNA DE LAS MEDICIONES.
-         */
-
-        TimerTask startHeartRate=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X09, 1);
-            }
-        };
-        TimerTask finishHeartRate=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X09, 0);
-                commandManager.singleRealtimeMeasure(0X11, 1);
-            }
-        };
-        TimerTask finishBloodOxygen=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X11, 0);
-                commandManager.singleRealtimeMeasure(0X21, 1);
-            }
-        };
-        TimerTask finishBloodPressure=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X21, 0);
-                commandManager.singleRealtimeMeasure(0X81, 1);
-            }
-        };
-        TimerTask finishTemperature=new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.singleRealtimeMeasure(0X81, 0);
-            }
-        };
-
-        /**
-         *
-         * PROGRAMACIÓN DE TAREAS PARA INICIAR Y FINALIZAR LAS MEDICIONES
-         */
-
-
-        timer.schedule(startHeartRate,0);
-        timer.schedule(finishHeartRate,45000);
-        timer.schedule(finishBloodOxygen,90000);
-        timer.schedule(finishBloodPressure,135000);
-        timer.schedule(finishTemperature,180000);
-
-
-
-
-//        while(System.currentTimeMillis()-|Time<=60000) {
-//            Log.i(TAG, "---------MEASUREMENT IN PROGRESS------------");
-//            notifyAll();
-//        }
-//        Log.i(TAG,"-----------MEASUREMENT FINISHED-----------");
-//        pause(60000);
-//        TimeUnit.MINUTES.sleep(1);
-//        commandManager.oneButtonMeasurement(1);
-//        commandManager.getRealTimeHeartRate(1);
 
     }
 
@@ -678,9 +655,6 @@ public class MainActivity extends AppCompatActivity {
         notifyAll();
 
 
-
-
-
     }
 
     /**
@@ -705,12 +679,110 @@ public class MainActivity extends AppCompatActivity {
 
 
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
-    public static void pause(int ms) {
-        try {
-            TimeUnit.MILLISECONDS.sleep(ms);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
+    public synchronized void Meassure() {
+        /**
+         *
+         * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
+         */
+        Timer timer;
+        timer = new Timer();
+//
+//        /**
+//         *
+//         * DECLARACIÓN DE LAS TAREAS PARA INICIAR Y FINALIZAR CADA UNA DE LAS MEDICIONES.
+//         */
+//
+//        TimerTask startHeartRate=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.singleRealtimeMeasure(0X09, 1);
+//            }
+//        };
+//        TimerTask finishHeartRate=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.singleRealtimeMeasure(0X09, 0);
+//                commandManager.singleRealtimeMeasure(0X11, 1);
+//            }
+//        };
+//        TimerTask finishBloodOxygen=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.singleRealtimeMeasure(0X11, 0);
+//                commandManager.singleRealtimeMeasure(0X21, 1);
+//            }
+//        };
+//        TimerTask finishBloodPressure=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.singleRealtimeMeasure(0X21, 0);
+//                commandManager.singleRealtimeMeasure(0X81, 1);
+//            }
+//        };
+//        TimerTask finishTemperature=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.singleRealtimeMeasure(0X81, 0);
+//            }
+//        };
+//
+//        /**
+//         *
+//         * PROGRAMACIÓN DE TAREAS PARA INICIAR Y FINALIZAR LAS MEDICIONES
+//         */
+//
+//
+//        timer.schedule(startHeartRate,0);
+//        timer.schedule(finishHeartRate,45000);
+//        timer.schedule(finishBloodOxygen,90000);
+//        timer.schedule(finishBloodPressure,135000);
+//        timer.schedule(finishTemperature,180000);
+
+
+//        while(System.currentTimeMillis()-|Time<=60000) {
+//            Log.i(TAG, "---------MEASUREMENT IN PROGRESS------------");
+//            notifyAll();
+//        }
+//        Log.i(TAG,"-----------MEASUREMENT FINISHED-----------");
+//        pause(60000);
+//        TimeUnit.MINUTES.sleep(1);
+//        commandManager.oneButtonMeasurement(1);
+//        commandManager.getRealTimeHeartRate(1);
+
+        /**
+         *
+         *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
+         */
+
+
+//        TimerTask startTemperature=new TimerTask() {
+//            @Override
+//            public void run() {
+//                commandManager.oneButtonMeasurement( 0);
+//                commandManager.singleRealtimeMeasure(0X81, 1);
+//            }
+//        };
+        TimerTask finishMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(0);
+            }
+        };
+
+        /**
+         *
+         * INICIO DE LA MEDICIÓN
+         */
+        commandManager.oneButtonMeasurement(1);
+
+        /**
+         *
+         * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
+         */
+//        timer.schedule(startTemperature,45000);
+        timer.schedule(finishMeasure, 45000);
+
+
     }
 
 }

@@ -1,266 +1,324 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><!--
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
     android:orientation="vertical"
-    >
+    tools:context=".MainActivity">
 
 
-
-<ScrollView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="20dp"
-        android:orientation="vertical"
+        android:layout_height="match_parent">
 
-        >
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="20dp"
+
             >
 
-            <TextView
-                android:id="@+id/message"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                />
+                android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+
+                <Button
+                    android:id="@+id/connect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="connect"
+                    android:text="@string/connect" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/goToLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="Login" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="syncTime"
+                    android:text="@string/sync_time" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="vibrate"
+                    android:text="@string/vibrate" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="version"
+                    android:text="@string/get_band_info" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="battery"
+                    android:text="@string/battery" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="openMeasure"
+                    android:text="@string/open_hourly_measure" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="syncData"
+                    android:text="@string/get_data" />
+
+
+<<<<<<< HEAD
+            </LinearLayout>
+=======
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="battery"
+                android:text="@string/battery" />
+>>>>>>> aa4c952527f1b22b7ec6faad03a138af5116a215
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="clearData"
+                    android:text="@string/clear_data" />
+
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="openMessage"
+                    android:text="@string/open_message" />
+
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="sendMessage"
+                    android:text="@string/test_message" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="alarm_clock"
+                    android:text="@string/set_alarm_clock" />
+
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="getSleep"
+                    android:text="@string/get_sleep_data" />
+
+
+                &lt;!&ndash;<Button&ndash;&gt;
+                &lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;
+                &lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;
+                &lt;!&ndash;android:text="测试消息通知"&ndash;&gt;
+                &lt;!&ndash;android:onClick="sendMessage"&ndash;&gt;
+                &lt;!&ndash;/>&ndash;&gt;
+
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="50dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="single_heartRate"
+                    android:text="@string/single_measure" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="real_time_heartRate"
+                    android:text="@string/real_time_measure" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="real_time_heartRate2_0"
+                    android:text="@string/one_button_measurement" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="real_time_heartRate2_1"
+                    android:text="@string/get_real_heartrate" />
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="real_time_heartRate2_0"
+                    android:text="@string/turn_off_real_heartrate" />
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+</LinearLayout>-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_connect_manager"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/topbar_step">
+
+        <ImageView
+            android:id="@+id/iv_band_connected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/band_unconnect" />
+
+        <TextView
+            android:id="@+id/tv_connect_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:text="Conectar"
+            android:textColor="@color/white" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/rl_band_connected"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/white">
+
+                <TextView
+                    android:id="@+id/message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="15dp"
+                    android:text="Mac" />
+
+
+                <TextView
+                    android:id="@+id/tv_last_device"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="15dp"
+                    android:text="Texto para conectar "
+                    android:visibility="gone" />
+            </RelativeLayout>
 
             <Button
                 android:id="@+id/connect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="230dp"
+                android:background="@drawable/bg_check_version_selector"
+                android:gravity="center"
                 android:onClick="connect"
+                android:paddingStart="60dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="60dp"
+                android:paddingBottom="10dp"
                 android:text="@string/connect" />
 
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                />
-
-            <Button
-                android:id="@+id/goToLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Login"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sync_time"
-                android:onClick="syncTime"
-                />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/vibrate"
-                android:onClick="vibrate"
-                />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/get_band_info"
-                android:onClick="version"
-                />
 
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/battery"
-                android:onClick="battery"
-                />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/open_hourly_measure"
-                android:onClick="openMeasure"
-                />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/get_data"
-                android:onClick="syncData"
-                />
-
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="clearData"
-                android:text="@string/clear_data" />
-
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="openMessage"
-                android:text="@string/open_message" />
-
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="sendMessage"
-                android:text="@string/test_message" />
-
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/set_alarm_clock"
-                android:onClick="alarm_clock"
-                />
-
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/get_sleep_data"
-                android:onClick="getSleep"
-                />
-
-
-            <!--<Button-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="测试消息通知"-->
-            <!--android:onClick="sendMessage"-->
-            <!--/>-->
-
-
-
-        </LinearLayout>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/single_measure"
-                android:onClick="single_heartRate"
-                />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/real_time_measure"
-                android:onClick="real_time_heartRate"
-                />
-
-
-
-
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/one_button_measurement"
-                android:onClick="real_time_heartRate2_0"
-                />
-
-
-
-
-
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/get_real_heartrate"
-                android:onClick="real_time_heartRate2_1"
-                />
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="real_time_heartRate2_0"
-                android:text="@string/turn_off_real_heartrate" />
-
-
-
-
-
-
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-
-
-</ScrollView>
-
-
-
+    </ScrollView>
 </LinearLayout>
