@@ -38,6 +38,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+        <activity android:name=".activity.HomeActivity" />
+        <activity android:name=".activity.RegisterActivity" />
         <activity android:name=".activity.DeviceScanActivity"  />
         <activity android:name=".activity.SendPicActivity" />
     </application>
