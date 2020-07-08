@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wakeup.bandsdk.activity.DeviceScanActivity;
+import com.wakeup.bandsdk.activity.HomeActivity;
 import com.wakeup.mylibrary.Config;
 import com.wakeup.mylibrary.bean.BandInfo;
 import com.wakeup.mylibrary.bean.Battery;
@@ -268,6 +269,9 @@ public class MainActivity extends AppCompatActivity {
                 imgConecct.setBackgroundResource(R.drawable.band_connected);
                 tv_connect_state.setText("Conectado");
 //                progressBar.setVisibility(View.GONE);
+                Intent intentHome = new Intent(context, HomeActivity.class);
+                intentHome.putExtra("address",address);
+                startActivity(intentHome);
 
                 /**
                  *
@@ -513,100 +517,6 @@ public class MainActivity extends AppCompatActivity {
         commandManager.vibrate();
     }
 
-    public void version(View view) {
-        commandManager.getVersion();
-
-    }
-
-    public void battery(View view) {
-        commandManager.getBatteryInfo();
-    }
-
-    public void syncTime(View view) {
-        commandManager.setTimeSync();
-    }
-
-    public void syncData(View view) {
-        if (bandInfo == null) {
-            Toast.makeText(MainActivity.this, "GET INFO OF BRACELET FIRST", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        //DATA SYNCHRONIZATION METHOD OF BRACELET WITH CONTINUOUS HEART RATE
-        if (Config.hasContinuousHeart) {
-            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
-
-            commandManager.syncDataHr(System.currentTimeMillis() - 7 * 24 * 3600 * 1000,
-                    System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
-
-        } else {
-            //WAY OF SYNCHRONIZING DATA WITH BRACELET WITHOUT CONTINUOUS HEART RATE
-            commandManager.syncData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
-
-        }
-    }
-
-    /**
-     * TURN ON HOURLY MEASUREMENT
-     *
-     * @param view
-     */
-    public void openMeasure(View view) {
-        commandManager.openHourlyMeasure(1);
-    }
-
-    /**
-     * CLEAR BRACELET DATA
-     *
-     * @param view
-     */
-    public void clearData(View view) {
-        commandManager.clearData();
-    }
-
-    /**
-     * SEND MESSAGE
-     *
-     * @param view
-     */
-    public void sendMessage(View view) {
-        //以QQ消息为例，可以传入不同的MessageID  例如MessageID.WECHAT
-        commandManager.sendMessage(MessageID.QQ, MessageType.COMING_MESSAGES, "测试消息通知");
-    }
-
-    public void openMessage(View view) {
-        commandManager.sendMessage(MessageID.QQ, MessageType.ON, null);
-
-    }
-
-
-    /**
-     * SET ALARM
-     *
-     * @param view
-     */
-    public void alarm_clock(View view) {
-        //闹钟id 为0 开启18:01闹钟，只响一次
-        commandManager.setAlarmClock(0, 1, 18, 1, Constants.ALARM_CLOCK_TYPE1);
-
-//        //闹钟id 为1 开启06:30闹钟，周一至周五
-//        commandManager.setAlarmClock(1,1,6,30,Constants.ALARM_CLOCK_TYPE2);
-//
-//        //闹钟id 为2 开启08:03，每天
-//        commandManager.setAlarmClock(2,1,8,3,Constants.ALARM_CLOCK_TYPE3);
-    }
-
-    /**
-     * ONE-CLICK MEASUREMENT   ONE-CLICK MEASUREMENT. AFTER 1 MINUTE, THE SHUT DOWN COMMAND WILL BE SENT AND THE RESULT WILL BE RETURNED
-     *
-     * @param view
-     */
-    public void one_button_measurement(View view) throws InterruptedException {
-        commandManager.oneButtonMeasurement(1);
-        Thread.sleep(60000);
-        //ONE MINUTE AFTER SENDING THE CLOSE COMMAND, THE MEASUREMENT WILL BE SENT
-        commandManager.oneButtonMeasurement(0);
-
-    }
 
     /**
      * SINGLE MEASUREMENT-AFTER 45S MEASUREMENT RESULTS WILL BE RETURNED
@@ -618,71 +528,7 @@ public class MainActivity extends AppCompatActivity {
     public synchronized void single_heartRate(View view) {
 
         Meassure();
-
-
     }
-
-    /**
-     * REAL TIME MEASUREMENT
-     *
-     * @param view
-     */
-    public void real_time_heartRate(View view) throws InterruptedException {
-        commandManager.singleRealtimeMeasure(0X09, 1);
-//        commandManager.singleRealtimeMeasure(0X09, 0);
-//        commandManager.singleRealtimeMeasure(0X0A,0); //关闭实时测量
-
-
-    }
-
-    public void getSleep(View view) {
-        commandManager.syncSleepData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
-    }
-
-
-    /**
-     * CONTINUOUS HEART RATE BRACELET FOR REAL-TIME HEART RATE
-     *
-     * @param view
-     */
-
-
-    public synchronized void real_time_heartRate2_1(View view) {
-//        while (!transfer){
-//            try{
-//                wait();
-//            }catch (InterruptedException e){
-//                Thread.currentThread().interrupt();
-//                Log.i(TAG, "Thread Interrupted");
-//            }
-//        }
-//        transfer = false;
-        commandManager.getRealTimeHeartRate(1);
-        notifyAll();
-
-
-    }
-
-    /**
-     * 关闭 CLOSE CONTINUOUS HEART RATE BRACELET FOR REAL-TIME HEART RATE
-     *
-     * @param view
-     */
-    public synchronized void real_time_heartRate2_0(View view) {
-        while (transfer) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                Log.i(TAG, "Thread Interrupted");
-            }
-        }
-        transfer = true;
-        notifyAll();
-        commandManager.singleRealtimeMeasure(0X09, 0);
-        //commandManager.getRealTimeHeartRate(0);
-    }
-
 
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
     public synchronized void Meassure() {
@@ -692,82 +538,13 @@ public class MainActivity extends AppCompatActivity {
          */
         Timer timer;
         timer = new Timer();
-//
-//        /**
-//         *
-//         * DECLARACIÓN DE LAS TAREAS PARA INICIAR Y FINALIZAR CADA UNA DE LAS MEDICIONES.
-//         */
-//
-//        TimerTask startHeartRate=new TimerTask() {
-//            @Override
-//            public void run() {
-//                commandManager.singleRealtimeMeasure(0X09, 1);
-//            }
-//        };
-//        TimerTask finishHeartRate=new TimerTask() {
-//            @Override
-//            public void run() {
-//                commandManager.singleRealtimeMeasure(0X09, 0);
-//                commandManager.singleRealtimeMeasure(0X11, 1);
-//            }
-//        };
-//        TimerTask finishBloodOxygen=new TimerTask() {
-//            @Override
-//            public void run() {
-//                commandManager.singleRealtimeMeasure(0X11, 0);
-//                commandManager.singleRealtimeMeasure(0X21, 1);
-//            }
-//        };
-//        TimerTask finishBloodPressure=new TimerTask() {
-//            @Override
-//            public void run() {
-//                commandManager.singleRealtimeMeasure(0X21, 0);
-//                commandManager.singleRealtimeMeasure(0X81, 1);
-//            }
-//        };
-//        TimerTask finishTemperature=new TimerTask() {
-//            @Override
-//            public void run() {
-//                commandManager.singleRealtimeMeasure(0X81, 0);
-//            }
-//        };
-//
-//        /**
-//         *
-//         * PROGRAMACIÓN DE TAREAS PARA INICIAR Y FINALIZAR LAS MEDICIONES
-//         */
-//
-//
-//        timer.schedule(startHeartRate,0);
-//        timer.schedule(finishHeartRate,45000);
-//        timer.schedule(finishBloodOxygen,90000);
-//        timer.schedule(finishBloodPressure,135000);
-//        timer.schedule(finishTemperature,180000);
 
-
-//        while(System.currentTimeMillis()-|Time<=60000) {
-//            Log.i(TAG, "---------MEASUREMENT IN PROGRESS------------");
-//            notifyAll();
-//        }
-//        Log.i(TAG,"-----------MEASUREMENT FINISHED-----------");
-//        pause(60000);
-//        TimeUnit.MINUTES.sleep(1);
-//        commandManager.oneButtonMeasurement(1);
-//        commandManager.getRealTimeHeartRate(1);
 
         /**
          *
          *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
          */
 
-
-//        TimerTask startTemperature=new TimerTask() {
-//            @Override
-//            public void run() {
-//                commandManager.oneButtonMeasurement( 0);
-//                commandManager.singleRealtimeMeasure(0X81, 1);
-//            }
-//        };
         TimerTask finishMeasure = new TimerTask() {
             @Override
             public void run() {
@@ -785,7 +562,6 @@ public class MainActivity extends AppCompatActivity {
          *
          * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
          */
-//        timer.schedule(startTemperature,45000);
         timer.schedule(finishMeasure, 45000);
 
 
