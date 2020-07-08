@@ -10,7 +10,14 @@
         android:id="@+id/fl_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/connect_status" />
+        android:layout_above="@+id/connect_status" >
+
+        <ImageView
+            android:id="@+id/iv_guide"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY" />
+    </FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -71,6 +78,14 @@
                 android:drawableTop="@drawable/rb_mine_selector"
                 android:text="Usuario"
                 android:onClick="fragmentUser"/>
+
+            <Button
+                android:id="@+id/button4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:text="Measurement"/>
         </RadioGroup>
     </LinearLayout>
 
@@ -85,9 +100,4 @@
         android:textColor="@color/colorPrimary"
         android:textSize="12sp" />
 
-    <ImageView
-        android:id="@+id/iv_guide"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY" />
 </RelativeLayout>
