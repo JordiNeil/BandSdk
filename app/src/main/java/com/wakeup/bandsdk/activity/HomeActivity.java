@@ -1,5 +1,7 @@
 package com.wakeup.bandsdk.activity;
 
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -24,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wakeup.bandsdk.Fragments.HomeFragment;
@@ -57,6 +60,8 @@ import java.util.TimerTask;
 public class HomeActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private TextView mTextMessage, tv_connect_state;
+
     public RadioButton radioButtonHome;
     public RadioButton radioButtonInfo;
     public RadioButton radioButtonUser;
@@ -67,7 +72,7 @@ public class HomeActivity extends AppCompatActivity {
     private CommandManager commandManager;
     private DataParse dataPasrse;
     private BandInfo bandInfo;
-    public Button btnMeassure;
+    public Button btnMeasure;
 
 
     @Override
@@ -82,17 +87,12 @@ public class HomeActivity extends AppCompatActivity {
         radioButtonUser = (RadioButton) findViewById(R.id.rb_mine);
         //radioButtonUser.callOnClick();
 
-        btnMeassure=(Button)findViewById(R.id.button4);
+        btnMeasure = (Button) findViewById(R.id.button4);
         /*FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.fl_fragment_container, fragmentHome);
         fragmentTransaction.commit();*/
-        btnMeassure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Measure();
-            }
-        });
+
     }
 
 
@@ -114,8 +114,8 @@ public class HomeActivity extends AppCompatActivity {
 
     public synchronized void fragmentInfo(View view) {
 
-        Measure();
-
+//        measure();
+//        commandManager.oneButtonMeasurement();
     }
 
     public void fragmentUser(View view) {
@@ -133,11 +133,6 @@ public class HomeActivity extends AppCompatActivity {
 
         }
     }
-
-
-
-
-
 
 
     //Code to manage Service lifecycle
@@ -277,49 +272,45 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-          /*  if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
+            if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
-                *//*connectBt.setText("DISCONNECT");
-                imgConecct.setBackgroundResource(R.drawable.band_connected);
-                tv_connect_state.setText("Conectado");*//*
+//                connectBt.setText("DISCONNECT");
+//                imgConecct.setBackgroundResource(R.drawable.band_connected);
+//                tv_connect_state.setText("Conectado");
 //                progressBar.setVisibility(View.GONE);
 
-                *//**
-                 *
-                 * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
-                 *//*
-                Timer timer;
-                timer = new Timer();
-
-                TimerTask batteryInfo = new TimerTask() {
-                    @Override
-                    public void run() {
-                        commandManager.getBatteryInfo();
-                    }
-                };
-                timer.schedule(batteryInfo, 0, 600000);
-
-                *//**
-                 *
-                 * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
-                 *//*
-
-                commandManager.openHourlyMeasure(1);
+                /**
              *
-             *                 *//**
-                 *
-                 * SINCRONIZACIÓN DE TIEMPO
-                 *
-                 *//*
-                commandManager.setTimeSync();
+             * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+             **/
+//                Timer timer;
+//                timer = new Timer();
+//
+//                TimerTask batteryInfo = new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        commandManager.getBatteryInfo();
+//                    }
+//                };
+//                timer.schedule(batteryInfo, 0, 600000);
+
+
+             /**
+              *
+              * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
+              **/
+//                commandManager.openHourlyMeasure(1);
+
+
+//                commandManager.setTimeSync();
 
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
-              *//*  connectBt.setText("CONNECTION");
-                imgConecct.setBackgroundResource(R.drawable.band_unconnect);
+//                connectBt.setText("CONNECTION");
+//                imgConecct.setBackgroundResource(R.drawable.band_unconnect);
                 tv_connect_state.setText("Desconectado");
-*//*
+
                 //progressBar.setVisibility(View.GONE);
 
                 
@@ -328,17 +319,17 @@ public class HomeActivity extends AppCompatActivity {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
 
 
-            } els*/
-            
-            Measure();
-            
+            } else {
+
+//            measure();
+            }
             if (BluetoothService.ACTION_DATA_AVAILABLE.equals(action)) {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(System.currentTimeMillis());
                 Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
-                        +" at "+(calendar.get(Calendar.HOUR_OF_DAY)) +":"+
-                        (calendar.get(Calendar.MINUTE))+":"+
+                        + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+                        (calendar.get(Calendar.MINUTE)) + ":" +
                         (calendar.get(Calendar.SECOND)));
                 List<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
                 if (datas.size() == 0) {
@@ -347,36 +338,36 @@ public class HomeActivity extends AppCompatActivity {
 
                 if (datas.get(0) == 0xAB) {
                     switch (datas.get(4)) {
-                        /*case 0x91:
+                        case 0x91:
                             //BATTERY POWER
-                            Battery battery = (Battery) dataPasrse.parseData(datas);
-                            Log.i(TAG, battery.toString());
-                            break;*/
-                        /*case 0x92:
+//                            Battery battery = (Battery) dataPasrse.parseData(datas);
+//                            Log.i(TAG, battery.toString());
+                            break;
+                        case 0x92:
                             //BRACELET DATA
-                            bandInfo = (BandInfo) dataPasrse.parseData(datas);
-                            Log.i(TAG, bandInfo.toString());
-                            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
+//                            bandInfo = (BandInfo) dataPasrse.parseData(datas);
+//                            Log.i(TAG, bandInfo.toString());
+//                            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
 
 
-                            if (bandInfo.getBandType() == 0x0B
-                                    || bandInfo.getBandType() == 0x0D
-                                    || bandInfo.getBandType() == 0x0E
-                                    || bandInfo.getBandType() == 0x0F) {
+//                            if (bandInfo.getBandType() == 0x0B
+//                                    || bandInfo.getBandType() == 0x0D
+//                                    || bandInfo.getBandType() == 0x0E
+//                                    || bandInfo.getBandType() == 0x0F) {
+//
+//                                Config.hasContinuousHeart = true;
 
-                                Config.hasContinuousHeart = true;
-
-                            }
+//                            }
 
 
-                            break;*/
+//                            break;
                         case 0x51:
-
+//
                             switch (datas.get(5)) {
                                 case 0x11:
-                                    //STAND-ALONE MEASUREMENT OF HEART RATE DATA
-                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, heartRateBean.toString());
+//                                    STAND-ALONE MEASUREMENT OF HEART RATE DATA
+//                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, heartRateBean.toString());
                                     break;
                                 case 0x12:
                                     //STAND-ALONE MEASUREMENT OF BLOOD OXYGEN RATE DATA
@@ -509,7 +500,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         address = SPUtils.getString(HomeActivity.this, SPUtils.ADDRESS, "");
-       // mTextMessage.setText(address);
+        // mTextMessage.setText(address);
 
     }
 
@@ -543,7 +534,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
-    public synchronized void Measure() {
+    public synchronized void measure() {
         /**
          *
          * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
@@ -556,28 +547,28 @@ public class HomeActivity extends AppCompatActivity {
          *
          *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
          */
+        TimerTask startMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(1);
+            }
+        };
 
         TimerTask finishMeasure = new TimerTask() {
             @Override
             public void run() {
                 commandManager.oneButtonMeasurement(0);
             }
+
         };
 
         /**
          *
          * INICIO DE LA MEDICIÓN
          */
-        commandManager.oneButtonMeasurement(1);
-
-        /**
-         *
-         * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
-         */
-        timer.schedule(finishMeasure, 45000);
+        timer.schedule(startMeasure,0);
+        timer.schedule(finishMeasure,45000);
 
 
     }
-
-
 }
