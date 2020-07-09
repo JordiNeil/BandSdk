@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
     public void connect(View view) {
         mBluetoothLeService.connect(address);
 
-        dialog.show();
+        showDialog();
 
 
     }
@@ -269,7 +269,8 @@ public class MainActivity extends AppCompatActivity {
 
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                dialog.dismiss();
+                hideDialog();
+
                 tv_connect_state.setText("Desconectado");
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
@@ -599,6 +600,54 @@ public class MainActivity extends AppCompatActivity {
         timer.schedule(finishMeasure, 45000);
 
 
+    }
+    public void retryMeasure(){
+        /**
+         *
+         * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
+         */
+        Timer timer;
+        timer = new Timer();
+
+
+        /**
+         *
+         *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
+         */
+        TimerTask startMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(1);
+            }
+        };
+
+        TimerTask finishMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(0);
+            }
+        };
+
+        /**
+         *
+         * INICIO DE LA MEDICIÓN
+         */
+//        timer.schedule(finishMeasure, 300000);
+        timer.schedule(finishMeasure, 60000);
+
+        /**
+         *
+         * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
+         */
+//        timer.schedule(finishMeasure, 45000+300000);
+        timer.schedule(finishMeasure, 60000+45000);
+
+    }
+    public void hideDialog(){
+        dialog.dismiss();
+    }
+    public void showDialog(){
+        dialog.show();
     }
 
 }

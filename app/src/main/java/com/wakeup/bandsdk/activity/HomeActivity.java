@@ -167,35 +167,7 @@ public class HomeActivity extends MainActivity {
                 startActivity(intentHome);*/
 
 
-                /**
-             *
-             * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
-             **/
-                Timer timer;
-                timer = new Timer();
 
-                TimerTask batteryInfo = new TimerTask() {
-                    @Override
-                    public void run() {
-//                        commandManager.getBatteryInfo();
-                    }
-                };
-//                timer.schedule(batteryInfo, 0, 600000);
-
-                //Meassure();
-
-
-
-             /**
-              *
-              * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
-              **/
-
-//                commandManager.openHourlyMeasure(1);
-
-
-
-//                commandManager.setTimeSync();
 
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
@@ -633,48 +605,7 @@ public class HomeActivity extends MainActivity {
 
     }
 
-    public void retryMeasure(){
-        /**
-         *
-         * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
-         */
-        Timer timer;
-        timer = new Timer();
 
-
-        /**
-         *
-         *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
-         */
-        TimerTask startMeasure = new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.oneButtonMeasurement(1);
-            }
-        };
-
-        TimerTask finishMeasure = new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.oneButtonMeasurement(0);
-            }
-        };
-
-        /**
-         *
-         * INICIO DE LA MEDICIÓN
-         */
-//        timer.schedule(finishMeasure, 300000);
-        timer.schedule(finishMeasure, 60000);
-
-        /**
-         *
-         * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
-         */
-//        timer.schedule(finishMeasure, 45000+300000);
-        timer.schedule(finishMeasure, 60000+45000);
-
-    }
 
     public void sendPhysiometryData(JsonObject data) {
         ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
