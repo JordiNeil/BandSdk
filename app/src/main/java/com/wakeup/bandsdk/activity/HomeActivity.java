@@ -27,10 +27,14 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
 import com.wakeup.bandsdk.Fragments.HomeFragment;
 import com.wakeup.bandsdk.Fragments.UserFragment;
 import com.wakeup.bandsdk.MainActivity;
+import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
 import com.wakeup.bandsdk.R;
+import com.wakeup.bandsdk.Services.ServiceFisiometria;
+import com.wakeup.bandsdk.configVar.ConfigGeneral;
 import com.wakeup.mylibrary.Config;
 import com.wakeup.mylibrary.bean.BandInfo;
 import com.wakeup.mylibrary.bean.Battery;
@@ -55,6 +59,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeActivity extends MainActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -90,7 +98,13 @@ public class HomeActivity extends MainActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.fl_fragment_container, fragmentHome);
         fragmentTransaction.commit();*/
-        //
+        Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
+        btnMeassure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Measure();
+            }
+        });
     }
 
 
@@ -148,7 +162,24 @@ public class HomeActivity extends MainActivity {
                 intentHome.putExtra("address", address);
                 startActivity(intentHome);*/
 
+//<<<<<<< HEAD
+                /**
+             *
+             * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+             **/
+                Timer timer;
+                timer = new Timer();
+
+                TimerTask batteryInfo = new TimerTask() {
+                    @Override
+                    public void run() {
+                        commandManager.getBatteryInfo();
+                    }
+                };
+                timer.schedule(batteryInfo, 0, 600000);
+//=======
                 //Meassure();
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
 
                 /*Timer timer;
                 timer = new Timer();
@@ -161,12 +192,20 @@ public class HomeActivity extends MainActivity {
                 };
                 timer.schedule(batteryInfo, 0, 600000);
 
+<<<<<<< HEAD
+             /**
+              *
+              * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
+              **/
+                commandManager.openHourlyMeasure(1);
+//=======
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
 
                 commandManager.openHourlyMeasure(1);
 
 
                 commandManager.setTimeSync();
-*/
+//*/
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
@@ -191,8 +230,8 @@ public class HomeActivity extends MainActivity {
 
                 if (datas.get(0) == 0xAB) {
                     switch (datas.get(4)) {
-                        /*case 0x91:
-                            //BATTERY POWER
+                        case 0x91:
+//                            BATTERY POWER
                             Battery battery = (Battery) dataPasrse.parseData(datas);
                             Log.i(TAG, battery.toString());
                             break;
@@ -201,24 +240,42 @@ public class HomeActivity extends MainActivity {
                             bandInfo = (BandInfo) dataPasrse.parseData(datas);
                             Log.i(TAG, bandInfo.toString());
                             Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
+//<<<<<<< HEAD
+//=======
 
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
 
                             if (bandInfo.getBandType() == 0x0B
                                     || bandInfo.getBandType() == 0x0D
                                     || bandInfo.getBandType() == 0x0E
                                     || bandInfo.getBandType() == 0x0F) {
 
-                                Config.hasContinuousHeart = true;
+//<<<<<<< HEAD
+                                if (bandInfo.getBandType() == 0x0B
+                                        || bandInfo.getBandType() == 0x0D
+                                        || bandInfo.getBandType() == 0x0E
+                                        || bandInfo.getBandType() == 0x0F) {
 
+//=======
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
+                                    Config.hasContinuousHeart = true;
+
+                                }
                             }
 
-
-                            break;*/
+//<<<<<<< HEAD
+//=======
+                            break;
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
                         case 0x51:
 
                             switch (datas.get(5)) {
                                 case 0x11:
+//<<<<<<< HEAD
+//                                    STAND-ALONE MEASUREMENT OF HEART RATE DATA
+//=======
                                     //STAND-ALONE MEASUREMENT OF HEART RATE DATA
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
                                     HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, heartRateBean.toString());
                                     break;
@@ -228,7 +285,7 @@ public class HomeActivity extends MainActivity {
                                     Log.i(TAG, bloodOxygenBean.toString());
                                     break;
                                 case 0x14:
-                                    //STAND-ALONE MEASUREMENT OF BLOOD PREASURE
+                                    //STAND-ALONE MEASUREMENT OF BLOOD PRESSURE
                                     BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bloodPressureBean.toString());
                                     break;
@@ -331,6 +388,18 @@ public class HomeActivity extends MainActivity {
                             System.out.println("---------" + datas);
 
                             //Log.i(TAG, oneButtonMeasurementBean.toString());
+
+                            /**
+                             *
+                             * SI LA MEDICIÓN RETORNA VALORES NO VÁLIDOS (NULOS O CEROS) SE DEBE VOLVER A HACER
+                             *
+                             */
+                            if(datas.get(0)==1){
+
+                            }
+
+
+
 
                             break;
 
@@ -529,18 +598,74 @@ public class HomeActivity extends MainActivity {
          */
         timer.schedule(finishMeasure, 45000);
 
+    }
+
+    public void retryMeasure(){
+        /**
+         *
+         * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
+         */
+        Timer timer;
+        timer = new Timer();
+
+
+        /**
+         *
+         *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
+         */
+        TimerTask startMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(1);
+            }
+        };
+
+        TimerTask finishMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(0);
+            }
+        };
+
+        /**
+         *
+         * INICIO DE LA MEDICIÓN
+         */
+        timer.schedule(finishMeasure, 300000);
+
+        /**
+         *
+         * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
+         */
+        timer.schedule(finishMeasure, 45000+300000);
+
 
     }
 
+    public void sendPhysiometryData(JsonObject data) {
+        ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
+        final Call<DataFisiometria> responseData = service.setPhysiometryData("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTU5NDM5MjEyMH0.BU7VAZQXM5ADH4zCI8985qIOR81bny8b9gm2RWFD9wFUiuJNGY9Td36hPmJw5-_SliAx28CbrA4RVV-MQSkXMw" ,data);
+
+        responseData.enqueue(new Callback<DataFisiometria>() {
+            @Override
+            public void onResponse(Call<DataFisiometria> call, Response<DataFisiometria> response) {
+                if (response.isSuccessful()){
+                    assert response.body() != null;
+                    Log.i(TAG, "onResponse: " + response.body().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DataFisiometria> call, Throwable t) {
+                System.out.println(t.getMessage());
+            }
+        });
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         address = SPUtils.getString(HomeActivity.this, SPUtils.ADDRESS, "");
-
-
     }
-
-
 }
