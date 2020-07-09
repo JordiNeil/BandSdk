@@ -40,5 +40,6 @@
     <string name="register_password" tools:ignore="MissingTranslation">Ingrese la contraseña de la cuenta</string>
     <string name="send_weather">* 发送天气</string>
     <string name="send_pic">* 发送图片</string>
+    <string name="loading" tools:ignore="MissingTranslation">Espere un momento, por favor</string>
 
 </resources>
