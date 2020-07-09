@@ -64,67 +64,67 @@ public class DataFisiometria {
         this.id = id;
     }
 
-    public String getfechaRegistro() {
+    public String getFechaRegistro() {
         return fechaRegistro;
     }
 
-    public void setfechaRegistro(String fechaRegistro) {
+    public void setFechaRegistro(String fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
     }
 
-    public String getfechaToma() {
+    public String getFechaToma() {
         return fechaToma;
     }
 
-    public void setfechaToma(String fechaToma) {
+    public void setFechaToma(String fechaToma) {
         this.fechaToma = fechaToma;
     }
 
-    public int getoximetria() {
+    public int getOximetria() {
         return oximetria;
     }
 
-    public void setoximetria(int oximetria) {
+    public void setOximetria(int oximetria) {
         this.oximetria = oximetria;
     }
 
-    public int getpresionArterialDiastolica() {
+    public int getPresionArterialDiastolica() {
         return presionArterialDiastolica;
     }
 
-    public void setpresionArterialDiastolica(int presionArterialDiastolica) {
+    public void setPresionArterialDiastolica(int presionArterialDiastolica) {
         this.presionArterialDiastolica = presionArterialDiastolica;
     }
 
-    public int getpresionArterialSistolica() {
+    public int getPresionArterialSistolica() {
         return presionArterialSistolica;
     }
 
-    public void setTotalCost(int presionArterialSistolica) {
+    public void setPresionArterialSistolica(int presionArterialSistolica) {
         this.presionArterialSistolica = presionArterialSistolica;
     }
 
-    public int getritmoCardiaco() {
+    public int getRitmoCardiaco() {
         return ritmoCardiaco;
     }
 
-    public void setritmoCardiaco(int ritmoCardiaco) {
+    public void setRitmoCardiaco(int ritmoCardiaco) {
         this.ritmoCardiaco = ritmoCardiaco;
     }
 
-    public float gettemperatura() {
+    public float getTemperatura() {
         return temperatura;
     }
 
-    public void settemperatura(int temperatura) {
+    public void setTemperatura(int temperatura) {
         this.temperatura = temperatura;
     }
 
-    public DataUser getdataUser() {
+    public DataUser getUserData() {
         return dataUser;
     }
 
-    public void setdataUser(DataUser dataUser) {
+    public void setUserData(DataUser dataUser) {
         this.dataUser = dataUser;
     }
 

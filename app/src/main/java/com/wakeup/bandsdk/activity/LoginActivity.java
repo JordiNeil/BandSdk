@@ -3,23 +3,25 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.JsonObject;
 import com.wakeup.bandsdk.Pojos.Authenticate.JWTAuth;
+import com.wakeup.bandsdk.Pojos.DataUser;
 import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
 import com.wakeup.bandsdk.R;
 import com.wakeup.bandsdk.Services.ServiceFisiometria;
 import com.wakeup.bandsdk.configVar.ConfigGeneral;
-import com.wakeup.bandsdk.activity.HomeActivity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.service.autofill.UserData;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -32,7 +34,6 @@ public class LoginActivity extends AppCompatActivity {
     TextInputLayout loginUsernameField, loginPasswordField;
     TextInputEditText loginUsernameInput, loginPasswordInput;
     private JsonObject userCredentials = new JsonObject();
-    private Object TextInputEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +134,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void getPhysiometryDataById(Context loginContext, String jwtToken, int userId) {
         ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
-        final Call<List<DataFisiometria>> dataResponse = service.getStudiesSubjes("Bearer " + jwtToken, userId);
+        final Call<List<DataFisiometria>> dataResponse = service.getPhysiometryData("Bearer " + jwtToken, userId);
 
         dataResponse.enqueue(new Callback<List<DataFisiometria>>() {
             @Override
@@ -141,12 +142,18 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     List<DataFisiometria> res = response.body();
                     assert res != null;
-                    System.out.println("Physiometry data size for this user -> " + res.size());
-                    for (DataFisiometria c : res) {
-                        System.out.println("User Id -> " + c.getdataUser().getId());
-                        System.out.println("User email -> " + c.getdataUser().emailget());
-                    }
+                    ArrayList<Object> fetchedUserData = new ArrayList<>();
+                    fetchedUserData.add(0, res.get(0).getUserData().getId());
+                    fetchedUserData.add(1, res.get(0).getUserData().getLogin());
+                    fetchedUserData.add(2, res.get(0).getUserData().getFirstName());
+                    fetchedUserData.add(3, res.get(0).getUserData().getLastName());
+                    fetchedUserData.add(4, res.get(0).getUserData().getEmail());
+                    fetchedUserData.add(5, res.get(0).getUserData().getActivated());
+                    fetchedUserData.add(6, res.get(0).getUserData().getLangKey());
+                    fetchedUserData.add(7, res.get(0).getUserData().getImageUrl());
+                    fetchedUserData.add(8, res.get(0).getUserData().getLastModifiedDate());
                     Intent homeIntent = new Intent(loginContext, HomeActivity.class);
+                    homeIntent.putExtra("fetchedUserData", fetchedUserData);
                     startActivity(homeIntent);
                 }
             }
