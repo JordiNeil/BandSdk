@@ -26,10 +26,14 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
 import com.wakeup.bandsdk.Fragments.HomeFragment;
 import com.wakeup.bandsdk.Fragments.UserFragment;
 import com.wakeup.bandsdk.MainActivity;
+import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
 import com.wakeup.bandsdk.R;
+import com.wakeup.bandsdk.Services.ServiceFisiometria;
+import com.wakeup.bandsdk.configVar.ConfigGeneral;
 import com.wakeup.mylibrary.Config;
 import com.wakeup.mylibrary.bean.BandInfo;
 import com.wakeup.mylibrary.bean.Battery;
@@ -54,6 +58,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeActivity extends MainActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -88,7 +96,13 @@ public class HomeActivity extends MainActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.fl_fragment_container, fragmentHome);
         fragmentTransaction.commit();*/
-        //
+        Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
+        btnMeassure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Measure();
+            }
+        });
     }
 
 
@@ -622,14 +636,30 @@ public class HomeActivity extends MainActivity {
 
     }
 
+    public void sendPhysiometryData(JsonObject data) {
+        ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
+        final Call<DataFisiometria> responseData = service.setPhysiometryData("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTU5NDM5MjEyMH0.BU7VAZQXM5ADH4zCI8985qIOR81bny8b9gm2RWFD9wFUiuJNGY9Td36hPmJw5-_SliAx28CbrA4RVV-MQSkXMw" ,data);
+
+        responseData.enqueue(new Callback<DataFisiometria>() {
+            @Override
+            public void onResponse(Call<DataFisiometria> call, Response<DataFisiometria> response) {
+                if (response.isSuccessful()){
+                    assert response.body() != null;
+                    Log.i(TAG, "onResponse: " + response.body().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DataFisiometria> call, Throwable t) {
+                System.out.println(t.getMessage());
+            }
+        });
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         address = SPUtils.getString(HomeActivity.this, SPUtils.ADDRESS, "");
-
     }
-
-
 }

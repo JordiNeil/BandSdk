@@ -21,6 +21,8 @@ public interface ServiceFisiometria {
     Call<JWTAuth> getJwtToken(@Body JsonObject body);
 
     @GET("fisiometria-1-s?")
-    Call<List<DataFisiometria>> getStudiesSubjes(@Header("Authorization") String api_token,
-                                                 @Query("userId.equals") int id);
+    Call<List<DataFisiometria>> getPhysiometryData(@Header("Authorization") String api_token,
+                                                   @Query("userId.equals") int id);
+    @POST("fisiometria-1-s")
+    Call<DataFisiometria> setPhysiometryData(@Header("Authorization") String api_token, @Body JsonObject body);
 }
