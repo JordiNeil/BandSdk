@@ -100,6 +100,7 @@ public class HomeActivity extends MainActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.fl_fragment_container, fragmentHome);
         fragmentTransaction.commit();*/
+        Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
 //        btnMeassure.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -149,6 +150,10 @@ public class HomeActivity extends MainActivity {
         }
     }
 
+    public boolean medidaCorrecta=false;
+    public int numeroIntentos=0;
+    public boolean ponerManilla=false;
+
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
 
@@ -173,22 +178,15 @@ public class HomeActivity extends MainActivity {
                 TimerTask batteryInfo = new TimerTask() {
                     @Override
                     public void run() {
-                        commandManager.getBatteryInfo();
+//                        commandManager.getBatteryInfo();
                     }
                 };
                 timer.schedule(batteryInfo, 0, 600000);
+//                timer.schedule(batteryInfo, 0, 600000);
+
                 //Meassure();
 
-                /*Timer timer;
-                timer = new Timer();
 
-                TimerTask batteryInfo = new TimerTask() {
-                    @Override
-                    public void run() {
-                        commandManager.getBatteryInfo();
-                    }
-                };
-                timer.schedule(batteryInfo, 0, 600000);
 
              /**
               *
@@ -196,11 +194,12 @@ public class HomeActivity extends MainActivity {
               **/
                 commandManager.openHourlyMeasure(1);
 
-                commandManager.openHourlyMeasure(1);
+//                commandManager.openHourlyMeasure(1);
 
 
-                commandManager.setTimeSync();
-//*/
+
+//                commandManager.setTimeSync();
+
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
@@ -227,33 +226,40 @@ public class HomeActivity extends MainActivity {
                     switch (datas.get(4)) {
                         case 0x91:
 //                            BATTERY POWER
-                            Battery battery = (Battery) dataPasrse.parseData(datas);
-                            Log.i(TAG, battery.toString());
+//                            Battery battery = (Battery) dataPasrse.parseData(datas);
+//                            Log.i(TAG, battery.toString());
                             break;
                         case 0x92:
                             //BRACELET DATA
-                            bandInfo = (BandInfo) dataPasrse.parseData(datas);
-                            Log.i(TAG, bandInfo.toString());
-                            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
+//                            bandInfo = (BandInfo) dataPasrse.parseData(datas);
+//                            Log.i(TAG, bandInfo.toString());
+//                            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
 
-                            if (bandInfo.getBandType() == 0x0B
-                                    || bandInfo.getBandType() == 0x0D
-                                    || bandInfo.getBandType() == 0x0E
-                                    || bandInfo.getBandType() == 0x0F) {
+//                            if (bandInfo.getBandType() == 0x0B
+//                                    || bandInfo.getBandType() == 0x0D
+//                                    || bandInfo.getBandType() == 0x0E
+//                                    || bandInfo.getBandType() == 0x0F) {
+//
+//
+//                                if (bandInfo.getBandType() == 0x0B
+//                                        || bandInfo.getBandType() == 0x0D
+//                                        || bandInfo.getBandType() == 0x0E
+//                                        || bandInfo.getBandType() == 0x0F) {
+//
+//
+//                                    Config.hasContinuousHeart = true;
+//
+//                                }
+//                            }
 
-                                if (bandInfo.getBandType() == 0x0B
-                                        || bandInfo.getBandType() == 0x0D
-                                        || bandInfo.getBandType() == 0x0E
-                                        || bandInfo.getBandType() == 0x0F) {
-                                    Config.hasContinuousHeart = true;
-                                }
-                            }
                             break;
+
                         case 0x51:
 
                             switch (datas.get(5)) {
                                 case 0x11:
                                     //STAND-ALONE MEASUREMENT OF HEART RATE DATA
+
                                     HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, heartRateBean.toString());
                                     break;
@@ -277,6 +283,36 @@ public class HomeActivity extends MainActivity {
                                     //RETURN HOURLY DATA
                                     HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, hourlyMeasureDataBean.toString());
+
+
+                                    /**
+                                     *
+                                     * DATOS DE LA MEDICIÓN CADA HORA
+                                     *
+                                     */
+                                    while(!medidaCorrecta) {
+//
+                                        if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
+                                                datas.get(10) == 0 || datas.get(11) == 0) {
+                                            Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN");
+                                            numeroIntentos++;
+                                            if (numeroIntentos<3) {
+                                                retryMeasure();
+                                            }
+                                            else {
+                                                numeroIntentos=0;
+                                                medicionCorrecta=true;
+                                                ponerManilla=true;
+                                                Log.i(TAG,"POR FAVOR PONERSE LA MANILLA");
+
+                                            }
+                                        }
+                                        else{
+                                            medicionCorrecta=true;
+                                        }
+                                    }
+
+
                                     break;
                                 case 0x21:
                                     //BODY TEMPERATURE AND IMMUNITY DATA
@@ -372,8 +408,28 @@ public class HomeActivity extends MainActivity {
                              * SI LA MEDICIÓN RETORNA VALORES NO VÁLIDOS (NULOS O CEROS) SE DEBE VOLVER A HACER
                              *
                              */
-                            if(datas.get(0)==1){
 
+//
+                            while(!medidaCorrecta) {
+//
+                                if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
+                                        datas.get(10) == 0 || datas.get(11) == 0) {
+                                    Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN");
+                                    numeroIntentos++;
+                                    if (numeroIntentos<3) {
+                                        retryMeasure();
+                                    }
+                                    else {
+                                        numeroIntentos=0;
+                                        medicionCorrecta=true;
+                                        ponerManilla=true;
+                                        Log.i(TAG,"POR FAVOR PONERSE LA MANILLA");
+
+                                    }
+                                }
+                                else{
+                                    medicionCorrecta=true;
+                                }
                             }
                             break;
 
@@ -605,14 +661,15 @@ public class HomeActivity extends MainActivity {
          *
          * INICIO DE LA MEDICIÓN
          */
-        timer.schedule(finishMeasure, 300000);
+//        timer.schedule(finishMeasure, 300000);
+        timer.schedule(finishMeasure, 60000);
 
         /**
          *
          * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
          */
-        timer.schedule(finishMeasure, 45000+300000);
-
+//        timer.schedule(finishMeasure, 45000+300000);
+        timer.schedule(finishMeasure, 60000+45000);
 
     }
 
