@@ -1,7 +1,5 @@
 package com.wakeup.bandsdk.activity;
 
-
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -26,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wakeup.bandsdk.Fragments.HomeFragment;
@@ -52,6 +49,7 @@ import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
@@ -59,8 +57,6 @@ import java.util.TimerTask;
 
 public class HomeActivity extends MainActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    private TextView mTextMessage, tv_connect_state;
 
     public RadioButton radioButtonHome;
     public RadioButton radioButtonInfo;
@@ -72,9 +68,9 @@ public class HomeActivity extends MainActivity {
     private CommandManager commandManager;
     private DataParse dataPasrse;
     private BandInfo bandInfo;
-    public Button btnMeasure;
-
-
+    public Button btnMeassure;
+    Fragment fragmentHome = new HomeFragment();
+    Bundle args = new Bundle();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,17 +83,17 @@ public class HomeActivity extends MainActivity {
         radioButtonUser = (RadioButton) findViewById(R.id.rb_mine);
         //radioButtonUser.callOnClick();
 
-        btnMeasure = (Button) findViewById(R.id.button4);
+//        btnMeassure = (Button) findViewById(R.id.button4);
         /*FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.fl_fragment_container, fragmentHome);
         fragmentTransaction.commit();*/
-
+        //
     }
 
 
     public void fragmentHome(View view) {
-        Fragment fragmentHome = new HomeFragment();
+
         if (radioButtonHome.isChecked() == true) {
             System.out.println("cambio a home");
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -113,9 +109,7 @@ public class HomeActivity extends MainActivity {
     }
 
     public synchronized void fragmentInfo(View view) {
-
-//        measure();
-//        commandManager.oneButtonMeasurement();
+        meassure();
     }
 
     public void fragmentUser(View view) {
@@ -133,6 +127,271 @@ public class HomeActivity extends MainActivity {
 
         }
     }
+
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
+                Log.i(TAG, "ACTION_GATT_CONNECTED");
+
+//                progressBar.setVisibility(View.GONE);
+                /*Intent intentHome = new Intent(context, HomeActivity.class);
+                intentHome.putExtra("address", address);
+                startActivity(intentHome);*/
+
+//<<<<<<< HEAD
+                /**
+             *
+             * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+             **/
+                Timer timer;
+                timer = new Timer();
+
+                TimerTask batteryInfo = new TimerTask() {
+                    @Override
+                    public void run() {
+                        commandManager.getBatteryInfo();
+                    }
+                };
+                timer.schedule(batteryInfo, 0, 600000);
+//=======
+                //Meassure();
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
+
+                /*Timer timer;
+                timer = new Timer();
+
+                TimerTask batteryInfo = new TimerTask() {
+                    @Override
+                    public void run() {
+                        commandManager.getBatteryInfo();
+                    }
+                };
+                timer.schedule(batteryInfo, 0, 600000);
+
+<<<<<<< HEAD
+             /**
+              *
+              * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
+              **/
+                commandManager.openHourlyMeasure(1);
+//=======
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
+
+                commandManager.openHourlyMeasure(1);
+
+
+                commandManager.setTimeSync();
+//*/
+
+            } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                Log.i(TAG, "ACTION_GATT_DISCONNECTED");
+
+
+            } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+                Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
+
+
+            } else if (BluetoothService.ACTION_DATA_AVAILABLE.equals(action)) {
+                final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(System.currentTimeMillis());
+                Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                        + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+                        (calendar.get(Calendar.MINUTE)) + ":" +
+                        (calendar.get(Calendar.SECOND)));
+                ArrayList<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
+                if (datas.size() == 0) {
+                    return;
+                }
+
+                if (datas.get(0) == 0xAB) {
+                    switch (datas.get(4)) {
+                        /*case 0x91:
+                            //BATTERY POWER
+                            Battery battery = (Battery) dataPasrse.parseData(datas);
+                            Log.i(TAG, battery.toString());
+                            break;
+                        case 0x92:
+                            //BRACELET DATA
+                            bandInfo = (BandInfo) dataPasrse.parseData(datas);
+                            Log.i(TAG, bandInfo.toString());
+                            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
+
+                            if (bandInfo.getBandType() == 0x0B
+                                    || bandInfo.getBandType() == 0x0D
+                                    || bandInfo.getBandType() == 0x0E
+                                    || bandInfo.getBandType() == 0x0F) {
+
+<<<<<<< HEAD
+                            if (bandInfo.getBandType() == 0x0B
+                                    || bandInfo.getBandType() == 0x0D
+                                    || bandInfo.getBandType() == 0x0E
+                                    || bandInfo.getBandType() == 0x0F) {
+
+=======
+>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
+                                Config.hasContinuousHeart = true;
+
+                            }
+
+
+<<<<<<< HEAD
+                            break;
+=======
+                            break;*/
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
+                        case 0x51:
+
+                            switch (datas.get(5)) {
+                                case 0x11:
+//<<<<<<< HEAD
+//                                    STAND-ALONE MEASUREMENT OF HEART RATE DATA
+//=======
+                                    //STAND-ALONE MEASUREMENT OF HEART RATE DATA
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
+                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, heartRateBean.toString());
+                                    break;
+                                case 0x12:
+                                    //STAND-ALONE MEASUREMENT OF BLOOD OXYGEN RATE DATA
+                                    BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodOxygenBean.toString());
+                                    break;
+                                case 0x14:
+                                    //STAND-ALONE MEASUREMENT OF BLOOD PRESSURE
+                                    BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodPressureBean.toString());
+                                    break;
+                                case 0x08:
+                                    //CURRENT DATA
+                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, currentDataBean.toString());
+                                    break;
+
+                                case 0x20:
+                                    //RETURN HOURLY DATA
+                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+                                    break;
+                                case 0x21:
+                                    //BODY TEMPERATURE AND IMMUNITY DATA
+                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bodytempAndMianyiBean.toString());
+                                    break;
+
+                                case 0x13:
+                                    //STAND-ALONE BODY TEMPERATURE MEASUREMENT
+                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bodyTempBean.toString());
+                                    break;
+
+                                case 0x18:
+                                    //RETURN TO STAND-ALONE IMMUNITY MEASUREMENT
+                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, mianyiBean.toString());
+                                    break;
+
+                            }
+
+
+                            break;
+                        case 0x52:
+                            //SLEEP TIME RECORD
+                            SleepData sleepData = (SleepData) dataPasrse.parseData(datas);
+                            Log.i(TAG, sleepData.toString());
+
+                            break;
+
+                        case 0x31:
+                            //SINGLE MEASUREMENT, REAL TIME MEASUREMENT
+                            switch (datas.get(5)) {
+                                case 0x09:
+                                    //HEART RATE(SINGLE)
+                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, heartRateBean.toString());
+                                    break;
+                                case 0x11:
+                                    //BLOOD OXYGEN (SINGLE)
+                                    BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodOxygenBean.toString());
+                                    break;
+                                case 0x21:
+                                    //BLOOD PRESSURE (SINGLE)
+                                    BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodPressureBean.toString());
+
+                                    break;
+                                case 0X0A:
+                                    //HEART RATE (REAL-TIME)
+                                    HeartRateBean heartRateBean1 = (HeartRateBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, heartRateBean1.toString());
+                                    break;
+                                case 0x12:
+                                    //BLOOD OXYGEN(REAL-TIME)
+                                    BloodOxygenBean bloodOxygenBean1 = (BloodOxygenBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodOxygenBean1.toString());
+                                    break;
+                                case 0x22:
+                                    //BLOOD PRESSURE(REAL-TIME)
+                                    BloodPressureBean bloodPressureBean1 = (BloodPressureBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bloodPressureBean1.toString());
+
+                                    break;
+                                case 0x81:
+                                    //SINGLE TEMPERATURE MEASUREMENT
+                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, bodyTempBean.toString());
+                                    break;
+                                case 0x41:
+                                    //SINGLE MEASUREMENT OF IMMUNITY
+                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, mianyiBean.toString());
+
+                                    break;
+                            }
+
+                            break;
+                        case 0x32:
+                            //ONE-CLICK MEASUREMENT
+//                            OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);}
+                            args.putIntegerArrayList("DataMeasure",datas);
+                            fragmentHome.setArguments(args);
+                            System.out.println("-----------" + datas);
+
+                            System.out.println("---------" + datas);
+
+                            //Log.i(TAG, oneButtonMeasurementBean.toString());
+
+                            /**
+                             *
+                             * SI LA MEDICIÓN RETORNA VALORES NO VÁLIDOS (NULOS O CEROS) SE DEBE VOLVER A HACER
+                             *
+                             */
+
+
+                            break;
+
+                        case 0x84:
+                            //CONTINUOUS HEART RATE, BRACELET REAL-TIME HEART RATE RETURN
+                            HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
+                            Log.i(TAG, heartRateBean.toString());
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+            }
+        }
+    };
 
 
     //Code to manage Service lifecycle
@@ -248,268 +507,9 @@ public class HomeActivity extends MainActivity {
         }
     }
 
-    public void connect(View view) {
-        mBluetoothLeService.connect(address);
-        // progressBar.setVisibility(View.VISIBLE);
-        /*if (!TextUtils.isEmpty(address)) {
-            mBluetoothLeService.connect(address);
-            progressBar.setVisibility(View.VISIBLE);
-        }*/
-        /*if (connectBt.getText().toString().equals("连接")) {
-            if (!TextUtils.isEmpty(address)) {
-                mBluetoothLeService.connect(address);
-                progressBar.setVisibility(View.VISIBLE);
-            }
-        } else if (connectBt.getText().toString().equals("断开连接")) {
-            mBluetoothLeService.disconnect();
-        }*/
-    }
 
     public boolean medicionCorrecta = false;
-    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
-                Log.i(TAG, "ACTION_GATT_CONNECTED");
-//                connectBt.setText("DISCONNECT");
-//                imgConecct.setBackgroundResource(R.drawable.band_connected);
-//                tv_connect_state.setText("Conectado");
-//                progressBar.setVisibility(View.GONE);
-
-                /**
-             *
-             * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
-             **/
-                Timer timer;
-                timer = new Timer();
-
-                TimerTask batteryInfo = new TimerTask() {
-                    @Override
-                    public void run() {
-                        commandManager.getBatteryInfo();
-                    }
-                };
-                timer.schedule(batteryInfo, 0, 600000);
-
-
-             /**
-              *
-              * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
-              **/
-                commandManager.openHourlyMeasure(1);
-
-
-//                commandManager.setTimeSync();
-
-
-            } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                Log.i(TAG, "ACTION_GATT_DISCONNECTED");
-//                connectBt.setText("CONNECTION");
-//                imgConecct.setBackgroundResource(R.drawable.band_unconnect);
-                tv_connect_state.setText("Desconectado");
-
-                //progressBar.setVisibility(View.GONE);
-
-                
-
-            } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
-
-
-            } else {
-
-//            measure();
-            }
-            if (BluetoothService.ACTION_DATA_AVAILABLE.equals(action)) {
-                final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(System.currentTimeMillis());
-                Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
-                        + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
-                        (calendar.get(Calendar.MINUTE)) + ":" +
-                        (calendar.get(Calendar.SECOND)));
-                List<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
-                if (datas.size() == 0) {
-                    return;
-                }
-
-                if (datas.get(0) == 0xAB) {
-                    switch (datas.get(4)) {
-                        case 0x91:
-                            //BATTERY POWER
-                            Battery battery = (Battery) dataPasrse.parseData(datas);
-                            Log.i(TAG, battery.toString());
-                            break;
-                        case 0x92:
-                            //BRACELET DATA
-                            bandInfo = (BandInfo) dataPasrse.parseData(datas);
-                            Log.i(TAG, bandInfo.toString());
-                            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
-
-
-                            if (bandInfo.getBandType() == 0x0B
-                                    || bandInfo.getBandType() == 0x0D
-                                    || bandInfo.getBandType() == 0x0E
-                                    || bandInfo.getBandType() == 0x0F) {
-
-                                Config.hasContinuousHeart = true;
-
-                            }
-
-
-                            break;
-                        case 0x51:
-//
-                            switch (datas.get(5)) {
-                                case 0x11:
-//                                    STAND-ALONE MEASUREMENT OF HEART RATE DATA
-                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, heartRateBean.toString());
-                                    break;
-                                case 0x12:
-                                    //STAND-ALONE MEASUREMENT OF BLOOD OXYGEN RATE DATA
-                                    BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bloodOxygenBean.toString());
-                                    break;
-                                case 0x14:
-                                    //STAND-ALONE MEASUREMENT OF BLOOD PRESSURE
-                                    BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bloodPressureBean.toString());
-                                    break;
-                                case 0x08:
-                                    //CURRENT DATA
-                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, currentDataBean.toString());
-                                    break;
-
-                                case 0x20:
-                                    //RETURN HOURLY DATA
-                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, hourlyMeasureDataBean.toString());
-                                    break;
-                                case 0x21:
-                                    //BODY TEMPERATURE AND IMMUNITY DATA
-                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bodytempAndMianyiBean.toString());
-                                    break;
-
-                                case 0x13:
-                                    //STAND-ALONE BODY TEMPERATURE MEASUREMENT
-                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bodyTempBean.toString());
-                                    break;
-
-                                case 0x18:
-                                    //RETURN TO STAND-ALONE IMMUNITY MEASUREMENT
-                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, mianyiBean.toString());
-                                    break;
-
-                            }
-
-
-                            break;
-                        case 0x52:
-                            //SLEEP TIME RECORD
-                            SleepData sleepData = (SleepData) dataPasrse.parseData(datas);
-                            Log.i(TAG, sleepData.toString());
-
-                            break;
-
-                        case 0x31:
-                            //SINGLE MEASUREMENT, REAL TIME MEASUREMENT
-                            switch (datas.get(5)) {
-                                case 0x09:
-                                    //HEART RATE(SINGLE)
-                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, heartRateBean.toString());
-                                    break;
-                                case 0x11:
-                                    //BLOOD OXYGEN (SINGLE)
-                                    BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bloodOxygenBean.toString());
-                                    break;
-                                case 0x21:
-                                    //BLOOD PRESSURE (SINGLE)
-                                    BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bloodPressureBean.toString());
-
-                                    break;
-                                case 0X0A:
-                                    //HEART RATE (REAL-TIME)
-                                    HeartRateBean heartRateBean1 = (HeartRateBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, heartRateBean1.toString());
-                                    break;
-                                case 0x12:
-                                    //BLOOD OXYGEN(REAL-TIME)
-                                    BloodOxygenBean bloodOxygenBean1 = (BloodOxygenBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bloodOxygenBean1.toString());
-                                    break;
-                                case 0x22:
-                                    //BLOOD PRESSURE(REAL-TIME)
-                                    BloodPressureBean bloodPressureBean1 = (BloodPressureBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bloodPressureBean1.toString());
-
-                                    break;
-                                case 0x81:
-                                    //SINGLE TEMPERATURE MEASUREMENT
-                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bodyTempBean.toString());
-                                    break;
-                                case 0x41:
-                                    //SINGLE MEASUREMENT OF IMMUNITY
-                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, mianyiBean.toString());
-
-                                    break;
-                            }
-
-                            break;
-                        case 0x32:
-                            //ONE-CLICK MEASUREMENT
-                            OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);
-
-                            System.out.println("-----------" + datas);
-
-                            System.out.println("---------" + datas);
-
-                            Log.i(TAG, oneButtonMeasurementBean.toString());
-
-                            /**
-                             *
-                             * SI LA MEDICIÓN RETORNA VALORES NO VÁLIDOS (NULOS O CEROS) SE DEBE VOLVER A HACER
-                             *
-                             */
-
-
-                            break;
-
-                        case 0x84:
-                            //CONTINUOUS HEART RATE, BRACELET REAL-TIME HEART RATE RETURN
-                            HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
-                            Log.i(TAG, heartRateBean.toString());
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-            }
-        }
-    };
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        address = SPUtils.getString(HomeActivity.this, SPUtils.ADDRESS, "");
-        // mTextMessage.setText(address);
-
-    }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -524,7 +524,7 @@ public class HomeActivity extends MainActivity {
     protected void onDestroy() {
         super.onDestroy();
         unbindService(mServiceConnection);
-        unregisterReceiver(mGattUpdateReceiver);
+        //unregisterReceiver(mGattUpdateReceiver);
     }
 
     public void vibrate(View view) {
@@ -554,28 +554,38 @@ public class HomeActivity extends MainActivity {
          *
          *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
          */
-        TimerTask startMeasure = new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.oneButtonMeasurement(1);
-            }
-        };
 
         TimerTask finishMeasure = new TimerTask() {
             @Override
             public void run() {
                 commandManager.oneButtonMeasurement(0);
             }
-
         };
 
         /**
          *
          * INICIO DE LA MEDICIÓN
          */
-        timer.schedule(startMeasure,0);
-        timer.schedule(finishMeasure,45000);
+        commandManager.oneButtonMeasurement(1);
+
+        /**
+         *
+         * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
+         */
+        timer.schedule(finishMeasure, 45000);
 
 
     }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        address = SPUtils.getString(HomeActivity.this, SPUtils.ADDRESS, "");
+
+
+    }
+
+
 }

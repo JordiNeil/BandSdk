@@ -96,8 +96,8 @@ public class DataHandUtils {
 	/**
 	 * 字节数组转化成集合
 	 */
-	public static List<Integer> bytesToArrayList(byte[] bytes){
-		List<Integer> datas = new ArrayList<>();
+	public static ArrayList<Integer> bytesToArrayList(byte[] bytes){
+		ArrayList<Integer> datas = new ArrayList<>();
 		if (bytes!=null) {
 			for (int i = 0; i < bytes.length; i++) {
 				datas.add(bytes[i] & 0xff);

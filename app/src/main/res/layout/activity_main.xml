@@ -318,12 +318,6 @@
                 android:paddingBottom="10dp"
                 android:text="@string/connect" />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="single_heartRate"
-                android:text="@string/open_hourly_measure" />
-
 
         </LinearLayout>
     </ScrollView>
