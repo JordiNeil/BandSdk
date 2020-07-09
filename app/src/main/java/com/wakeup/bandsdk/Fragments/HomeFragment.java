@@ -37,7 +37,7 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments()!=null) {
-            a = getArguments().putAll().getIntegerArrayList("DataMeasure");
+            a = getArguments().getIntegerArrayList("DataMeasure");
             System.out.println("estas en home Fragmen" + a);
             temp = Integer.toString(a.get(11)) + "." + Integer.toString(a.get(12))+"°C";
             presS = Integer.toString(a.get(8)) + "/" + Integer.toString(a.get(9));

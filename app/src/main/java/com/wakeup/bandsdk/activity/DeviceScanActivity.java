@@ -251,7 +251,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
              @Override
             public void onResponse(Call<List<DataFisiometria>> call, Response<List<DataFisiometria>> response) {
                 if (response.isSuccessful()) {
-                    System.out.println(response.body().get(0));
+                    System.out.println(response.body().get(1));
                     /*for (int i = 0; response.body() > i; i++){
 
                     }*/

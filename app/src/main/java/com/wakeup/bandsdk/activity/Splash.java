@@ -5,8 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.wakeup.bandsdk.LoginActivity;
-import com.wakeup.bandsdk.MainActivity;
 import com.wakeup.bandsdk.R;
 
 public class Splash extends AppCompatActivity {
@@ -21,7 +19,7 @@ public class Splash extends AppCompatActivity {
             public void run() {
                 try {
                     Thread.sleep(1000);
-                    Intent intent = new Intent(getBaseContext(), HomeActivity.class);
+                    Intent intent = new Intent(getBaseContext(), LoginActivity.class);
                     startActivity(intent);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

@@ -24,8 +24,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.HomeActivity"
-            android:theme="@style/SplashTheme"></activity>
+        <activity
+            android:name=".activity.LoginActivity"
+            android:theme="@style/SplashTheme" />
         <activity
             android:name=".activity.Splash"
             android:noHistory="true"
@@ -37,6 +38,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+        <activity android:name=".activity.HomeActivity" />
+        <activity android:name=".activity.RegisterActivity" />
         <activity android:name=".activity.DeviceScanActivity"  />
         <activity android:name=".activity.SendPicActivity" />
     </application>
