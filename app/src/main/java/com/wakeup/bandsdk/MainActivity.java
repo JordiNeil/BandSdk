@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean medicionCorrecta = false;
-<<<<<<< HEAD
+
     /*private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
 
@@ -488,7 +488,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }*/
-=======
+
 //    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 //
 //
@@ -718,17 +718,15 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }
 //    };
->>>>>>> 544155895eb8ed6b76689b722118159eb69c2d08
+
 
 
     @Override
     protected void onResume() {
         super.onResume();
-<<<<<<< HEAD
-       // registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-=======
+
 //        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
->>>>>>> 544155895eb8ed6b76689b722118159eb69c2d08
+
         address = SPUtils.getString(MainActivity.this, SPUtils.ADDRESS, "");
         mTextMessage.setText(address);
 
@@ -746,13 +744,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-<<<<<<< HEAD
        // unbindService(mServiceConnection);
        // unregisterReceiver(mGattUpdateReceiver);
-=======
         unbindService(mServiceConnection);
 //        unregisterReceiver(mGattUpdateReceiver);
->>>>>>> 544155895eb8ed6b76689b722118159eb69c2d08
+
     }
 
     public void vibrate(View view) {
@@ -769,19 +765,17 @@ public class MainActivity extends AppCompatActivity {
 
     public synchronized void single_heartRate(View view) {
 
-<<<<<<< HEAD
+
         meassure();
     }
 
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
     public  void meassure() {
-=======
         Measure();
     }
 
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
     public synchronized void Measure() {
->>>>>>> 544155895eb8ed6b76689b722118159eb69c2d08
         /**
          *
          * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.

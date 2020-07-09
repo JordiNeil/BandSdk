@@ -79,17 +79,6 @@
                 android:onClick="fragmentUser"
                 android:text="Usuario" />
 
-<<<<<<< HEAD
-
-=======
-            <Button
-                android:id="@+id/button4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="fragmentInfo"
-                android:text="Measurement"/>
->>>>>>> 544155895eb8ed6b76689b722118159eb69c2d08
         </RadioGroup>
 
     </LinearLayout>
