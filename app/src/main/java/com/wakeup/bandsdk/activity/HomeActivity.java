@@ -210,8 +210,8 @@ public class HomeActivity extends MainActivity {
 
                 if (datas.get(0) == 0xAB) {
                     switch (datas.get(4)) {
-                        /*case 0x91:
-                            //BATTERY POWER
+                        case 0x91:
+//                            BATTERY POWER
                             Battery battery = (Battery) dataPasrse.parseData(datas);
                             Log.i(TAG, battery.toString());
                             break;
@@ -220,33 +220,32 @@ public class HomeActivity extends MainActivity {
                             bandInfo = (BandInfo) dataPasrse.parseData(datas);
                             Log.i(TAG, bandInfo.toString());
                             Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
-<<<<<<< HEAD
-=======
+//<<<<<<< HEAD
+//=======
 
->>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
 
                             if (bandInfo.getBandType() == 0x0B
                                     || bandInfo.getBandType() == 0x0D
                                     || bandInfo.getBandType() == 0x0E
                                     || bandInfo.getBandType() == 0x0F) {
 
-<<<<<<< HEAD
-                            if (bandInfo.getBandType() == 0x0B
-                                    || bandInfo.getBandType() == 0x0D
-                                    || bandInfo.getBandType() == 0x0E
-                                    || bandInfo.getBandType() == 0x0F) {
+//<<<<<<< HEAD
+                                if (bandInfo.getBandType() == 0x0B
+                                        || bandInfo.getBandType() == 0x0D
+                                        || bandInfo.getBandType() == 0x0E
+                                        || bandInfo.getBandType() == 0x0F) {
 
-=======
->>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
-                                Config.hasContinuousHeart = true;
+//=======
+//>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
+                                    Config.hasContinuousHeart = true;
 
+                                }
                             }
 
-
-<<<<<<< HEAD
+//<<<<<<< HEAD
+//=======
                             break;
-=======
-                            break;*/
 //>>>>>>> 9765ac8f477e50e878e526c333b9ef096ca1311f
                         case 0x51:
 
@@ -375,6 +374,11 @@ public class HomeActivity extends MainActivity {
                              * SI LA MEDICIÓN RETORNA VALORES NO VÁLIDOS (NULOS O CEROS) SE DEBE VOLVER A HACER
                              *
                              */
+                            if(datas.get(0)==1){
+
+                            }
+
+
 
 
                             break;
@@ -574,6 +578,47 @@ public class HomeActivity extends MainActivity {
          */
         timer.schedule(finishMeasure, 45000);
 
+    }
+
+    public void retryMeasure(){
+        /**
+         *
+         * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
+         */
+        Timer timer;
+        timer = new Timer();
+
+
+        /**
+         *
+         *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
+         */
+        TimerTask startMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(1);
+            }
+        };
+
+        TimerTask finishMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(0);
+            }
+        };
+
+        /**
+         *
+         * INICIO DE LA MEDICIÓN
+         */
+        timer.schedule(finishMeasure, 300000);
+
+        /**
+         *
+         * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
+         */
+        timer.schedule(finishMeasure, 45000+300000);
+
 
     }
 
@@ -583,7 +628,6 @@ public class HomeActivity extends MainActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         address = SPUtils.getString(HomeActivity.this, SPUtils.ADDRESS, "");
-
 
     }
 
