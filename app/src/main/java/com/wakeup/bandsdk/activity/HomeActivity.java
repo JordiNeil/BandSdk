@@ -57,7 +57,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends MainActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private TextView mTextMessage, tv_connect_state;
@@ -283,23 +283,23 @@ public class HomeActivity extends AppCompatActivity {
              *
              * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
              **/
-//                Timer timer;
-//                timer = new Timer();
-//
-//                TimerTask batteryInfo = new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        commandManager.getBatteryInfo();
-//                    }
-//                };
-//                timer.schedule(batteryInfo, 0, 600000);
+                Timer timer;
+                timer = new Timer();
+
+                TimerTask batteryInfo = new TimerTask() {
+                    @Override
+                    public void run() {
+                        commandManager.getBatteryInfo();
+                    }
+                };
+                timer.schedule(batteryInfo, 0, 600000);
 
 
              /**
               *
               * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
               **/
-//                commandManager.openHourlyMeasure(1);
+                commandManager.openHourlyMeasure(1);
 
 
 //                commandManager.setTimeSync();
@@ -340,34 +340,34 @@ public class HomeActivity extends AppCompatActivity {
                     switch (datas.get(4)) {
                         case 0x91:
                             //BATTERY POWER
-//                            Battery battery = (Battery) dataPasrse.parseData(datas);
-//                            Log.i(TAG, battery.toString());
+                            Battery battery = (Battery) dataPasrse.parseData(datas);
+                            Log.i(TAG, battery.toString());
                             break;
                         case 0x92:
                             //BRACELET DATA
-//                            bandInfo = (BandInfo) dataPasrse.parseData(datas);
-//                            Log.i(TAG, bandInfo.toString());
-//                            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
+                            bandInfo = (BandInfo) dataPasrse.parseData(datas);
+                            Log.i(TAG, bandInfo.toString());
+                            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
 
 
-//                            if (bandInfo.getBandType() == 0x0B
-//                                    || bandInfo.getBandType() == 0x0D
-//                                    || bandInfo.getBandType() == 0x0E
-//                                    || bandInfo.getBandType() == 0x0F) {
-//
-//                                Config.hasContinuousHeart = true;
+                            if (bandInfo.getBandType() == 0x0B
+                                    || bandInfo.getBandType() == 0x0D
+                                    || bandInfo.getBandType() == 0x0E
+                                    || bandInfo.getBandType() == 0x0F) {
 
-//                            }
+                                Config.hasContinuousHeart = true;
+
+                            }
 
 
-//                            break;
+                            break;
                         case 0x51:
 //
                             switch (datas.get(5)) {
                                 case 0x11:
 //                                    STAND-ALONE MEASUREMENT OF HEART RATE DATA
-//                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
-//                                    Log.i(TAG, heartRateBean.toString());
+                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, heartRateBean.toString());
                                     break;
                                 case 0x12:
                                     //STAND-ALONE MEASUREMENT OF BLOOD OXYGEN RATE DATA
@@ -375,7 +375,7 @@ public class HomeActivity extends AppCompatActivity {
                                     Log.i(TAG, bloodOxygenBean.toString());
                                     break;
                                 case 0x14:
-                                    //STAND-ALONE MEASUREMENT OF BLOOD PREASURE
+                                    //STAND-ALONE MEASUREMENT OF BLOOD PRESSURE
                                     BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bloodPressureBean.toString());
                                     break;
@@ -477,6 +477,13 @@ public class HomeActivity extends AppCompatActivity {
                             System.out.println("---------" + datas);
 
                             Log.i(TAG, oneButtonMeasurementBean.toString());
+
+                            /**
+                             *
+                             * SI LA MEDICIÓN RETORNA VALORES NO VÁLIDOS (NULOS O CEROS) SE DEBE VOLVER A HACER
+                             *
+                             */
+
 
                             break;
 
