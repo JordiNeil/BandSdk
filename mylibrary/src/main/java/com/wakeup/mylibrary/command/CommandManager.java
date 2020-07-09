@@ -262,7 +262,7 @@ public class CommandManager {
     /**
      * 一键测量(一键测量的时间为1分钟，1分钟到后发一个关闭指令，手环会返回数据)
      *
-     * @param control 0(关)  1(开)
+     *  0(关)  1(开)
      */
     public void oneButtonMeasurement(int control) {
         byte[] bytes = new byte[7];
@@ -273,6 +273,7 @@ public class CommandManager {
         bytes[4] = (byte) 0x32;
         bytes[5] = (byte) 0x80;
         bytes[6] = (byte) control;
+//        bytes[6] = (byte) 1;
         broadcastData(bytes);
     }
 
