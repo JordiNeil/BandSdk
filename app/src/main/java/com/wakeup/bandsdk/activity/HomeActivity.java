@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -121,6 +122,10 @@ public class HomeActivity extends MainActivity {
 
         }
 
+    }
+
+    private void DialogAlerte() {
+
 
     }
 
@@ -152,12 +157,26 @@ public class HomeActivity extends MainActivity {
             final String action = intent.getAction();
             if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
-
+                MainActivity.bandInfo = true;
 //                progressBar.setVisibility(View.GONE);
                 /*Intent intentHome = new Intent(context, HomeActivity.class);
                 intentHome.putExtra("address", address);
                 startActivity(intentHome);*/
 
+                /**
+             *
+             * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+             **/
+                Timer timer;
+                timer = new Timer();
+
+                TimerTask batteryInfo = new TimerTask() {
+                    @Override
+                    public void run() {
+                        commandManager.getBatteryInfo();
+                    }
+                };
+                timer.schedule(batteryInfo, 0, 600000);
                 //Meassure();
 
                 /*Timer timer;
@@ -171,12 +190,17 @@ public class HomeActivity extends MainActivity {
                 };
                 timer.schedule(batteryInfo, 0, 600000);
 
+             /**
+              *
+              * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
+              **/
+                commandManager.openHourlyMeasure(1);
 
                 commandManager.openHourlyMeasure(1);
 
 
                 commandManager.setTimeSync();
-*/
+//*/
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
@@ -201,8 +225,8 @@ public class HomeActivity extends MainActivity {
 
                 if (datas.get(0) == 0xAB) {
                     switch (datas.get(4)) {
-                        /*case 0x91:
-                            //BATTERY POWER
+                        case 0x91:
+//                            BATTERY POWER
                             Battery battery = (Battery) dataPasrse.parseData(datas);
                             Log.i(TAG, battery.toString());
                             break;
@@ -212,18 +236,19 @@ public class HomeActivity extends MainActivity {
                             Log.i(TAG, bandInfo.toString());
                             Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
 
-
                             if (bandInfo.getBandType() == 0x0B
                                     || bandInfo.getBandType() == 0x0D
                                     || bandInfo.getBandType() == 0x0E
                                     || bandInfo.getBandType() == 0x0F) {
 
-                                Config.hasContinuousHeart = true;
-
+                                if (bandInfo.getBandType() == 0x0B
+                                        || bandInfo.getBandType() == 0x0D
+                                        || bandInfo.getBandType() == 0x0E
+                                        || bandInfo.getBandType() == 0x0F) {
+                                    Config.hasContinuousHeart = true;
+                                }
                             }
-
-
-                            break;*/
+                            break;
                         case 0x51:
 
                             switch (datas.get(5)) {
@@ -238,7 +263,7 @@ public class HomeActivity extends MainActivity {
                                     Log.i(TAG, bloodOxygenBean.toString());
                                     break;
                                 case 0x14:
-                                    //STAND-ALONE MEASUREMENT OF BLOOD PREASURE
+                                    //STAND-ALONE MEASUREMENT OF BLOOD PRESSURE
                                     BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, bloodPressureBean.toString());
                                     break;
@@ -334,7 +359,7 @@ public class HomeActivity extends MainActivity {
                         case 0x32:
                             //ONE-CLICK MEASUREMENT
 //                            OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);}
-                            args.putIntegerArrayList("DataMeasure",datas);
+                            args.putIntegerArrayList("DataMeasure", datas);
                             fragmentHome.setArguments(args);
                             System.out.println("-----------" + datas);
 
@@ -342,6 +367,14 @@ public class HomeActivity extends MainActivity {
 
                             //Log.i(TAG, oneButtonMeasurementBean.toString());
 
+                            /**
+                             *
+                             * SI LA MEDICIÓN RETORNA VALORES NO VÁLIDOS (NULOS O CEROS) SE DEBE VOLVER A HACER
+                             *
+                             */
+                            if(datas.get(0)==1){
+
+                            }
                             break;
 
                         case 0x84:
@@ -538,6 +571,47 @@ public class HomeActivity extends MainActivity {
          * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
          */
         timer.schedule(finishMeasure, 45000);
+
+    }
+
+    public void retryMeasure(){
+        /**
+         *
+         * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
+         */
+        Timer timer;
+        timer = new Timer();
+
+
+        /**
+         *
+         *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
+         */
+        TimerTask startMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(1);
+            }
+        };
+
+        TimerTask finishMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(0);
+            }
+        };
+
+        /**
+         *
+         * INICIO DE LA MEDICIÓN
+         */
+        timer.schedule(finishMeasure, 300000);
+
+        /**
+         *
+         * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
+         */
+        timer.schedule(finishMeasure, 45000+300000);
 
 
     }
