@@ -11,6 +11,7 @@ import com.wakeup.bandsdk.configVar.ConfigGeneral;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.service.autofill.UserData;
@@ -34,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     TextInputLayout loginUsernameField, loginPasswordField;
     TextInputEditText loginUsernameInput, loginPasswordInput;
     private JsonObject userCredentials = new JsonObject();
+    private Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         loginPasswordInput = findViewById(R.id.loginPasswordText);
 
         directAccessBtn.setOnClickListener(v -> {
-            Intent homeIntent = new Intent(this, HomeActivity.class);
+            Intent homeIntent = new Intent(context, HomeActivity.class);
             startActivity(homeIntent);
         });
 
@@ -99,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
 
         loginBtn.setOnClickListener( v -> {
             Log.d(TAG, "User credentials -> " + userCredentials);
-            getJwtToken(this, userCredentials);
+            getJwtToken(context, userCredentials);
         });
         toRegisterBtn.setOnClickListener(v -> {
             Intent registerIntent = new Intent(this, RegisterActivity.class);
@@ -108,28 +110,40 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void getJwtToken(Context loginContext, JsonObject credentials) {
-        ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
-        final Call<JWTAuth> responseData = service.getJwtToken(credentials);
+        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        String storedJwtToken = sharedPrefs.getString("storedJwtToken", "");
+        if (storedJwtToken != null) {
+            if (storedJwtToken.equals("")) {
+                ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
+                final Call<JWTAuth> responseData = service.getJwtToken(credentials);
 
-        responseData.enqueue(new Callback<JWTAuth>() {
-            @Override
-            public void onResponse(Call<JWTAuth> call, Response<JWTAuth> response) {
-                if (response.isSuccessful()){
-                    assert response.body() != null;
-                    Log.i(TAG, "onResponse: " + response.body().toString());
-                    getPhysiometryDataById(loginContext, response.body().getIdToken(), 3);
-                }
-                if (response.code() == 401) {
-                    loginUsernameField.setError("Credenciales inválidas. Intentalo de nuevo.");
-                    loginPasswordField.setError("Credenciales inválidas. Intentalo de nuevo.");
-                }
-            }
+                responseData.enqueue(new Callback<JWTAuth>() {
+                    @Override
+                    public void onResponse(Call<JWTAuth> call, Response<JWTAuth> response) {
+                        if (response.isSuccessful()){
+                            assert response.body() != null;
+                            Log.i(TAG, "onResponse: " + response.body().toString());
+                            editor.putString("storedJwtToken", response.body().getIdToken());
+                            editor.commit();
+                            getPhysiometryDataById(loginContext, response.body().getIdToken(), 3);
+                        }
+                        if (response.code() == 401) {
+                            loginUsernameField.setError("Credenciales inválidas. Intentalo de nuevo.");
+                            loginPasswordField.setError("Credenciales inválidas. Intentalo de nuevo.");
+                        }
+                    }
 
-            @Override
-            public void onFailure(Call<JWTAuth> call, Throwable t) {
-                System.out.println(t.getMessage());
+                    @Override
+                    public void onFailure(Call<JWTAuth> call, Throwable t) {
+                        System.out.println(t.getMessage());
+                    }
+                });
+            }else{
+                getPhysiometryDataById(loginContext, storedJwtToken, 3);
             }
-        });
+        }
+
     }
 
     public void getPhysiometryDataById(Context loginContext, String jwtToken, int userId) {
