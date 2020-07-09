@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -75,10 +76,11 @@ public class HomeActivity extends MainActivity {
     private String address;
     private CommandManager commandManager;
     private DataParse dataPasrse;
-    private BandInfo bandInfo;
+    //private BandInfo bandInfo;
     public Button btnMeassure;
     Fragment fragmentHome = new HomeFragment();
     Bundle args = new Bundle();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +121,10 @@ public class HomeActivity extends MainActivity {
 
         }
 
+    }
+
+    private void DialogAlerte() {
+
 
     }
 
@@ -154,7 +160,7 @@ public class HomeActivity extends MainActivity {
             final String action = intent.getAction();
             if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
-
+                MainActivity.bandInfo = true;
 //                progressBar.setVisibility(View.GONE);
                 /*Intent intentHome = new Intent(context, HomeActivity.class);
                 intentHome.putExtra("address", address);
@@ -389,7 +395,7 @@ public class HomeActivity extends MainActivity {
                         case 0x32:
                             //ONE-CLICK MEASUREMENT
 //                            OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);}
-                            args.putIntegerArrayList("DataMeasure",datas);
+                            args.putIntegerArrayList("DataMeasure", datas);
                             fragmentHome.setArguments(args);
                             System.out.println("-----------" + datas);
 
