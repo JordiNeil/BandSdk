@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean medicionCorrecta = false;
-    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+    /*private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
 
         @Override
@@ -269,14 +269,15 @@ public class MainActivity extends AppCompatActivity {
                 imgConecct.setBackgroundResource(R.drawable.band_connected);
                 tv_connect_state.setText("Conectado");
 //                progressBar.setVisibility(View.GONE);
-                Intent intentHome = new Intent(context, HomeActivity.class);
+                *//*Intent intentHome = new Intent(context, HomeActivity.class);
                 intentHome.putExtra("address",address);
-                startActivity(intentHome);
+                startActivity(intentHome);*//*
 
-                /**
+                //Meassure();
+                *//**
                  *
                  * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
-                 */
+                 *//*
                 Timer timer;
                 timer = new Timer();
 
@@ -288,18 +289,18 @@ public class MainActivity extends AppCompatActivity {
                 };
                 timer.schedule(batteryInfo, 0, 600000);
 
-                /**
+                *//**
                  *
                  * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
-                 */
+                 *//*
 
                 commandManager.openHourlyMeasure(1);
 
-                /**
+                *//**
                  *
                  * SINCRONIZACIÓN DE TIEMPO
                  *
-                 */
+                 *//*
                 commandManager.setTimeSync();
 
 
@@ -485,13 +486,13 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
-    };
+    }*/
 
 
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+       // registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         address = SPUtils.getString(MainActivity.this, SPUtils.ADDRESS, "");
         mTextMessage.setText(address);
 
@@ -509,8 +510,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mServiceConnection);
-        unregisterReceiver(mGattUpdateReceiver);
+       // unbindService(mServiceConnection);
+       // unregisterReceiver(mGattUpdateReceiver);
     }
 
     public void vibrate(View view) {
@@ -527,11 +528,11 @@ public class MainActivity extends AppCompatActivity {
 
     public synchronized void single_heartRate(View view) {
 
-        Meassure();
+        meassure();
     }
 
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
-    public synchronized void Meassure() {
+    public  void meassure() {
         /**
          *
          * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.

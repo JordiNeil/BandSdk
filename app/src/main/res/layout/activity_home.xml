@@ -10,7 +10,7 @@
         android:id="@+id/fl_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/connect_status" >
+        android:layout_above="@+id/connect_status">
 
         <ImageView
             android:id="@+id/iv_guide"
@@ -62,31 +62,26 @@
                 android:id="@+id/rb_home"
                 style="@style/rg_bc_style"
                 android:drawableTop="@drawable/rb_home_selector"
-                android:text="Home"
-                android:onClick="fragmentHome"/>
+                android:onClick="fragmentHome"
+                android:text="Home" />
 
             <RadioButton
                 android:id="@+id/rb_discover"
                 style="@style/rg_bc_style"
                 android:drawableTop="@drawable/rb_discover_selector"
-                android:text="coneccion"
-                android:onClick="fragmentInfo" />
+                android:onClick="fragmentInfo"
+                android:text="coneccion" />
 
             <RadioButton
                 android:id="@+id/rb_mine"
                 style="@style/rg_bc_style"
                 android:drawableTop="@drawable/rb_mine_selector"
-                android:text="Usuario"
-                android:onClick="fragmentUser"/>
+                android:onClick="fragmentUser"
+                android:text="Usuario" />
 
-            <Button
-                android:id="@+id/button4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
 
-                android:text="Measurement"/>
         </RadioGroup>
+
     </LinearLayout>
 
     <TextView
