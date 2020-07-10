@@ -57,6 +57,7 @@ import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimerTask;
@@ -250,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void connect(View view) {
-        mBluetoothLeService.connect(address);
+       conectarBluetooth();
 
         showDialog();
 
@@ -649,11 +650,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void sincronizarHora(){
         commandManager.setTimeSync();
+        Log.i(TAG,"SINCRONIZACIÓN DE TIEMPO");
     }
 
     public void iniciarMedicionHora(){
         commandManager.openHourlyMeasure(1);
+        Log.i(TAG,"INICIO MEDICIÓN POR HORA");
 
+    }
+    public void nivelBateria(ArrayList<Integer> datas){
+        Log.i(TAG,"NIVEL DE BATERÍA: "+datas.get(7));
+    }
+    public void conectarBluetooth(){
+        mBluetoothLeService.connect(address);
     }
 
 

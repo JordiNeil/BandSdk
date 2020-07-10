@@ -219,7 +219,7 @@ public class HomeActivity extends MainActivity {
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
-
+                conectarBluetooth();
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
@@ -229,10 +229,18 @@ public class HomeActivity extends MainActivity {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(System.currentTimeMillis());
-                Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
-                        + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
-                        (calendar.get(Calendar.MINUTE)) + ":" +
-                        (calendar.get(Calendar.SECOND)));
+                if (calendar.get(Calendar.SECOND) >=10) {
+                    Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                            + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+                            (calendar.get(Calendar.MINUTE)) + ":" +
+                            (calendar.get(Calendar.SECOND)));
+                }
+                else {
+                    Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                            + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+                            (calendar.get(Calendar.MINUTE)) + ":0" +
+                            (calendar.get(Calendar.SECOND)));
+                }
                 ArrayList<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
 
 
@@ -247,6 +255,7 @@ public class HomeActivity extends MainActivity {
 //                            BATTERY POWER
 //                            Battery battery = (Battery) dataPasrse.parseData(datas);
 //                            Log.i(TAG, battery.toString());
+                            nivelBateria(datas);
                             break;
                         case 0x92:
                             //BRACELET DATA
