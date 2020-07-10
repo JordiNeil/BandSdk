@@ -643,9 +643,9 @@ public class HomeActivity extends MainActivity {
             userData.addProperty("firstName", (String) fetchedUserData.get(2));
             userData.addProperty("lastName", (String) fetchedUserData.get(3));
             userData.addProperty("email", (String) fetchedUserData.get(4));
-            userData.addProperty("activated", (Boolean) fetchedUserData.get(5));
-            userData.addProperty("langKey", (String) fetchedUserData.get(6));
-            userData.addProperty("imageUrl", (String) fetchedUserData.get(7));
+            userData.addProperty("imageUrl", (String) fetchedUserData.get(5));
+            userData.addProperty("activated", (Boolean) fetchedUserData.get(6));
+            userData.addProperty("langKey", (String) fetchedUserData.get(7));
             // Adding userData object to Physiometry object
             physiometryData.add("user", userData);
             // Sending physiometry data to the service
@@ -655,7 +655,7 @@ public class HomeActivity extends MainActivity {
         }
     }
 
-    public void sendPhysiometryData(String jwtToken ,JsonObject data) {
+    public void sendPhysiometryData(String jwtToken, JsonObject data) {
         ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
         final Call<DataFisiometria> responseData = service.setPhysiometryData("Bearer " + jwtToken, data);
 

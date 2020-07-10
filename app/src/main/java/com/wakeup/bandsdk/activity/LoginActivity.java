@@ -6,6 +6,7 @@ import com.wakeup.bandsdk.Pojos.Authenticate.JWTAuth;
 import com.wakeup.bandsdk.Pojos.DataUser;
 import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
 import com.wakeup.bandsdk.R;
+import com.wakeup.bandsdk.Services.AccountService;
 import com.wakeup.bandsdk.Services.ServiceFisiometria;
 import com.wakeup.bandsdk.configVar.ConfigGeneral;
 
@@ -127,7 +128,7 @@ public class LoginActivity extends AppCompatActivity {
                         Log.i(TAG, "onResponse: " + response.body().toString());
                         editor.putString("storedJwtToken", response.body().getIdToken());
                         editor.commit();
-                        getPhysiometryDataById(loginContext, response.body().getIdToken(), 3);
+                        fetchUserData(loginContext, response.body().getIdToken());
                     }
                     if (response.code() == 401) {
                         loginUsernameField.setError("Credenciales inválidas. Intentalo de nuevo.");
@@ -141,8 +142,68 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         } else {
-            getPhysiometryDataById(loginContext, storedJwtToken, 3);
+            fetchUserData(loginContext, storedJwtToken);
         }
+    }
+
+    public void fetchUserData(Context loginContext, String jwtToken) {
+        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        AccountService service = ConfigGeneral.retrofit.create(AccountService.class);
+        final Call<DataUser> dataResponse = service.getUserData("Bearer " + jwtToken);
+
+        dataResponse.enqueue(new Callback<DataUser>() {
+            @Override
+            public void onResponse(Call<DataUser> call, Response<DataUser> response) {
+                if (response.isSuccessful()) {
+                    assert response.body() != null;
+                    Log.i(TAG, "onResponse: " + response.body().toString());
+
+                    DataUser res = response.body();
+                    assert res != null;
+                    ArrayList<Object> fetchedUserData = new ArrayList<>();
+                    fetchedUserData.add(0, res.getId());
+                    fetchedUserData.add(1, res.getLogin());
+                    fetchedUserData.add(2, res.getFirstName());
+                    fetchedUserData.add(3, res.getLastName());
+                    fetchedUserData.add(4, res.getEmail());
+                    fetchedUserData.add(5, res.getImageUrl());
+                    fetchedUserData.add(6, res.getActivated());
+                    fetchedUserData.add(7, res.getLangKey());
+                    fetchedUserData.add(8, res.getCreatedBy());
+                    fetchedUserData.add(9, res.getCreatedDate());
+                    fetchedUserData.add(10, res.getLastModifiedBy());
+                    fetchedUserData.add(11, res.getLastModifiedDate());
+
+                    // Storing necessary user data to shared preferences
+                    editor.putInt("userId", res.getId());
+                    editor.putString("login", res.getLogin());
+                    editor.putString("firstName", res.getFirstName());
+                    editor.putString("lastName", res.getLastName());
+                    editor.putString("email", res.getEmail());
+                    editor.putBoolean("activated", res.getActivated());
+                    editor.putString("langKey", res.getLangKey());
+                    editor.putString("imageUrl", res.getImageUrl());
+
+                    Intent homeIntent = new Intent(loginContext, HomeActivity.class);
+                    homeIntent.putExtra("fetchedUserData", fetchedUserData);
+                    startActivity(homeIntent);
+                }
+                if (response.code() == 401) {
+                    editor.remove("storedJwtToken");
+                    editor.commit();
+                    getJwtToken(context, userCredentials);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DataUser> call, Throwable t) {
+                System.out.println(t.getMessage());
+                if (Objects.requireNonNull(t.getMessage()).equals("timeout")) {
+                    Toast.makeText(context, "Ha ocurrido un error. Por favor intentalo de nuevo.", Toast.LENGTH_LONG);
+                }
+            }
+        });
     }
 
     public void getPhysiometryDataById(Context loginContext, String jwtToken, int userId) {
@@ -157,18 +218,14 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     List<DataFisiometria> res = response.body();
                     assert res != null;
-                    ArrayList<Object> fetchedUserData = new ArrayList<>();
-                    fetchedUserData.add(0, res.get(0).getUserData().getId());
-                    fetchedUserData.add(1, res.get(0).getUserData().getLogin());
-                    fetchedUserData.add(2, res.get(0).getUserData().getFirstName());
-                    fetchedUserData.add(3, res.get(0).getUserData().getLastName());
-                    fetchedUserData.add(4, res.get(0).getUserData().getEmail());
-                    fetchedUserData.add(5, res.get(0).getUserData().getActivated());
-                    fetchedUserData.add(6, res.get(0).getUserData().getLangKey());
-                    fetchedUserData.add(7, res.get(0).getUserData().getImageUrl());
-                    fetchedUserData.add(8, res.get(0).getUserData().getLastModifiedDate());
+                    ArrayList<Object> fetchedPhysiometryData = new ArrayList<>();
+                    fetchedPhysiometryData.add(0, res.get(res.size() - 1).getRitmoCardiaco());
+                    fetchedPhysiometryData.add(1, res.get(res.size() - 1).getOximetria());
+                    fetchedPhysiometryData.add(2, res.get(res.size() - 1).getPresionArterialSistolica());
+                    fetchedPhysiometryData.add(3, res.get(res.size() - 1).getPresionArterialDiastolica());
+                    fetchedPhysiometryData.add(4, res.get(res.size() - 1).getTemperatura());
                     Intent homeIntent = new Intent(loginContext, HomeActivity.class);
-                    homeIntent.putExtra("fetchedUserData", fetchedUserData);
+                    homeIntent.putExtra("fetchedPhysiometryData", fetchedPhysiometryData);
                     startActivity(homeIntent);
                 }
                 if (response.code() == 401) {
