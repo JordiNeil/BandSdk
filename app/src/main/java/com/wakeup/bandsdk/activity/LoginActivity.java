@@ -19,11 +19,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -113,40 +115,39 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         String storedJwtToken = sharedPrefs.getString("storedJwtToken", "");
-        if (storedJwtToken != null) {
-            if (storedJwtToken.equals("")) {
-                ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
-                final Call<JWTAuth> responseData = service.getJwtToken(credentials);
+        if (storedJwtToken != null || storedJwtToken.equals("")) {
+            ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
+            final Call<JWTAuth> responseData = service.getJwtToken(credentials);
 
-                responseData.enqueue(new Callback<JWTAuth>() {
-                    @Override
-                    public void onResponse(Call<JWTAuth> call, Response<JWTAuth> response) {
-                        if (response.isSuccessful()){
-                            assert response.body() != null;
-                            Log.i(TAG, "onResponse: " + response.body().toString());
-                            editor.putString("storedJwtToken", response.body().getIdToken());
-                            editor.commit();
-                            getPhysiometryDataById(loginContext, response.body().getIdToken(), 3);
-                        }
-                        if (response.code() == 401) {
-                            loginUsernameField.setError("Credenciales inválidas. Intentalo de nuevo.");
-                            loginPasswordField.setError("Credenciales inválidas. Intentalo de nuevo.");
-                        }
+            responseData.enqueue(new Callback<JWTAuth>() {
+                @Override
+                public void onResponse(Call<JWTAuth> call, Response<JWTAuth> response) {
+                    if (response.isSuccessful()){
+                        assert response.body() != null;
+                        Log.i(TAG, "onResponse: " + response.body().toString());
+                        editor.putString("storedJwtToken", response.body().getIdToken());
+                        editor.commit();
+                        getPhysiometryDataById(loginContext, response.body().getIdToken(), 3);
                     }
+                    if (response.code() == 401) {
+                        loginUsernameField.setError("Credenciales inválidas. Intentalo de nuevo.");
+                        loginPasswordField.setError("Credenciales inválidas. Intentalo de nuevo.");
+                    }
+                }
 
-                    @Override
-                    public void onFailure(Call<JWTAuth> call, Throwable t) {
-                        System.out.println(t.getMessage());
-                    }
-                });
-            }else{
-                getPhysiometryDataById(loginContext, storedJwtToken, 3);
-            }
+                @Override
+                public void onFailure(Call<JWTAuth> call, Throwable t) {
+                    System.out.println(t.getMessage());
+                }
+            });
+        } else {
+            getPhysiometryDataById(loginContext, storedJwtToken, 3);
         }
-
     }
 
     public void getPhysiometryDataById(Context loginContext, String jwtToken, int userId) {
+        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
         ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
         final Call<List<DataFisiometria>> dataResponse = service.getPhysiometryData("Bearer " + jwtToken, userId);
 
@@ -170,11 +171,19 @@ public class LoginActivity extends AppCompatActivity {
                     homeIntent.putExtra("fetchedUserData", fetchedUserData);
                     startActivity(homeIntent);
                 }
+                if (response.code() == 401) {
+                    editor.remove("storedJwtToken");
+                    editor.commit();
+                    getJwtToken(context, userCredentials);
+                }
             }
 
             @Override
             public void onFailure(Call<List<DataFisiometria>> call, Throwable t) {
                 System.out.println(t.getMessage());
+                if (Objects.requireNonNull(t.getMessage()).equals("timeout")) {
+                    Toast.makeText(context, "Ha ocurrido un error. Por favor intentalo de nuevo.", Toast.LENGTH_LONG);
+                }
             }
         });
     }
