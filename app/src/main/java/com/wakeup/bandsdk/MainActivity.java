@@ -623,7 +623,7 @@ public class MainActivity extends AppCompatActivity {
          *
          * INICIO DE LA MEDICIÓN
          */
-        timer.schedule(finishMeasure, 300000);
+        timer.schedule(startMeasure, 300000);
 //        timer.schedule(startMeasure, 60000);
 
         /**

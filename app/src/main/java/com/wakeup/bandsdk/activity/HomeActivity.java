@@ -214,9 +214,8 @@ public class HomeActivity extends MainActivity {
               *
               * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
               **/
-                commandManager.openHourlyMeasure(1);
-
 //                commandManager.openHourlyMeasure(1);
+
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
