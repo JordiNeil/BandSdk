@@ -623,15 +623,15 @@ public class MainActivity extends AppCompatActivity {
          *
          * INICIO DE LA MEDICIÓN
          */
-//        timer.schedule(finishMeasure, 300000);
-        timer.schedule(startMeasure, 60000);
+        timer.schedule(finishMeasure, 300000);
+//        timer.schedule(startMeasure, 60000);
 
         /**
          *
          * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
          */
-//        timer.schedule(finishMeasure, 45000+300000);
-        timer.schedule(finishMeasure, 60000+45000);
+        timer.schedule(finishMeasure, 45000+300000);
+//        timer.schedule(finishMeasure, 60000+45000);
 
     }
     public void medirBateria(){
