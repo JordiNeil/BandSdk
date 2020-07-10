@@ -1,6 +1,7 @@
 package com.wakeup.bandsdk.activity;
 
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -17,6 +18,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -57,6 +59,8 @@ import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -67,6 +71,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class HomeActivity extends MainActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -82,6 +87,7 @@ public class HomeActivity extends MainActivity {
     private BandInfo bandInfo;
     public Button btnMeassre;
     private Context context = this;
+    private ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
     Fragment fragmentHome = new HomeFragment();
     Bundle args = new Bundle();
     View viewAlert;
@@ -113,6 +119,7 @@ public class HomeActivity extends MainActivity {
         fragmentTransaction.add(R.id.fl_fragment_container, fragmentHome);
         fragmentTransaction.commit();*/
         Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
+        Log.d(TAG, "onCreate: " + utc);
 //        btnMeassure.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -646,7 +653,11 @@ public class HomeActivity extends MainActivity {
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
 
 
-    public void mixUserAndPhysiometryData(int heartRate, int bloodOxygen, int systolicBP, int diastolicBP, int temperature, String registerDate, String measureDate) {
+
+
+
+    public void mixUserAndPhysiometryData(ArrayList<Integer> measuredPhysiometryData) {
+
 //      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
         SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String storedJwtToken = sharedPrefs.getString("storedJwtToken", "");
@@ -656,13 +667,13 @@ public class HomeActivity extends MainActivity {
         if (fetchedUserData != null) {
             // Defining Physiometry object and adding data to it
             JsonObject physiometryData = new JsonObject();
-            physiometryData.addProperty("ritmoCardiaco", heartRate);
-            physiometryData.addProperty("oximetria", bloodOxygen);
-            physiometryData.addProperty("presionArterialSistolica", systolicBP);
-            physiometryData.addProperty("presionArterialDiastolica", diastolicBP);
-            physiometryData.addProperty("temperatura", temperature);
-            physiometryData.addProperty("fechaRegistro", registerDate);
-            physiometryData.addProperty("fechaToma", measureDate);
+            physiometryData.addProperty("ritmoCardiaco", measuredPhysiometryData.get(0));
+            physiometryData.addProperty("oximetria", measuredPhysiometryData.get(1));
+            physiometryData.addProperty("presionArterialSistolica", measuredPhysiometryData.get(2));
+            physiometryData.addProperty("presionArterialDiastolica", measuredPhysiometryData.get(3));
+            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(4));
+            physiometryData.addProperty("fechaRegistro", utc.toString());
+            physiometryData.addProperty("fechaToma", utc.toString());
             // Defining userData object to store the user data from login activity
             JsonObject userData = new JsonObject();
             userData.addProperty("id", (Number) fetchedUserData.get(0));
@@ -670,9 +681,9 @@ public class HomeActivity extends MainActivity {
             userData.addProperty("firstName", (String) fetchedUserData.get(2));
             userData.addProperty("lastName", (String) fetchedUserData.get(3));
             userData.addProperty("email", (String) fetchedUserData.get(4));
-            userData.addProperty("activated", (Boolean) fetchedUserData.get(5));
-            userData.addProperty("langKey", (String) fetchedUserData.get(6));
-            userData.addProperty("imageUrl", (String) fetchedUserData.get(7));
+            userData.addProperty("imageUrl", (String) fetchedUserData.get(5));
+            userData.addProperty("activated", (Boolean) fetchedUserData.get(6));
+            userData.addProperty("langKey", (String) fetchedUserData.get(7));
             // Adding userData object to Physiometry object
             physiometryData.add("user", userData);
             // Sending physiometry data to the service
