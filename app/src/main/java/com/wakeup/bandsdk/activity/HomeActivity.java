@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -77,8 +78,9 @@ public class HomeActivity extends MainActivity {
     private String address;
     private CommandManager commandManager;
     private DataParse dataPasrse;
-    //private BandInfo bandInfo;
+    private BandInfo bandInfo;
     public Button btnMeassure;
+    private Context context = this;
     Fragment fragmentHome = new HomeFragment();
     Bundle args = new Bundle();
 
@@ -188,9 +190,33 @@ public class HomeActivity extends MainActivity {
                  */
                 iniciarMedicionHora();
 
+                /**
+             *
+             * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+             **/
+                Timer timer;
+                timer = new Timer();
+
+                TimerTask batteryInfo = new TimerTask() {
+                    @Override
+                    public void run() {
+//                        commandManager.getBatteryInfo();
+                    }
+                };
+                timer.schedule(batteryInfo, 0, 600000);
+//                timer.schedule(batteryInfo, 0, 600000);
+
+                //Meassure();
 
 
 
+             /**
+              *
+              * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
+              **/
+                commandManager.openHourlyMeasure(1);
+
+//                commandManager.openHourlyMeasure(1);
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
@@ -252,9 +278,6 @@ public class HomeActivity extends MainActivity {
 
                             switch (datas.get(5)) {
                                 case 0x11:
-
-//                                    STAND-ALONE MEASUREMENT OF HEART RATE DATA
-
                                     //STAND-ALONE MEASUREMENT OF HEART RATE DATA
 
                                     HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
@@ -428,9 +451,6 @@ public class HomeActivity extends MainActivity {
                                     medicionCorrecta=true;
                                 }
                             }
-
-
-
                             break;
 
                         case 0x84:
@@ -599,9 +619,45 @@ public class HomeActivity extends MainActivity {
 
 
 
-    public void sendPhysiometryData(JsonObject data) {
+    public void mixUserAndPhysiometryData(int heartRate, int bloodOxygen, int systolicBP, int diastolicBP, int temperature, String registerDate, String measureDate) {
+//      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
+        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String storedJwtToken = sharedPrefs.getString("storedJwtToken", "");
+        ArrayList<Object> fetchedUserData;
+        fetchedUserData = getIntent().hasExtra("fetchedUserData") ? (ArrayList<Object>) getIntent().getSerializableExtra("fetchedUserData") : null;
+
+        if (fetchedUserData != null) {
+            // Defining Physiometry object and adding data to it
+            JsonObject physiometryData = new JsonObject();
+            physiometryData.addProperty("ritmoCardiaco", heartRate);
+            physiometryData.addProperty("oximetria", bloodOxygen);
+            physiometryData.addProperty("presionArterialSistolica", systolicBP);
+            physiometryData.addProperty("presionArterialDiastolica", diastolicBP);
+            physiometryData.addProperty("temperatura", temperature);
+            physiometryData.addProperty("fechaRegistro", registerDate);
+            physiometryData.addProperty("fechaToma", measureDate);
+            // Defining userData object to store the user data from login activity
+            JsonObject userData = new JsonObject();
+            userData.addProperty("id", (Number) fetchedUserData.get(0));
+            userData.addProperty("login", (String) fetchedUserData.get(1));
+            userData.addProperty("firstName", (String) fetchedUserData.get(2));
+            userData.addProperty("lastName", (String) fetchedUserData.get(3));
+            userData.addProperty("email", (String) fetchedUserData.get(4));
+            userData.addProperty("activated", (Boolean) fetchedUserData.get(5));
+            userData.addProperty("langKey", (String) fetchedUserData.get(6));
+            userData.addProperty("imageUrl", (String) fetchedUserData.get(7));
+            // Adding userData object to Physiometry object
+            physiometryData.add("user", userData);
+            // Sending physiometry data to the service
+            sendPhysiometryData(storedJwtToken, physiometryData);
+        } else {
+            Log.d(TAG, "mixUserAndPhysiometryData -> No hay datos de usuario desde login");
+        }
+    }
+
+    public void sendPhysiometryData(String jwtToken ,JsonObject data) {
         ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
-        final Call<DataFisiometria> responseData = service.setPhysiometryData("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTU5NDM5MjEyMH0.BU7VAZQXM5ADH4zCI8985qIOR81bny8b9gm2RWFD9wFUiuJNGY9Td36hPmJw5-_SliAx28CbrA4RVV-MQSkXMw" ,data);
+        final Call<DataFisiometria> responseData = service.setPhysiometryData("Bearer " + jwtToken, data);
 
         responseData.enqueue(new Callback<DataFisiometria>() {
             @Override
