@@ -196,6 +196,8 @@ public class HomeActivity extends MainActivity {
     public int numeroIntentos = 0;
     public boolean ponerManilla = false;
 
+    public boolean conectado=false;
+
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
 
@@ -209,27 +211,31 @@ public class HomeActivity extends MainActivity {
                 /*Intent intentHome = new Intent(context, HomeActivity.class);
                 intentHome.putExtra("address", address);
                 startActivity(intentHome);*/
-                /**
-                 *
-                 *
-                 * INICIO MEDICIÓN AUTOMÁTICA DE BATERÍA CADA HORA
-                 *
-                 */
-                medirBateria();
+                if (!StatusConnection) {
+                    /**
+                     *
+                     *
+                     * INICIO MEDICIÓN AUTOMÁTICA DE BATERÍA CADA HORA
+                     *
+                     */
+                    medirBateria();
 
-                /**
-                 *
-                 * SINCRONIZACIÓN DE HORA
-                 *
-                 */
-                sincronizarHora();
+                    /**
+                     *
+                     * SINCRONIZACIÓN DE HORA
+                     *
+                     */
+                    sincronizarHora();
 
-                /**
-                 *
-                 *
-                 * ABRIR MEDICION CADA HORA
-                 */
-                iniciarMedicionHora();
+                    /**
+                     *
+                     *
+                     * ABRIR MEDICION CADA HORA
+                     */
+                    iniciarMedicionHora();
+                }
+                StatusConnection=true;
+                conectado=true;
 
                 /**
                  *
@@ -244,53 +250,63 @@ public class HomeActivity extends MainActivity {
 //                        commandManager.getBatteryInfo();
                     }
                 };
-//                timer.schedule(batteryInfo, 0, 600000);
-//                timer.schedule(batteryInfo, 0, 600000);
-
-                //Meassure();
-
-
-
-
-             /**
-              *
-              * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
-              **/
-
-                /**
-                 *
-                 * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
-                 **/
-               // commandManager.openHourlyMeasure(1);
-
-
 
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
+                conectado=false;
+                Timer timer;
+                timer = new Timer();
 
-                conectarBluetooth();
-
+                TimerTask verificarConexion=new TimerTask() {
+                    @Override
+                    public void run(){
+                        TimerTask reintentarConexion = new TimerTask() {
+                            @Override
+                            public void run() {
+                                if (!conectado) {
+                                    conectarBluetooth();
+                                }
+                            }
+                        };
+                        timer.schedule(reintentarConexion, 0);
+                    }
+                };
+                timer.schedule(verificarConexion, 0, 600000);
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
-                StatusConnection=true;
+
 
             } else if (BluetoothService.ACTION_DATA_AVAILABLE.equals(action)) {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(System.currentTimeMillis());
-                if (calendar.get(Calendar.SECOND) >=10) {
+                if (calendar.get(Calendar.MINUTE) >=10 && calendar.get(Calendar.SECOND)>=10) {
                     Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
                             + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
                             (calendar.get(Calendar.MINUTE)) + ":" +
                             (calendar.get(Calendar.SECOND)));
                 }
-                else {
+                else if (calendar.get(calendar.MINUTE)>=10 && calendar.get (Calendar.SECOND)<10) {
                     Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
                             + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
                             (calendar.get(Calendar.MINUTE)) + ":0" +
                             (calendar.get(Calendar.SECOND)));
+                }
+                else if (calendar.get(calendar.MINUTE)<10 && calendar.get (Calendar.SECOND)>=10) {
+                    Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                            + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":0" +
+                            (calendar.get(Calendar.MINUTE)) + ":" +
+                            (calendar.get(Calendar.SECOND)));
+                }
+                else{
+                    {
+                        Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                                + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":0" +
+                                (calendar.get(Calendar.MINUTE)) + ":0" +
+                                (calendar.get(Calendar.SECOND)));
+                    }
                 }
                 ArrayList<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
 
@@ -359,8 +375,9 @@ public class HomeActivity extends MainActivity {
 
                                 case 0x20:
                                     //RETURN HOURLY DATA
-//                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-//                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+                                    System.out.println(datas);
 
 
                                     /**
