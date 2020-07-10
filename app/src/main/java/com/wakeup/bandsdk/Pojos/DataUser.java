@@ -168,10 +168,13 @@ public class DataUser {
                 ", firstName ='" + firstName + '\'' +
                 ", lastName =" + lastName + '\'' +
                 ", email =" + email + '\'' +
+                ", imageUrl =" + imageUrl + '\'' +
                 ", activated =" + activated + '\'' +
                 ", langKey =" + langKey + '\'' +
-                ", imageUrl =" + imageUrl + '\'' +
-                ", resetDate =" + null + '\'' +
+                ", createdBy =" + createdBy + '\'' +
+                ", createdDate =" + createdDate + '\'' +
+                ", lastModifiedBy =" + lastModifiedBy + '\'' +
+                ", lastModifiedDate =" + lastModifiedDate + '\'' +
                 '}';
     }
 }
