@@ -1,4 +1,5 @@
 package com.wakeup.bandsdk.activity;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.JsonObject;
@@ -19,6 +20,7 @@ import android.service.autofill.UserData;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -139,6 +141,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<JWTAuth> call, Throwable t) {
                     System.out.println(t.getMessage());
+                    Snackbar.make(loginPasswordField, "Ha ocurrido un error. Por favor intentalo de nuevo.", Snackbar.LENGTH_LONG).show();
                 }
             });
         } else {
@@ -199,9 +202,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<DataUser> call, Throwable t) {
                 System.out.println(t.getMessage());
-                if (Objects.requireNonNull(t.getMessage()).equals("timeout")) {
-                    Toast.makeText(context, "Ha ocurrido un error. Por favor intentalo de nuevo.", Toast.LENGTH_LONG);
-                }
+                Snackbar.make(loginPasswordField, "Ha ocurrido un error. Por favor intentalo de nuevo.", Snackbar.LENGTH_LONG).show();
+//                if (Objects.requireNonNull(t.getMessage()).equals("timeout")) {
+//                    Toast.makeText(context, "Ha ocurrido un error. Por favor intentalo de nuevo.", Toast.LENGTH_LONG);
+//                }
             }
         });
     }
