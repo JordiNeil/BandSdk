@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
@@ -79,11 +80,14 @@ public class HomeActivity extends MainActivity {
     private CommandManager commandManager;
     private DataParse dataPasrse;
     private BandInfo bandInfo;
-    public Button btnMeassure;
+    public Button btnMeassre;
     private Context context = this;
     Fragment fragmentHome = new HomeFragment();
     Bundle args = new Bundle();
-
+    View viewAlert;
+    AlertDialog.Builder builder;
+    AlertDialog dialog;
+    Boolean StatusConnection=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +99,13 @@ public class HomeActivity extends MainActivity {
         //radioButtonInfo.callOnClick();
         radioButtonUser = (RadioButton) findViewById(R.id.rb_mine);
         //radioButtonUser.callOnClick();
+
+        viewAlert = LayoutInflater.from(this).inflate(R.layout.loading_data_measure, null);
+        builder = new AlertDialog.Builder(this);
+        builder.setView(viewAlert);
+        builder.setCancelable(false);
+        dialog = builder.create();
+
 
 //        btnMeassure = (Button) findViewById(R.id.button4);
         /*FragmentManager fragmentManager = getSupportFragmentManager();
@@ -126,13 +137,36 @@ public class HomeActivity extends MainActivity {
 
     }
 
-    private void DialogAlerte() {
+    private void DialogAlertmeasure() {
 
 
     }
 
     public synchronized void fragmentInfo(View view) {
-        meassure();
+
+        if (StatusConnection){
+            dialog.show();
+            meassure();
+        }
+        else {
+            viewAlert = LayoutInflater.from(this).inflate(R.layout.alert_dialog_base, null);
+            builder = new AlertDialog.Builder(this);
+            builder.setView(viewAlert);
+            builder.setCancelable(true);
+            dialog = builder.create();
+            dialog.show();
+            TextView txtMessage=viewAlert.findViewById(R.id.messageAlert);
+            txtMessage.setText("No existe un dispositivo conectado");
+            Button btnConnection=viewAlert.findViewById(R.id.btn_cancel);
+            btnConnection.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+
+        }
+
     }
 
     public void fragmentUser(View view) {
@@ -151,9 +185,9 @@ public class HomeActivity extends MainActivity {
         }
     }
 
-    public boolean medidaCorrecta=false;
-    public int numeroIntentos=0;
-    public boolean ponerManilla=false;
+    public boolean medidaCorrecta = false;
+    public int numeroIntentos = 0;
+    public boolean ponerManilla = false;
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
@@ -191,9 +225,9 @@ public class HomeActivity extends MainActivity {
                 iniciarMedicionHora();
 
                 /**
-             *
-             * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
-             **/
+                 *
+                 * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+                 **/
                 Timer timer;
                 timer = new Timer();
 
@@ -209,22 +243,20 @@ public class HomeActivity extends MainActivity {
                 //Meassure();
 
 
-
-             /**
-              *
-              * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
-              **/
-                commandManager.openHourlyMeasure(1);
+                /**
+                 *
+                 * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
+                 **/
+               // commandManager.openHourlyMeasure(1);
 
 //                commandManager.openHourlyMeasure(1);
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
 
-
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
-
+                StatusConnection=true;
 
             } else if (BluetoothService.ACTION_DATA_AVAILABLE.equals(action)) {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
@@ -235,7 +267,6 @@ public class HomeActivity extends MainActivity {
                         (calendar.get(Calendar.MINUTE)) + ":" +
                         (calendar.get(Calendar.SECOND)));
                 ArrayList<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
-
 
 
                 if (datas.size() == 0) {
@@ -310,25 +341,24 @@ public class HomeActivity extends MainActivity {
                                      * DATOS DE LA MEDICIÓN CADA HORA
                                      *
                                      */
-                                    while(!medidaCorrecta) {
+                                    while (!medidaCorrecta) {
 //
                                         if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
                                                 datas.get(10) == 0 || datas.get(11) == 0) {
                                             Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN");
                                             numeroIntentos++;
-                                            if (numeroIntentos<3) {
+                                            if (numeroIntentos < 3) {
                                                 retryMeasure();
+                                            } else {
+                                                numeroIntentos = 0;
+                                                medicionCorrecta = true;
+                                                ponerManilla = true;
+                                                Log.i(TAG, "POR FAVOR PONERSE LA MANILLA");
+                                                dialog.dismiss();
                                             }
-                                            else {
-                                                numeroIntentos=0;
-                                                medicionCorrecta=true;
-                                                ponerManilla=true;
-                                                Log.i(TAG,"POR FAVOR PONERSE LA MANILLA");
-
-                                            }
-                                        }
-                                        else{
-                                            medicionCorrecta=true;
+                                        } else {
+                                            medicionCorrecta = true;
+                                            dialog.dismiss();
                                         }
                                     }
 
@@ -430,25 +460,24 @@ public class HomeActivity extends MainActivity {
                              */
 
 //
-                            if(!medidaCorrecta) {
+                            if (!medidaCorrecta) {
 //
                                 if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
                                         datas.get(10) == 0 || datas.get(11) == 0) {
                                     numeroIntentos++;
-                                    if (numeroIntentos<3) {
-                                        Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN ("+numeroIntentos+"/3).");
+                                    if (numeroIntentos < 3) {
+                                        Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN (" + numeroIntentos + "/3).");
                                         retryMeasure();
-                                    }
-                                    else {
-                                        numeroIntentos=0;
-                                        medicionCorrecta=true;
-                                        ponerManilla=true;
-                                        Log.i(TAG,"POR FAVOR PONERSE LA MANILLA");
+                                    } else {
+                                        numeroIntentos = 0;
+                                        medicionCorrecta = true;
+                                        ponerManilla = true;
+                                        Log.i(TAG, "POR FAVOR PONERSE LA MANILLA");
 
                                     }
-                                }
-                                else{
-                                    medicionCorrecta=true;
+                                } else {
+                                    medicionCorrecta = true;
+                                    dialog.dismiss();
                                 }
                             }
                             break;
@@ -617,8 +646,6 @@ public class HomeActivity extends MainActivity {
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
 
 
-
-
     public void mixUserAndPhysiometryData(int heartRate, int bloodOxygen, int systolicBP, int diastolicBP, int temperature, String registerDate, String measureDate) {
 //      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
         SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -655,14 +682,14 @@ public class HomeActivity extends MainActivity {
         }
     }
 
-    public void sendPhysiometryData(String jwtToken ,JsonObject data) {
+    public void sendPhysiometryData(String jwtToken, JsonObject data) {
         ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
         final Call<DataFisiometria> responseData = service.setPhysiometryData("Bearer " + jwtToken, data);
 
         responseData.enqueue(new Callback<DataFisiometria>() {
             @Override
             public void onResponse(Call<DataFisiometria> call, Response<DataFisiometria> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     assert response.body() != null;
                     Log.i(TAG, "onResponse: " + response.body().toString());
                 }

@@ -268,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
             if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
 
-
+                dialog.dismiss();
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 hideDialog();
 
@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
-                dialog.dismiss();
+
                 imgConecct.setBackgroundResource(R.drawable.band_connected);
                 tv_connect_state.setText("Conectado");
             }
