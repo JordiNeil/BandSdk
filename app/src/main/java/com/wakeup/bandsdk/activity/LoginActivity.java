@@ -14,16 +14,16 @@ import com.wakeup.bandsdk.configVar.ConfigGeneral;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.service.autofill.UserData;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -118,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         String storedJwtToken = sharedPrefs.getString("storedJwtToken", "");
-        if (storedJwtToken != null || storedJwtToken.equals("")) {
+        if (storedJwtToken == null || storedJwtToken.equals("")) {
             ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
             final Call<JWTAuth> responseData = service.getJwtToken(credentials);
 
@@ -138,10 +138,14 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
 
+                @RequiresApi(api = Build.VERSION_CODES.M)
                 @Override
                 public void onFailure(Call<JWTAuth> call, Throwable t) {
                     System.out.println(t.getMessage());
-                    Snackbar.make(loginPasswordField, "Ha ocurrido un error. Por favor intentalo de nuevo.", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(loginPasswordField, "Ha ocurrido un error. Por favor intentalo de nuevo.", 3000)
+                            .setTextColor(getColor(R.color.e9))
+                            .setBackgroundTint(getColor(R.color.error_color_material_light))
+                            .show();
                 }
             });
         } else {
@@ -199,10 +203,14 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onFailure(Call<DataUser> call, Throwable t) {
                 System.out.println(t.getMessage());
-                Snackbar.make(loginPasswordField, "Ha ocurrido un error. Por favor intentalo de nuevo.", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(loginPasswordField, "Ha ocurrido un error. Por favor intentalo de nuevo.", Snackbar.LENGTH_LONG)
+                        .setTextColor(getColor(R.color.e9))
+                        .setBackgroundTint(getColor(R.color.error_color_material_light))
+                        .show();
 //                if (Objects.requireNonNull(t.getMessage()).equals("timeout")) {
 //                    Toast.makeText(context, "Ha ocurrido un error. Por favor intentalo de nuevo.", Toast.LENGTH_LONG);
 //                }
@@ -239,12 +247,14 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onFailure(Call<List<DataFisiometria>> call, Throwable t) {
                 System.out.println(t.getMessage());
-                if (Objects.requireNonNull(t.getMessage()).equals("timeout")) {
-                    Toast.makeText(context, "Ha ocurrido un error. Por favor intentalo de nuevo.", Toast.LENGTH_LONG);
-                }
+                Snackbar.make(loginPasswordField, "Ha ocurrido un error. Por favor intentalo de nuevo.", Snackbar.LENGTH_LONG)
+                        .setTextColor(getColor(R.color.e9))
+                        .setBackgroundTint(getColor(R.color.error_color_material_light))
+                        .show();
             }
         });
     }
