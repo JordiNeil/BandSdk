@@ -65,6 +65,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1;
@@ -302,30 +303,20 @@ public class MainActivity extends AppCompatActivity {
 //                 *
 //                 * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
 //                 */
-//                Timer timer;
-//                timer = new Timer();
-//
-//                TimerTask batteryInfo = new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        commandManager.getBatteryInfo();
-//                    }
-//                };
-//                timer.schedule(batteryInfo, 0, 600000);
 //
 //                /**
 //                 *
 //                 * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
 //                 */
 //
-//                commandManager.openHourlyMeasure(1);
+//
 //
 //                /**
 //                 *
 //                 * SINCRONIZACIÓN DE TIEMPO
 //                 *
 //                 */
-//                commandManager.setTimeSync();
+//
 //
 //
 //            } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
@@ -633,7 +624,7 @@ public class MainActivity extends AppCompatActivity {
          * INICIO DE LA MEDICIÓN
          */
 //        timer.schedule(finishMeasure, 300000);
-        timer.schedule(finishMeasure, 60000);
+        timer.schedule(startMeasure, 60000);
 
         /**
          *
@@ -643,6 +634,32 @@ public class MainActivity extends AppCompatActivity {
         timer.schedule(finishMeasure, 60000+45000);
 
     }
+    public void medirBateria(){
+        Timer timer;
+        timer = new Timer();
+
+        TimerTask batteryInfo = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.getBatteryInfo();
+            }
+        };
+        timer.schedule(batteryInfo, 0, 600000);
+    }
+
+    public void sincronizarHora(){
+        commandManager.setTimeSync();
+    }
+
+    public void iniciarMedicionHora(){
+        commandManager.openHourlyMeasure(1);
+
+    }
+
+
+
+
+
     public void hideDialog(){
         dialog.dismiss();
     }

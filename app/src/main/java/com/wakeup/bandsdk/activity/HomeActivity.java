@@ -1,5 +1,6 @@
 package com.wakeup.bandsdk.activity;
 
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -165,6 +166,27 @@ public class HomeActivity extends MainActivity {
                 /*Intent intentHome = new Intent(context, HomeActivity.class);
                 intentHome.putExtra("address", address);
                 startActivity(intentHome);*/
+                /**
+                 *
+                 *
+                 * INICIO MEDICIÓN AUTOMÁTICA DE BATERÍA CADA HORA
+                 *
+                 */
+                medirBateria();
+
+                /**
+                 *
+                 * SINCRONIZACIÓN DE HORA
+                 *
+                 */
+                sincronizarHora();
+
+                /**
+                 *
+                 *
+                 * ABRIR MEDICION CADA HORA
+                 */
+                iniciarMedicionHora();
 
 
 
@@ -187,6 +209,9 @@ public class HomeActivity extends MainActivity {
                         (calendar.get(Calendar.MINUTE)) + ":" +
                         (calendar.get(Calendar.SECOND)));
                 ArrayList<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
+
+
+
                 if (datas.size() == 0) {
                     return;
                 }
@@ -200,7 +225,7 @@ public class HomeActivity extends MainActivity {
                             break;
                         case 0x92:
                             //BRACELET DATA
-//                            bandInfo = (BandInfo) dataPasrse.parseData(datas);
+//                            BandInfo bandInfo = (BandInfo) dataPasrse.parseData(datas);
 //                            Log.i(TAG, bandInfo.toString());
 //                            Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
 
@@ -253,8 +278,8 @@ public class HomeActivity extends MainActivity {
 
                                 case 0x20:
                                     //RETURN HOURLY DATA
-                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+//                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, hourlyMeasureDataBean.toString());
 
 
                                     /**
@@ -382,13 +407,13 @@ public class HomeActivity extends MainActivity {
                              */
 
 //
-                            while(!medidaCorrecta) {
+                            if(!medidaCorrecta) {
 //
                                 if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
                                         datas.get(10) == 0 || datas.get(11) == 0) {
-                                    Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN");
                                     numeroIntentos++;
                                     if (numeroIntentos<3) {
+                                        Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN ("+numeroIntentos+"/3).");
                                         retryMeasure();
                                     }
                                     else {
@@ -570,40 +595,7 @@ public class HomeActivity extends MainActivity {
 
 
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
-    public synchronized void measure() {
-        /**
-         *
-         * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
-         */
-        Timer timer;
-        timer = new Timer();
 
-
-        /**
-         *
-         *CREACIÓN DE LAS TAREAS PARA LAS MEDICIONES
-         */
-
-        TimerTask finishMeasure = new TimerTask() {
-            @Override
-            public void run() {
-                commandManager.oneButtonMeasurement(0);
-            }
-        };
-
-        /**
-         *
-         * INICIO DE LA MEDICIÓN
-         */
-        commandManager.oneButtonMeasurement(1);
-
-        /**
-         *
-         * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
-         */
-        timer.schedule(finishMeasure, 45000);
-
-    }
 
 
 
