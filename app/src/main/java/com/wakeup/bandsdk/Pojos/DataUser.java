@@ -72,95 +72,109 @@ public class DataUser {
         this.id = id;
     }
 
-    public String loginget() {
+    public String getLogin() {
         return login;
     }
 
-    public void loginset(String login) {
+    public void setLogin(String login) {
         this.login = login;
     }
 
-    public String firstNameget() {
+    public String getFirstName() {
         return firstName;
     }
 
-    public void firstNameset(String firstName) {
+    public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-    public String lastNameget() {
+    public String getLastName() {
         return lastName;
     }
 
-    public  void lastNameset(String lastName) {
+    public  void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    public  String emailget() {
+    public  String getEmail() {
         return email;
     }
 
-    public void emailset( String email) {
+    public void setEmail( String email) {
         this.email = email;
     }
 
-    public String imageUrlget() {
+    public String getImageUrl() {
         return imageUrl;
     }
 
-    public void imageUrlset(String imageUrl) {
+    public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 
-
-    public Boolean activatedget() {
+    public Boolean getActivated() {
         return activated;
     }
 
-    public void activatedset(Boolean activated) {
+    public void setActivated(Boolean activated) {
         this.activated = activated;
     }
 
-    public String langKeyget() {
+    public String getLangKey() {
         return langKey;
     }
 
-    public void langKeyset(String langKey) {
+    public void setLangKey(String langKey) {
         this.langKey = langKey;
     }
 
-    public String createdByget() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void createdByset(String createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String createdDateget() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void createdDateset(String createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
 
-    public String lastModifiedBy() {
-        return imageUrl;
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
     }
 
-    public void lastModifiedBy(String lastModifiedBy) {
+    public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public String lastModifiedDateget() {
+    public String getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void lastModifiedDateset(String lastModifiedDate) {
+    public void setLastModifiedDate(String lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "User: {" +
+                "id =" + id + '\'' +
+                ", login ='" + login + '\'' +
+                ", firstName ='" + firstName + '\'' +
+                ", lastName =" + lastName + '\'' +
+                ", email =" + email + '\'' +
+                ", imageUrl =" + imageUrl + '\'' +
+                ", activated =" + activated + '\'' +
+                ", langKey =" + langKey + '\'' +
+                ", createdBy =" + createdBy + '\'' +
+                ", createdDate =" + createdDate + '\'' +
+                ", lastModifiedBy =" + lastModifiedBy + '\'' +
+                ", lastModifiedDate =" + lastModifiedDate + '\'' +
+                '}';
+    }
 }

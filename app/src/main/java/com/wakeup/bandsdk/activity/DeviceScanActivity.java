@@ -26,7 +26,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
-import com.wakeup.bandsdk.Pojos.Fisiometria.ResponseFisiometria;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -43,9 +42,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
 
 /**
  * @author Harry
@@ -76,7 +72,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
 
         mHandler = new Handler();
 
-        getFisiometria = findViewById(R.id.getFisiometria);
+        //getFisiometria = findViewById(R.id.getFisiometria);
 
 
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -245,19 +241,19 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
     public void getFisiometria(View view) {
         service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
         String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTU5NDE0NDkyNH0.Km8OADd3QHBUsi0nSaxkIS2eqhICZPMvJMdnoFP4n5TtMXoTiMoP9UCASpDdMSeKrdKco3k3Z00Bhs5RGxAcxA";
-        final Call<List<DataFisiometria>> dataResponse = service.getStudiesSubjes("Bearer " + token, 3);
+        final Call<List<DataFisiometria>> dataResponse = service.getPhysiometryData("Bearer " + token, 3);
 
         dataResponse.enqueue(new Callback<List<DataFisiometria>>() {
              @Override
             public void onResponse(Call<List<DataFisiometria>> call, Response<List<DataFisiometria>> response) {
                 if (response.isSuccessful()) {
-                    System.out.println(response.body().get(0));
+                    System.out.println(response.body().get(1));
                     /*for (int i = 0; response.body() > i; i++){
 
                     }*/
                     List<DataFisiometria> res = response.body();
                     for (DataFisiometria c : res) {
-                        System.out.println(c.getdataUser().firstNameget());
+                        System.out.println(c.getUserData().getFirstName());
 
                     }
                 }
