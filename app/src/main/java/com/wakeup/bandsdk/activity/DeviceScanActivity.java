@@ -211,6 +211,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
                 @Override
                 public void run() {
                     Log.i(TAG, bluetoothDevice.getAddress());
+                    Log.i("RSSI VALUE: ", String.valueOf(((10 ^ ((-69 - i) / (10 * 2)))*10^6))+ "cm");
                     leDeviceListAdapter.addDevice(bluetoothDevice);
                     leDeviceListAdapter.notifyDataSetChanged();
                 }
@@ -221,6 +222,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         BluetoothDevice device = leDeviceListAdapter.getDevice(i);
+
         if (device == null) {
             return;
         }

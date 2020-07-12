@@ -73,7 +73,6 @@ public class LeDeviceListAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) view.getTag();
         }
-
         BluetoothDevice device = mLeDevices.get(i);
         final String deviceName = device.getName();
         if (deviceName != null && deviceName.length() > 0) {
@@ -82,7 +81,6 @@ public class LeDeviceListAdapter extends BaseAdapter {
             viewHolder.deviceName.setText(R.string.unknown_device);
         }
         viewHolder.deviceAddress.setText(device.getAddress());
-
         return view;
     }
 
