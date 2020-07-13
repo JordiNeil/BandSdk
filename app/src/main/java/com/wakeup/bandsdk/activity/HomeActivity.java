@@ -404,71 +404,6 @@ public class HomeActivity extends MainActivity {
                                             medicionCorrecta = true;
                                             dialog.dismiss();
 
-                                            int ritmoCardiaco=datas.get(6);
-                                            int oxigenoSangre=datas.get(7);
-                                            int presionAlta=datas.get(8);
-                                            int presionBaja=datas.get(9);
-                                            double temperatura=datas.get(11)+datas.get(12)*Math.pow(10,-2);
-
-                                            int []medidasCorrectas=new int[7];
-
-
-                                            for (int i=0;i<medidasCorrectas.length;i++){
-                                                medidasCorrectas[i]=0;
-                                            }
-
-                                            /**
-                                             * VALIDACIÓN DE RITMO CARDIACO
-                                             *
-                                             */
-
-                                            if (ritmoCardiaco<60 || ritmoCardiaco>100){
-                                                System.out.println("EL RITMO CARDIACO ESTÁ POR FUERA DE LOS RANGOS NORMALES (60 BPM - 100 BPM)");
-                                            }
-                                            else{
-                                                medidasCorrectas[0]=ritmoCardiaco;
-                                            }
-
-                                            /**
-                                             *
-                                             * VALIDACIÓN DE NIVEL DE OXÍGENO
-                                             */
-
-                                            if (oxigenoSangre<95){
-                                                System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%");
-                                            }
-                                            else {
-                                                medidasCorrectas[1]=oxigenoSangre;
-                                            }
-
-                                            /**
-                                             * VALIDACIÓN DE PRESIÓN SANGUÍNEA
-                                             */
-
-                                            if (presionAlta<80 || presionAlta>120 || presionBaja <60 || presionBaja>80){
-                                                System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg");
-                                            }
-                                            else{
-                                                medidasCorrectas[2]=presionAlta;
-                                                medidasCorrectas[3]=presionBaja;
-                                            }
-
-                                            /**
-                                             * VALIDACIÓN INMUNE
-                                             */
-                                            medidasCorrectas[4]=datas.get(10);
-
-                                            /**
-                                             * VALIDACIÓN DE TEMPERATURA
-                                             */
-
-                                            if (temperatura<36 || temperatura > 37.2){
-                                                System.out.println("LA TEMPERATURA ESTÁ POR FUERA DE LOS RANGOS NORMALES (36°C - 37.2°C)");
-                                            }
-                                            else{
-                                                medidasCorrectas[5]=datas.get(11);
-                                                medidasCorrectas[6]=datas.get(12);
-                                            }
 
 
                                         }
@@ -590,6 +525,72 @@ public class HomeActivity extends MainActivity {
                                 } else {
                                     medicionCorrecta = true;
                                     dialog.dismiss();
+                                    int ritmoCardiaco=datas.get(6);
+                                    int oxigenoSangre=datas.get(7);
+                                    int presionAlta=datas.get(8);
+                                    int presionBaja=datas.get(9);
+                                    double temperatura=datas.get(11)+datas.get(12)*Math.pow(10,-2);
+
+                                    int []medidasCorrectas=new int[7];
+
+
+                                    for (int i=0;i<medidasCorrectas.length;i++){
+                                        medidasCorrectas[i]=0;
+                                    }
+
+                                    /**
+                                     * VALIDACIÓN DE RITMO CARDIACO
+                                     *
+                                     */
+
+                                    if (ritmoCardiaco<60 || ritmoCardiaco>100){
+                                        System.out.println("EL RITMO CARDIACO ESTÁ POR FUERA DE LOS RANGOS NORMALES (60 BPM - 100 BPM)");
+                                    }
+                                    else{
+                                        medidasCorrectas[0]=ritmoCardiaco;
+                                    }
+
+                                    /**
+                                     *
+                                     * VALIDACIÓN DE NIVEL DE OXÍGENO
+                                     */
+
+                                    if (oxigenoSangre<95){
+                                        System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%");
+                                    }
+                                    else {
+                                        medidasCorrectas[1]=oxigenoSangre;
+                                    }
+
+                                    /**
+                                     * VALIDACIÓN DE PRESIÓN SANGUÍNEA
+                                     */
+
+                                    if (presionAlta<80 || presionAlta>120 || presionBaja <60 || presionBaja>80){
+                                        System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg");
+                                    }
+                                    else{
+                                        medidasCorrectas[2]=presionAlta;
+                                        medidasCorrectas[3]=presionBaja;
+                                    }
+
+                                    /**
+                                     * VALIDACIÓN INMUNE
+                                     */
+                                    medidasCorrectas[4]=datas.get(10);
+
+                                    /**
+                                     * VALIDACIÓN DE TEMPERATURA
+                                     */
+
+                                    if (temperatura<36 || temperatura > 37.2){
+                                        System.out.println("LA TEMPERATURA ESTÁ POR FUERA DE LOS RANGOS NORMALES (36°C - 37.2°C)");
+                                    }
+                                    else{
+                                        medidasCorrectas[5]=datas.get(11);
+                                        medidasCorrectas[6]=datas.get(12);
+                                    }
+
                                 }
                             }
                             break;
