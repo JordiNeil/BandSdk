@@ -71,7 +71,7 @@ public class CommandManager {
         bytes[3] = (byte) 0xff;
         bytes[4] = (byte) 0x93;
         bytes[5] = (byte) 0x80;
-//        bytes[6] = (byte)0;//占位符
+        bytes[6] = (byte)0;//
         bytes[7] = (byte) ((year & 0xff00) >> 8);
         bytes[8] = (byte) (year & 0xff);
         bytes[9] = (byte) (month & 0xff);
@@ -80,6 +80,7 @@ public class CommandManager {
         bytes[12] = (byte) (minute & 0xff);
         bytes[13] = (byte) (second & 0xff);
         broadcastData(bytes);
+        System.out.println("LA SINCRONIZACIÓN DE TIEMPO SE ESTABLECIÓ A LAS "+hour+":"+minute+":"+second);
     }
 
     /**

@@ -609,6 +609,7 @@ public class MainActivity extends AppCompatActivity {
         TimerTask startMeasure = new TimerTask() {
             @Override
             public void run() {
+                dialog.show();
                 commandManager.oneButtonMeasurement(1);
             }
         };
@@ -655,8 +656,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void iniciarMedicionHora(){
+        commandManager.openHourlyMeasure(0);
         commandManager.openHourlyMeasure(1);
         Log.i(TAG,"INICIO MEDICIÓN POR HORA");
+
+        Timer timer=new Timer();
+
+
+
+        TimerTask hourMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(1);
+                System.out.println("STARTING HOURLY MEASURE");
+            }
+        };
+
+        TimerTask finishHourMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(0);
+            }
+        };
+
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        Calendar calendar2=Calendar.getInstance();
+
+        calendar2.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DATE),calendar.get(Calendar.HOUR_OF_DAY)+1,0,0);
+        System.out.println("CALENDAR: "+calendar.get(Calendar.YEAR)+"/"+calendar.get(Calendar.DATE)+"/"+calendar.get(Calendar.DATE)+" "+calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE)+":"+calendar.get(Calendar.SECOND));
+        System.out.println("CALENDAR2: "+calendar2.get(Calendar.YEAR)+"/"+calendar2.get(Calendar.MONTH)+"/"+calendar2.get(Calendar.DATE)+" "+calendar2.get(Calendar.HOUR_OF_DAY)+":"+calendar2.get(Calendar.MINUTE)+":"+calendar2.get(Calendar.SECOND));
+
+        long delta=Math.abs(calendar2.getTimeInMillis()-calendar.getTimeInMillis());
+
+        System.out.println("HOURLY MEASURE IN "+Math.round(delta/60000)+" MIN");
+
+        timer.schedule(hourMeasure,delta,3600000);
+        timer.schedule(finishHourMeasure,delta,3600000+45000);
+
+
+
+
+
 
     }
     public void nivelBateria(ArrayList<Integer> datas){
