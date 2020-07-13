@@ -4,6 +4,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.JsonObject;
+import com.wakeup.bandsdk.MainActivity;
 import com.wakeup.bandsdk.Pojos.Authenticate.JWTAuth;
 import com.wakeup.bandsdk.Pojos.DataUser;
 import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
@@ -36,6 +37,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -137,7 +139,7 @@ public class LoginActivity extends AppCompatActivity {
             getJwtToken(context, userCredentials);
         });
         toRegisterBtn.setOnClickListener(v -> {
-            Intent registerIntent = new Intent(this, RegisterActivity.class);
+            Intent registerIntent = new Intent(this, HomeActivity.class);
             startActivity(registerIntent);
         });
     }
@@ -253,17 +255,20 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public void getPhysiometryDataById(Context loginContext, String jwtToken, int userId) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences(ConfigGeneral.preference_file_key, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
+    /*public void getPhysiometryDataById(Context loginContext, String jwtToken, int userId) {
+        System.out.println("------------------------ENTRO-----------------");
+
         ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
         final Call<List<DataFisiometria>> dataResponse = service.getPhysiometryData("Bearer " + jwtToken, userId);
 
         dataResponse.enqueue(new Callback<List<DataFisiometria>>() {
             @Override
             public void onResponse(Call<List<DataFisiometria>> call, Response<List<DataFisiometria>> response) {
+
+
                 if (response.isSuccessful()) {
                     List<DataFisiometria> res = response.body();
+
                     assert res != null;
                     ArrayList<Object> fetchedPhysiometryData = new ArrayList<>();
                     fetchedPhysiometryData.add(0, res.get(res.size() - 1).getRitmoCardiaco());
@@ -271,13 +276,11 @@ public class LoginActivity extends AppCompatActivity {
                     fetchedPhysiometryData.add(2, res.get(res.size() - 1).getPresionArterialSistolica());
                     fetchedPhysiometryData.add(3, res.get(res.size() - 1).getPresionArterialDiastolica());
                     fetchedPhysiometryData.add(4, res.get(res.size() - 1).getTemperatura());
-                    Intent homeIntent = new Intent(loginContext, HomeActivity.class);
-                    homeIntent.putExtra(ConfigGeneral.PUTEXTRASFISIOMETRIA, fetchedPhysiometryData);
-                    startActivity(homeIntent);
+                    System.out.println(fetchedPhysiometryData);
+
                 }
                 if (response.code() == 401) {
-                    editor.remove(ConfigGeneral.TOKENSHARED);
-                    editor.commit();
+
                     getJwtToken(context, userCredentials);
                 }
             }
@@ -292,5 +295,5 @@ public class LoginActivity extends AppCompatActivity {
                         .show();
             }
         });
-    }
+    }*/
 }
