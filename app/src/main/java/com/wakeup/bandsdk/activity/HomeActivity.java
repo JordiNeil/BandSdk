@@ -90,9 +90,9 @@ public class HomeActivity extends MainActivity {
     private ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
     Fragment fragmentHome = new HomeFragment();
     Bundle args = new Bundle();
-    View viewAlert;
-    AlertDialog.Builder builder;
-    AlertDialog dialog;
+    View viewAlert,viewAlertReceived;
+    AlertDialog.Builder builder,builderReceived;
+    AlertDialog dialog,dialogReciver;
     Boolean StatusConnection=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +112,21 @@ public class HomeActivity extends MainActivity {
         builder.setCancelable(false);
         dialog = builder.create();
 
+        //DATARECEIVED
+        viewAlertReceived = LayoutInflater.from(this).inflate(R.layout.alert_dialog_base_recived_data, null);
+        builderReceived = new AlertDialog.Builder(this);
+        builderReceived.setView(viewAlertReceived);
+        builderReceived.setCancelable(false);
+        dialogReciver = builderReceived.create();
+        TextView txtMessage=viewAlertReceived.findViewById(R.id.messageAlert);
+
+        Button btnConnection=viewAlertReceived.findViewById(R.id.btn_acep);
+        btnConnection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogReciver.dismiss();
+            }
+        });
 
 //        btnMeassure = (Button) findViewById(R.id.button4);
         /*FragmentManager fragmentManager = getSupportFragmentManager();
@@ -159,18 +174,27 @@ public class HomeActivity extends MainActivity {
             viewAlert = LayoutInflater.from(this).inflate(R.layout.alert_dialog_base, null);
             builder = new AlertDialog.Builder(this);
             builder.setView(viewAlert);
-            builder.setCancelable(true);
+            builder.setCancelable(false);
             dialog = builder.create();
             dialog.show();
             TextView txtMessage=viewAlert.findViewById(R.id.messageAlert);
-            txtMessage.setText("No existe un dispositivo conectado");
-            Button btnConnection=viewAlert.findViewById(R.id.btn_cancel);
-            btnConnection.setOnClickListener(new View.OnClickListener() {
+            txtMessage.setText(ConfigGeneral.SENDCONNECTION);
+            Button btncancelConnection=viewAlert.findViewById(R.id.btn_cancel);
+            Button btnConnection=viewAlert.findViewById(R.id.btn_Connection);
+            btncancelConnection.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     dialog.dismiss();
                 }
             });
+            btnConnection.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+            });
+
 
         }
 
@@ -485,6 +509,10 @@ public class HomeActivity extends MainActivity {
                                 } else {
                                     medicionCorrecta = true;
                                     dialog.dismiss();
+
+                                    mixUserAndPhysiometryData(datas);
+
+
                                 }
                             }
                             break;
@@ -633,7 +661,7 @@ public class HomeActivity extends MainActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mServiceConnection);
+//        unbindService(mServiceConnection);
         //unregisterReceiver(mGattUpdateReceiver);
     }
 
@@ -659,19 +687,19 @@ public class HomeActivity extends MainActivity {
     public void mixUserAndPhysiometryData(ArrayList<Integer> measuredPhysiometryData) {
 
 //      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
-        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        String storedJwtToken = sharedPrefs.getString("storedJwtToken", "");
+        SharedPreferences sharedPrefs = context.getSharedPreferences(ConfigGeneral.preference_file_key, Context.MODE_PRIVATE);
+        String storedJwtToken = sharedPrefs.getString(ConfigGeneral.TOKENSHARED, "");
         ArrayList<Object> fetchedUserData;
         fetchedUserData = getIntent().hasExtra("fetchedUserData") ? (ArrayList<Object>) getIntent().getSerializableExtra("fetchedUserData") : null;
 
         if (fetchedUserData != null) {
             // Defining Physiometry object and adding data to it
             JsonObject physiometryData = new JsonObject();
-            physiometryData.addProperty("ritmoCardiaco", measuredPhysiometryData.get(0));
-            physiometryData.addProperty("oximetria", measuredPhysiometryData.get(1));
-            physiometryData.addProperty("presionArterialSistolica", measuredPhysiometryData.get(2));
-            physiometryData.addProperty("presionArterialDiastolica", measuredPhysiometryData.get(3));
-            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(4));
+            physiometryData.addProperty("ritmoCardiaco", measuredPhysiometryData.get(10));
+            physiometryData.addProperty("oximetria", measuredPhysiometryData.get(7));
+            physiometryData.addProperty("presionArterialSistolica", measuredPhysiometryData.get(8));
+            physiometryData.addProperty("presionArterialDiastolica", measuredPhysiometryData.get(9));
+            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(11)+"."+measuredPhysiometryData.get(12));
             physiometryData.addProperty("fechaRegistro", utc.toString());
             physiometryData.addProperty("fechaToma", utc.toString());
             // Defining userData object to store the user data from login activity
@@ -689,6 +717,7 @@ public class HomeActivity extends MainActivity {
             // Sending physiometry data to the service
             sendPhysiometryData(storedJwtToken, physiometryData);
         } else {
+
             Log.d(TAG, "mixUserAndPhysiometryData -> No hay datos de usuario desde login");
         }
     }
@@ -702,7 +731,8 @@ public class HomeActivity extends MainActivity {
             public void onResponse(Call<DataFisiometria> call, Response<DataFisiometria> response) {
                 if (response.isSuccessful()) {
                     assert response.body() != null;
-                    Log.i(TAG, "onResponse: " + response.body().toString());
+                    dialogReciver.show();
+                    Log.i(TAG, "onResponse: " + response.body());
                 }
             }
 
