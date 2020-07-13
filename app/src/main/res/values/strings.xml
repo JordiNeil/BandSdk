@@ -47,5 +47,7 @@
     <string name="input_pwd" tools:ignore="MissingTranslation">Please enter the account password</string>
     <string name="loging" tools:ignore="MissingTranslation">Login</string>
     <string name="login" tools:ignore="MissingTranslation" >Registrar</string>
+    <string name="measure_recently" tools:ignore="MissingTranslation" >Cargar datos</string>
+
 
 </resources>

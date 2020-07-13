@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.os.Handler;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,7 +74,13 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
 
         mHandler = new Handler();
 
+
+
+
+
         //getFisiometria = findViewById(R.id.getFisiometria);
+
+
 
 
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -242,30 +250,33 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void getFisiometria(View view) {
+    public void getFisiometria() {
+        System.out.println("fisionetria");
         service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
-        String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTU5NDE0NDkyNH0.Km8OADd3QHBUsi0nSaxkIS2eqhICZPMvJMdnoFP4n5TtMXoTiMoP9UCASpDdMSeKrdKco3k3Z00Bhs5RGxAcxA";
+        String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTU5NDc0MTIxMX0.PQzJdCA1wvd-6Fncr29lDiYkC0uIjK_HjmxjqJfG2L7XJd-U2jg3klF5noaZzDA-hj975aGLnbCdcgOHxIs1wQ";
         final Call<List<DataFisiometria>> dataResponse = service.getPhysiometryData("Bearer " + token, 3);
 
         dataResponse.enqueue(new Callback<List<DataFisiometria>>() {
              @Override
             public void onResponse(Call<List<DataFisiometria>> call, Response<List<DataFisiometria>> response) {
-                if (response.isSuccessful()) {
-                    System.out.println(response.body().get(1));
-                    /*for (int i = 0; response.body() > i; i++){
+                 System.out.println("-----------------------"+response.body());
+                /*if (response.isSuccessful()) {
+                    System.out.println(response.body());
+                    *//*for (int i = 0; response.body() > i; i++){
 
-                    }*/
-                    List<DataFisiometria> res = response.body();
-                    for (DataFisiometria c : res) {
+                    }*//*
+                    DataFisiometria res = response.body();
+                    for (DataFisiometria c : response) {
                         System.out.println(c.getUserData().getFirstName());
 
                     }
-                }
+                }*/
 
             }
 
             @Override
             public void onFailure(Call<List<DataFisiometria>> call, Throwable t) {
+                System.out.println("error");
                 System.out.println(t.getMessage());
             }
         });
