@@ -693,7 +693,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("HOURLY MEASURE IN "+Math.round(delta/60000)+" MIN");
 
         timer.schedule(hourMeasure,delta,3600000);
-        timer.schedule(finishHourMeasure,delta,3600000+45000);
+        timer.schedule(finishHourMeasure,delta+45000,3600000);
 
 
 
