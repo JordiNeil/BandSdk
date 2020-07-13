@@ -61,23 +61,23 @@
             <RadioButton
                 android:id="@+id/rb_home"
                 style="@style/rg_bc_style"
-                android:drawableTop="@drawable/rb_home_selector"
+                android:drawableTop="@drawable/ic_baseline_assessment_24"
                 android:onClick="fragmentHome"
-                android:text="Home" />
+                 />
 
             <RadioButton
                 android:id="@+id/rb_discover"
                 style="@style/rg_bc_style"
-                android:drawableTop="@drawable/rb_discover_selector"
+                android:drawableTop="@drawable/ic_access_time"
                 android:onClick="fragmentInfo"
-                android:text="coneccion" />
+                 />
 
             <RadioButton
                 android:id="@+id/rb_mine"
                 style="@style/rg_bc_style"
-                android:drawableTop="@drawable/rb_mine_selector"
+                android:drawableTop="@drawable/ic_baseline_person_24"
                 android:onClick="fragmentUser"
-                android:text="Usuario" />
+                 />
 
         </RadioGroup>
 

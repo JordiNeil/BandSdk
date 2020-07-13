@@ -5,7 +5,7 @@
     <string name="title_notifications">Notifications</string>
     <string name="scanner_permission_rationale">Systems over Android 6.0 need to grant access to device locations in order to scan Bluetooth devices</string>
     <string name="open_gps">Open GPS</string>
-    <string name="cancel">cancel</string>
+    <string name="cancel">Medición completa</string>
     <string name="no_ble">Bluetooth is not supported on the device!</string>
     <string name="ok">Sure?</string>
     <string name="location_permission">Please allow APP to get location permissions, otherwise Bluetooth devices can not be searched!</string>
@@ -42,4 +42,10 @@
     <string name="send_pic">* 发送图片</string>
     <string name="preference_file_key" tools:ignore="MissingTranslation">be4techSharedPrefs</string>
     <string name="loading" tools:ignore="MissingTranslation">Espere un momento, por favor</string>
+    <string name="measure_all_loading" tools:ignore="MissingTranslation">Tomando Medición</string>
+    <string name="pls_input_email" tools:ignore="MissingTranslation">Please enter the mail address</string>
+    <string name="input_pwd" tools:ignore="MissingTranslation">Please enter the account password</string>
+    <string name="loging" tools:ignore="MissingTranslation">Login</string>
+    <string name="login" tools:ignore="MissingTranslation" >Registrar</string>
+
 </resources>

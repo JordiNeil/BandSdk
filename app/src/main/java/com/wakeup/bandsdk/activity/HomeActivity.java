@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
@@ -84,12 +85,15 @@ public class HomeActivity extends MainActivity {
     private CommandManager commandManager;
     private DataParse dataPasrse;
     private BandInfo bandInfo;
-    public Button btnMeassure;
+    public Button btnMeassre;
     private Context context = this;
     private ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
     Fragment fragmentHome = new HomeFragment();
     Bundle args = new Bundle();
-
+    View viewAlert,viewAlertReceived;
+    AlertDialog.Builder builder,builderReceived;
+    AlertDialog dialog,dialogReciver;
+    Boolean StatusConnection=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +105,28 @@ public class HomeActivity extends MainActivity {
         //radioButtonInfo.callOnClick();
         radioButtonUser = (RadioButton) findViewById(R.id.rb_mine);
         //radioButtonUser.callOnClick();
+
+        viewAlert = LayoutInflater.from(this).inflate(R.layout.loading_data_measure, null);
+        builder = new AlertDialog.Builder(this);
+        builder.setView(viewAlert);
+        builder.setCancelable(false);
+        dialog = builder.create();
+
+        //DATARECEIVED
+        viewAlertReceived = LayoutInflater.from(this).inflate(R.layout.alert_dialog_base_recived_data, null);
+        builderReceived = new AlertDialog.Builder(this);
+        builderReceived.setView(viewAlertReceived);
+        builderReceived.setCancelable(false);
+        dialogReciver = builderReceived.create();
+        TextView txtMessage=viewAlertReceived.findViewById(R.id.messageAlert);
+
+        Button btnConnection=viewAlertReceived.findViewById(R.id.btn_acep);
+        btnConnection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogReciver.dismiss();
+            }
+        });
 
 //        btnMeassure = (Button) findViewById(R.id.button4);
         /*FragmentManager fragmentManager = getSupportFragmentManager();
@@ -133,13 +159,45 @@ public class HomeActivity extends MainActivity {
 
     }
 
-    private void DialogAlerte() {
+    private void DialogAlertmeasure() {
 
 
     }
 
     public synchronized void fragmentInfo(View view) {
-        meassure();
+
+        if (StatusConnection){
+            dialog.show();
+            meassure();
+        }
+        else {
+            viewAlert = LayoutInflater.from(this).inflate(R.layout.alert_dialog_base, null);
+            builder = new AlertDialog.Builder(this);
+            builder.setView(viewAlert);
+            builder.setCancelable(false);
+            dialog = builder.create();
+            dialog.show();
+            TextView txtMessage=viewAlert.findViewById(R.id.messageAlert);
+            txtMessage.setText(ConfigGeneral.SENDCONNECTION);
+            Button btncancelConnection=viewAlert.findViewById(R.id.btn_cancel);
+            Button btnConnection=viewAlert.findViewById(R.id.btn_Connection);
+            btncancelConnection.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+            btnConnection.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+            });
+
+
+        }
+
     }
 
     public void fragmentUser(View view) {
@@ -158,9 +216,11 @@ public class HomeActivity extends MainActivity {
         }
     }
 
-    public boolean medidaCorrecta=false;
-    public int numeroIntentos=0;
-    public boolean ponerManilla=false;
+    public boolean medidaCorrecta = false;
+    public int numeroIntentos = 0;
+    public boolean ponerManilla = false;
+
+    public boolean conectado=false;
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
@@ -175,32 +235,36 @@ public class HomeActivity extends MainActivity {
                 /*Intent intentHome = new Intent(context, HomeActivity.class);
                 intentHome.putExtra("address", address);
                 startActivity(intentHome);*/
-                /**
-                 *
-                 *
-                 * INICIO MEDICIÓN AUTOMÁTICA DE BATERÍA CADA HORA
-                 *
-                 */
-                medirBateria();
+                if (!StatusConnection) {
+                    /**
+                     *
+                     *
+                     * INICIO MEDICIÓN AUTOMÁTICA DE BATERÍA CADA HORA
+                     *
+                     */
+                    medirBateria();
+
+                    /**
+                     *
+                     * SINCRONIZACIÓN DE HORA
+                     *
+                     */
+                    sincronizarHora();
+
+                    /**
+                     *
+                     *
+                     * ABRIR MEDICION CADA HORA
+                     */
+                    iniciarMedicionHora();
+                }
+                StatusConnection=true;
+                conectado=true;
 
                 /**
                  *
-                 * SINCRONIZACIÓN DE HORA
-                 *
-                 */
-                sincronizarHora();
-
-                /**
-                 *
-                 *
-                 * ABRIR MEDICION CADA HORA
-                 */
-                iniciarMedicionHora();
-
-                /**
-             *
-             * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
-             **/
+                 * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+                 **/
                 Timer timer;
                 timer = new Timer();
 
@@ -210,24 +274,29 @@ public class HomeActivity extends MainActivity {
 //                        commandManager.getBatteryInfo();
                     }
                 };
-                timer.schedule(batteryInfo, 0, 600000);
-//                timer.schedule(batteryInfo, 0, 600000);
 
-                //Meassure();
-
-
-
-             /**
-              *
-              * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
-              **/
-                commandManager.openHourlyMeasure(1);
-
-//                commandManager.openHourlyMeasure(1);
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
+                conectado=false;
+                Timer timer;
+                timer = new Timer();
 
+                TimerTask verificarConexion=new TimerTask() {
+                    @Override
+                    public void run(){
+                        TimerTask reintentarConexion = new TimerTask() {
+                            @Override
+                            public void run() {
+                                if (!conectado) {
+                                    conectarBluetooth();
+                                }
+                            }
+                        };
+                        timer.schedule(reintentarConexion, 0);
+                    }
+                };
+                timer.schedule(verificarConexion, 0, 600000);
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
@@ -237,12 +306,33 @@ public class HomeActivity extends MainActivity {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(System.currentTimeMillis());
-                Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
-                        + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
-                        (calendar.get(Calendar.MINUTE)) + ":" +
-                        (calendar.get(Calendar.SECOND)));
+                if (calendar.get(Calendar.MINUTE) >=10 && calendar.get(Calendar.SECOND)>=10) {
+                    Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                            + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+                            (calendar.get(Calendar.MINUTE)) + ":" +
+                            (calendar.get(Calendar.SECOND)));
+                }
+                else if (calendar.get(calendar.MINUTE)>=10 && calendar.get (Calendar.SECOND)<10) {
+                    Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                            + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+                            (calendar.get(Calendar.MINUTE)) + ":0" +
+                            (calendar.get(Calendar.SECOND)));
+                }
+                else if (calendar.get(calendar.MINUTE)<10 && calendar.get (Calendar.SECOND)>=10) {
+                    Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                            + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":0" +
+                            (calendar.get(Calendar.MINUTE)) + ":" +
+                            (calendar.get(Calendar.SECOND)));
+                }
+                else{
+                    {
+                        Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                                + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":0" +
+                                (calendar.get(Calendar.MINUTE)) + ":0" +
+                                (calendar.get(Calendar.SECOND)));
+                    }
+                }
                 ArrayList<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
-
 
 
                 if (datas.size() == 0) {
@@ -255,6 +345,7 @@ public class HomeActivity extends MainActivity {
 //                            BATTERY POWER
 //                            Battery battery = (Battery) dataPasrse.parseData(datas);
 //                            Log.i(TAG, battery.toString());
+                            nivelBateria(datas);
                             break;
                         case 0x92:
                             //BRACELET DATA
@@ -308,8 +399,9 @@ public class HomeActivity extends MainActivity {
 
                                 case 0x20:
                                     //RETURN HOURLY DATA
-//                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-//                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+                                    System.out.println(datas);
 
 
                                     /**
@@ -317,25 +409,27 @@ public class HomeActivity extends MainActivity {
                                      * DATOS DE LA MEDICIÓN CADA HORA
                                      *
                                      */
-                                    while(!medidaCorrecta) {
+                                    while (!medidaCorrecta) {
 //
                                         if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
                                                 datas.get(10) == 0 || datas.get(11) == 0) {
                                             Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN");
                                             numeroIntentos++;
-                                            if (numeroIntentos<3) {
+                                            if (numeroIntentos < 3) {
                                                 retryMeasure();
+                                            } else {
+                                                numeroIntentos = 0;
+                                                medicionCorrecta = true;
+                                                ponerManilla = true;
+                                                Log.i(TAG, "POR FAVOR PONERSE LA MANILLA");
+                                                dialog.dismiss();
                                             }
-                                            else {
-                                                numeroIntentos=0;
-                                                medicionCorrecta=true;
-                                                ponerManilla=true;
-                                                Log.i(TAG,"POR FAVOR PONERSE LA MANILLA");
+                                        } else {
+                                            medicionCorrecta = true;
+                                            dialog.dismiss();
 
-                                            }
-                                        }
-                                        else{
-                                            medicionCorrecta=true;
+
+
                                         }
                                     }
 
@@ -437,25 +531,92 @@ public class HomeActivity extends MainActivity {
                              */
 
 //
-                            if(!medidaCorrecta) {
+                            if (!medidaCorrecta) {
 //
                                 if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
                                         datas.get(10) == 0 || datas.get(11) == 0) {
                                     numeroIntentos++;
-                                    if (numeroIntentos<3) {
-                                        Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN ("+numeroIntentos+"/3).");
+                                    if (numeroIntentos < 3) {
+                                        Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN (" + numeroIntentos + "/3).");
                                         retryMeasure();
-                                    }
-                                    else {
-                                        numeroIntentos=0;
-                                        medicionCorrecta=true;
-                                        ponerManilla=true;
-                                        Log.i(TAG,"POR FAVOR PONERSE LA MANILLA");
+                                    } else {
+                                        numeroIntentos = 0;
+                                        medicionCorrecta = true;
+                                        ponerManilla = true;
+                                        Log.i(TAG, "POR FAVOR PONERSE LA MANILLA");
 
                                     }
-                                }
-                                else{
-                                    medicionCorrecta=true;
+                                } else {
+                                    medicionCorrecta = true;
+                                    dialog.dismiss();
+
+                                    int ritmoCardiaco=datas.get(6);
+                                    int oxigenoSangre=datas.get(7);
+                                    int presionAlta=datas.get(8);
+                                    int presionBaja=datas.get(9);
+                                    double temperatura=datas.get(11)+datas.get(12)*Math.pow(10,-2);
+
+                                    int []medidasCorrectas=new int[7];
+
+
+                                    for (int i=0;i<medidasCorrectas.length;i++){
+                                        medidasCorrectas[i]=0;
+                                    }
+
+                                    /**
+                                     * VALIDACIÓN DE RITMO CARDIACO
+                                     *
+                                     */
+
+                                    if (ritmoCardiaco<60 || ritmoCardiaco>100){
+                                        System.out.println("EL RITMO CARDIACO ESTÁ POR FUERA DE LOS RANGOS NORMALES (60 BPM - 100 BPM)");
+                                    }
+                                    else{
+                                        medidasCorrectas[0]=ritmoCardiaco;
+                                    }
+
+                                    /**
+                                     *
+                                     * VALIDACIÓN DE NIVEL DE OXÍGENO
+                                     */
+
+                                    if (oxigenoSangre<95){
+                                        System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%");
+                                    }
+                                    else {
+                                        medidasCorrectas[1]=oxigenoSangre;
+                                    }
+
+                                    /**
+                                     * VALIDACIÓN DE PRESIÓN SANGUÍNEA
+                                     */
+
+                                    if (presionAlta<80 || presionAlta>120 || presionBaja <60 || presionBaja>80){
+                                        System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg");
+                                    }
+                                    else{
+                                        medidasCorrectas[2]=presionAlta;
+                                        medidasCorrectas[3]=presionBaja;
+                                    }
+
+                                    /**
+                                     * VALIDACIÓN INMUNE
+                                     */
+                                    medidasCorrectas[4]=datas.get(10);
+
+                                    /**
+                                     * VALIDACIÓN DE TEMPERATURA
+                                     */
+
+                                    if (temperatura<36 || temperatura > 37.2){
+                                        System.out.println("LA TEMPERATURA ESTÁ POR FUERA DE LOS RANGOS NORMALES (36°C - 37.2°C)");
+                                    }
+                                    else{
+                                        medidasCorrectas[5]=datas.get(11);
+                                        medidasCorrectas[6]=datas.get(12);
+                                    }
+
+
                                 }
                             }
                             break;
@@ -604,7 +765,7 @@ public class HomeActivity extends MainActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mServiceConnection);
+//        unbindService(mServiceConnection);
         //unregisterReceiver(mGattUpdateReceiver);
     }
 
@@ -626,21 +787,23 @@ public class HomeActivity extends MainActivity {
 
 
 
+
     public void mixUserAndPhysiometryData(ArrayList<Integer> measuredPhysiometryData) {
+
 //      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
-        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        String storedJwtToken = sharedPrefs.getString("storedJwtToken", "");
+        SharedPreferences sharedPrefs = context.getSharedPreferences(ConfigGeneral.preference_file_key, Context.MODE_PRIVATE);
+        String storedJwtToken = sharedPrefs.getString(ConfigGeneral.TOKENSHARED, "");
         ArrayList<Object> fetchedUserData;
         fetchedUserData = getIntent().hasExtra("fetchedUserData") ? (ArrayList<Object>) getIntent().getSerializableExtra("fetchedUserData") : null;
 
         if (fetchedUserData != null) {
             // Defining Physiometry object and adding data to it
             JsonObject physiometryData = new JsonObject();
-            physiometryData.addProperty("ritmoCardiaco", measuredPhysiometryData.get(0));
-            physiometryData.addProperty("oximetria", measuredPhysiometryData.get(1));
-            physiometryData.addProperty("presionArterialSistolica", measuredPhysiometryData.get(2));
-            physiometryData.addProperty("presionArterialDiastolica", measuredPhysiometryData.get(3));
-            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(4));
+            physiometryData.addProperty("ritmoCardiaco", measuredPhysiometryData.get(10));
+            physiometryData.addProperty("oximetria", measuredPhysiometryData.get(7));
+            physiometryData.addProperty("presionArterialSistolica", measuredPhysiometryData.get(8));
+            physiometryData.addProperty("presionArterialDiastolica", measuredPhysiometryData.get(9));
+            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(11)+"."+measuredPhysiometryData.get(12));
             physiometryData.addProperty("fechaRegistro", utc.toString());
             physiometryData.addProperty("fechaToma", utc.toString());
             // Defining userData object to store the user data from login activity
@@ -658,6 +821,7 @@ public class HomeActivity extends MainActivity {
             // Sending physiometry data to the service
             sendPhysiometryData(storedJwtToken, physiometryData);
         } else {
+
             Log.d(TAG, "mixUserAndPhysiometryData -> No hay datos de usuario desde login");
         }
     }
@@ -669,9 +833,10 @@ public class HomeActivity extends MainActivity {
         responseData.enqueue(new Callback<DataFisiometria>() {
             @Override
             public void onResponse(Call<DataFisiometria> call, Response<DataFisiometria> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     assert response.body() != null;
-                    Log.i(TAG, "onResponse: " + response.body().toString());
+                    dialogReciver.show();
+                    Log.i(TAG, "onResponse: " + response.body());
                 }
             }
 
