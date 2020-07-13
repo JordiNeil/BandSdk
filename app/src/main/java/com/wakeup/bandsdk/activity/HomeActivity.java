@@ -220,6 +220,8 @@ public class HomeActivity extends MainActivity {
     public int numeroIntentos = 0;
     public boolean ponerManilla = false;
 
+    public boolean conectado=false;
+
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
 
@@ -233,27 +235,31 @@ public class HomeActivity extends MainActivity {
                 /*Intent intentHome = new Intent(context, HomeActivity.class);
                 intentHome.putExtra("address", address);
                 startActivity(intentHome);*/
-                /**
-                 *
-                 *
-                 * INICIO MEDICIÓN AUTOMÁTICA DE BATERÍA CADA HORA
-                 *
-                 */
-                medirBateria();
+                if (!StatusConnection) {
+                    /**
+                     *
+                     *
+                     * INICIO MEDICIÓN AUTOMÁTICA DE BATERÍA CADA HORA
+                     *
+                     */
+                    medirBateria();
 
-                /**
-                 *
-                 * SINCRONIZACIÓN DE HORA
-                 *
-                 */
-                sincronizarHora();
+                    /**
+                     *
+                     * SINCRONIZACIÓN DE HORA
+                     *
+                     */
+                    sincronizarHora();
 
-                /**
-                 *
-                 *
-                 * ABRIR MEDICION CADA HORA
-                 */
-                iniciarMedicionHora();
+                    /**
+                     *
+                     *
+                     * ABRIR MEDICION CADA HORA
+                     */
+                    iniciarMedicionHora();
+                }
+                StatusConnection=true;
+                conectado=true;
 
                 /**
                  *
@@ -268,35 +274,64 @@ public class HomeActivity extends MainActivity {
 //                        commandManager.getBatteryInfo();
                     }
                 };
-                timer.schedule(batteryInfo, 0, 600000);
-//                timer.schedule(batteryInfo, 0, 600000);
 
-                //Meassure();
-
-
-                /**
-                 *
-                 * * INICIO MEDICIÓN AUTOMÁTICA CADA HORA
-                 **/
-               // commandManager.openHourlyMeasure(1);
-
-//                commandManager.openHourlyMeasure(1);
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
+                conectado=false;
+                Timer timer;
+                timer = new Timer();
+
+                TimerTask verificarConexion=new TimerTask() {
+                    @Override
+                    public void run(){
+                        TimerTask reintentarConexion = new TimerTask() {
+                            @Override
+                            public void run() {
+                                if (!conectado) {
+                                    conectarBluetooth();
+                                }
+                            }
+                        };
+                        timer.schedule(reintentarConexion, 0);
+                    }
+                };
+                timer.schedule(verificarConexion, 0, 600000);
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
-                StatusConnection=true;
+
 
             } else if (BluetoothService.ACTION_DATA_AVAILABLE.equals(action)) {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(System.currentTimeMillis());
-                Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
-                        + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
-                        (calendar.get(Calendar.MINUTE)) + ":" +
-                        (calendar.get(Calendar.SECOND)));
+                if (calendar.get(Calendar.MINUTE) >=10 && calendar.get(Calendar.SECOND)>=10) {
+                    Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                            + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+                            (calendar.get(Calendar.MINUTE)) + ":" +
+                            (calendar.get(Calendar.SECOND)));
+                }
+                else if (calendar.get(calendar.MINUTE)>=10 && calendar.get (Calendar.SECOND)<10) {
+                    Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                            + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+                            (calendar.get(Calendar.MINUTE)) + ":0" +
+                            (calendar.get(Calendar.SECOND)));
+                }
+                else if (calendar.get(calendar.MINUTE)<10 && calendar.get (Calendar.SECOND)>=10) {
+                    Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                            + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":0" +
+                            (calendar.get(Calendar.MINUTE)) + ":" +
+                            (calendar.get(Calendar.SECOND)));
+                }
+                else{
+                    {
+                        Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
+                                + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":0" +
+                                (calendar.get(Calendar.MINUTE)) + ":0" +
+                                (calendar.get(Calendar.SECOND)));
+                    }
+                }
                 ArrayList<Integer> datas = DataHandUtils.bytesToArrayList(txValue);
 
 
@@ -310,6 +345,7 @@ public class HomeActivity extends MainActivity {
 //                            BATTERY POWER
 //                            Battery battery = (Battery) dataPasrse.parseData(datas);
 //                            Log.i(TAG, battery.toString());
+                            nivelBateria(datas);
                             break;
                         case 0x92:
                             //BRACELET DATA
@@ -363,8 +399,9 @@ public class HomeActivity extends MainActivity {
 
                                 case 0x20:
                                     //RETURN HOURLY DATA
-//                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-//                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+                                    System.out.println(datas);
 
 
                                     /**
@@ -390,6 +427,74 @@ public class HomeActivity extends MainActivity {
                                         } else {
                                             medicionCorrecta = true;
                                             dialog.dismiss();
+
+                                            int ritmoCardiaco=datas.get(6);
+                                            int oxigenoSangre=datas.get(7);
+                                            int presionAlta=datas.get(8);
+                                            int presionBaja=datas.get(9);
+                                            double temperatura=datas.get(11)+datas.get(12)*Math.pow(10,-2);
+
+                                            int []medidasCorrectas=new int[7];
+
+
+                                            for (int i=0;i<medidasCorrectas.length;i++){
+                                                medidasCorrectas[i]=0;
+                                            }
+
+                                            /**
+                                             * VALIDACIÓN DE RITMO CARDIACO
+                                             *
+                                             */
+
+                                            if (ritmoCardiaco<60 || ritmoCardiaco>100){
+                                                System.out.println("EL RITMO CARDIACO ESTÁ POR FUERA DE LOS RANGOS NORMALES (60 BPM - 100 BPM)");
+                                            }
+                                            else{
+                                                medidasCorrectas[0]=ritmoCardiaco;
+                                            }
+
+                                            /**
+                                             *
+                                             * VALIDACIÓN DE NIVEL DE OXÍGENO
+                                             */
+
+                                            if (oxigenoSangre<95){
+                                                System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%");
+                                            }
+                                            else {
+                                                medidasCorrectas[1]=oxigenoSangre;
+                                            }
+
+                                            /**
+                                             * VALIDACIÓN DE PRESIÓN SANGUÍNEA
+                                             */
+
+                                            if (presionAlta<80 || presionAlta>120 || presionBaja <60 || presionBaja>80){
+                                                System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg");
+                                            }
+                                            else{
+                                                medidasCorrectas[2]=presionAlta;
+                                                medidasCorrectas[3]=presionBaja;
+                                            }
+
+                                            /**
+                                             * VALIDACIÓN INMUNE
+                                             */
+                                            medidasCorrectas[4]=datas.get(10);
+
+                                            /**
+                                             * VALIDACIÓN DE TEMPERATURA
+                                             */
+
+                                            if (temperatura<36 || temperatura > 37.2){
+                                                System.out.println("LA TEMPERATURA ESTÁ POR FUERA DE LOS RANGOS NORMALES (36°C - 37.2°C)");
+                                            }
+                                            else{
+                                                medidasCorrectas[5]=datas.get(11);
+                                                medidasCorrectas[6]=datas.get(12);
+                                            }
+
+
                                         }
                                     }
 

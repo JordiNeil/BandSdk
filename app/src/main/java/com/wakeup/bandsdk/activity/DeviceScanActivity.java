@@ -210,9 +210,13 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i(TAG, bluetoothDevice.getAddress());
-                    leDeviceListAdapter.addDevice(bluetoothDevice);
-                    leDeviceListAdapter.notifyDataSetChanged();
+                    if (bluetoothDevice.getName() != null) {
+                        if (bluetoothDevice.getName().contains("T1") || bluetoothDevice.getName().contains("T1S")) {
+                            Log.i(TAG, "Name: " + bluetoothDevice.getName() + " Address: " + bluetoothDevice.getAddress() + " Alias: " + bluetoothDevice.getAlias());
+                            leDeviceListAdapter.addDevice(bluetoothDevice);
+                            leDeviceListAdapter.notifyDataSetChanged();
+                        }
+                    }
                 }
             });
         }
