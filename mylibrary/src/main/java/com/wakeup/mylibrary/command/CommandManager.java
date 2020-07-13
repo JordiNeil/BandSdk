@@ -134,7 +134,7 @@ public class CommandManager {
      * @param timeInMillis SYNCHRONIZATION DATA IN MILISECONDS
      */
     public void syncData(long timeInMillis) {
-        Log.i(TAG, "syncData: ");
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeInMillis);
         int year = calendar.get(Calendar.YEAR);
@@ -143,6 +143,8 @@ public class CommandManager {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
         int second = calendar.get(Calendar.SECOND);
+
+        Log.i(TAG, "syncData: "+hour+":"+minute+":"+second);
 
         byte[] data = new byte[12];
         data[0] = (byte) 0xAB;

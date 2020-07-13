@@ -650,6 +650,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void sincronizarHora(){
         commandManager.setTimeSync();
+//        commandManager.syncData(System.currentTimeMillis());
         Log.i(TAG,"SINCRONIZACIÓN DE TIEMPO");
     }
 
