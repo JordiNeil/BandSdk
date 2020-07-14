@@ -43,9 +43,10 @@ public class HomeFragment extends Fragment {
     String presS;
     String oximetria;
     String ritmoCar;
+    String dateRegister;
     ArrayList<Integer> a;
     Context thiscontect;
-    LinearLayout rl_heart_rate;
+    TextView rl_heart_rate;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,6 +83,8 @@ public class HomeFragment extends Fragment {
                     fetchedPhysiometryData.add(2, res.get(res.size() - 1).getPresionArterialSistolica());
                     fetchedPhysiometryData.add(3, res.get(res.size() - 1).getPresionArterialDiastolica());
                     fetchedPhysiometryData.add(4, res.get(res.size() - 1).getTemperatura());
+                    fetchedPhysiometryData.add(5, res.get(res.size() - 1).getFechaToma());
+                    dateRegister=fetchedPhysiometryData.get(5).toString();
                     temp = fetchedPhysiometryData.get(4) + "°C";
                     presS = fetchedPhysiometryData.get(2) + "/" + fetchedPhysiometryData.get(3);
                     oximetria = fetchedPhysiometryData.get(1).toString();
@@ -92,7 +95,7 @@ public class HomeFragment extends Fragment {
                     tv_blood_pressureFragment.setText(presS);
                     tv_heart_rateFragment.setText(ritmoCar);
 
-
+                    rl_heart_rate.setText(dateRegister);
                 }
 
             }
@@ -114,12 +117,7 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View fragmentViewHome = inflater.inflate(R.layout.fragmen_home, container, false);
         rl_heart_rate = fragmentViewHome.findViewById(R.id.show_data);
-        rl_heart_rate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getPhysiometryDataById();
-            }
-        });
+
         tv_tiredFragment = fragmentViewHome.findViewById(R.id.tv_tired);
         //tv_tiredFragment.setText(temp);
         tv_blood_oxygenFragment = fragmentViewHome.findViewById(R.id.tv_blood_oxygen);
@@ -128,6 +126,7 @@ public class HomeFragment extends Fragment {
         //tv_blood_pressureFragment.setText(presS);
         tv_heart_rateFragment = fragmentViewHome.findViewById(R.id.tv_heart_rate);
         //  tv_heart_rateFragment.setText(ritmoCar);
+        getPhysiometryDataById();
 
         return fragmentViewHome;
 

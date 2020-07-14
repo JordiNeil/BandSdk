@@ -45,9 +45,19 @@
     <string name="measure_all_loading" tools:ignore="MissingTranslation">Tomando Medición</string>
     <string name="pls_input_email" tools:ignore="MissingTranslation">Please enter the mail address</string>
     <string name="input_pwd" tools:ignore="MissingTranslation">Please enter the account password</string>
-    <string name="loging" tools:ignore="MissingTranslation">Login</string>
+    <string name="loging" tools:ignore="MissingTranslation">Iniciar Sesión</string>
+    <string name="conectar" tools:ignore="MissingTranslation">Conectar</string>
+
+    <string name="conectarDespositivo" tools:ignore="MissingTranslation"> Conectar Dispositivo</string>
+
+
     <string name="login" tools:ignore="MissingTranslation" >Registrar</string>
-    <string name="measure_recently" tools:ignore="MissingTranslation" >Cargar datos</string>
+    <string name="measure_recently" tools:ignore="MissingTranslation" >Ultima medición</string>
+    <string name="search_device" tools:ignore="MissingTranslation" >Buscar dispositivo</string>
+    <string name="disconnect_device" tools:ignore="MissingTranslation" >Desconectar dispositivo</string>
+    <string name="unbonded_device" tools:ignore="MissingTranslation" >Desvincular dispositivo</string>
+
+
 
 
 </resources>

@@ -31,7 +31,7 @@
     </RelativeLayout>-->
 
     <LinearLayout
-        android:id="@+id/show_data"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bg_common_green"
@@ -39,10 +39,13 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/show_data"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:gravity="center_horizontal"
             android:paddingBottom="10dp"
+            android:textSize="15dp"
+            android:padding="5dp"
             android:text="@string/measure_recently"
             android:textColor="@color/white" />
 
