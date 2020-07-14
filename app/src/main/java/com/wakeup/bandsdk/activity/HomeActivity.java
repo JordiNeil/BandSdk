@@ -36,8 +36,10 @@ import com.google.gson.JsonObject;
 import com.wakeup.bandsdk.Fragments.HomeFragment;
 import com.wakeup.bandsdk.Fragments.UserFragment;
 import com.wakeup.bandsdk.MainActivity;
+import com.wakeup.bandsdk.Pojos.Alarms.AlarmData;
 import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
 import com.wakeup.bandsdk.R;
+import com.wakeup.bandsdk.Services.AlarmService;
 import com.wakeup.bandsdk.Services.ServiceFisiometria;
 import com.wakeup.bandsdk.configVar.ConfigGeneral;
 import com.wakeup.mylibrary.Config;
@@ -74,7 +76,6 @@ import retrofit2.Response;
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class HomeActivity extends MainActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-
     public RadioButton radioButtonHome;
     public RadioButton radioButtonInfo;
     public RadioButton radioButtonUser;
@@ -87,6 +88,11 @@ public class HomeActivity extends MainActivity {
     private BandInfo bandInfo;
     public Button btnMeassre;
     private Context context = this;
+    SharedPreferences sharedPrefs;
+    String storedJwtToken, userLogin, userFirstName, userLastName, userEmail, userLangKey, userImageUrl;
+    Integer userId;
+    Boolean userActivated;
+
     private ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
     Fragment fragmentHome = new HomeFragment();
     Bundle args = new Bundle();
@@ -94,10 +100,23 @@ public class HomeActivity extends MainActivity {
     AlertDialog.Builder builder,builderReceived;
     AlertDialog dialog,dialogReciver;
     Boolean StatusConnection=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        sharedPrefs = context.getSharedPreferences(ConfigGeneral.preference_file_key, Context.MODE_PRIVATE);
+        storedJwtToken = sharedPrefs.getString(ConfigGeneral.TOKENSHARED, "");
+        userId = sharedPrefs.getInt("userId", 0);
+        userLogin = sharedPrefs.getString("login", "");
+        userFirstName = sharedPrefs.getString("firstName", "");
+        userLastName = sharedPrefs.getString("lastName", "");
+        userEmail = sharedPrefs.getString("email", "");
+        userActivated = sharedPrefs.getBoolean("activated", false);
+        userLangKey = sharedPrefs.getString("langKey", "");
+        userImageUrl = sharedPrefs.getString("imageUrl", "");
+
         radioButtonHome = (RadioButton) findViewById(R.id.rb_home);
 
         //radioButtonHome.callOnClick();
@@ -141,6 +160,25 @@ public class HomeActivity extends MainActivity {
 //                Measure();
 //            }
 //        });
+        // Alert data
+        JsonObject alertData = new JsonObject();
+        alertData.addProperty("descripcion", "Test");
+        alertData.addProperty("procedimiento", "Test");
+        alertData.addProperty("timeInstant", utc.toString());
+        // User data
+        JsonObject userData = new JsonObject();
+        userData.addProperty("id", userId);
+        userData.addProperty("login", userLogin);
+        userData.addProperty("firstName", userFirstName);
+        userData.addProperty("lastName", userLastName);
+        userData.addProperty("email", userEmail);
+        userData.addProperty("imageUrl", userImageUrl);
+        userData.addProperty("activated", userActivated);
+        userData.addProperty("langKey", userLangKey);
+        userData.addProperty("resetDate", (String) null);
+        // Mixing alert data with user data
+        alertData.add("user", userData);
+//        createNewAlert(storedJwtToken, alertData);
     }
 
 
@@ -788,10 +826,7 @@ public class HomeActivity extends MainActivity {
 
 
     public void mixUserAndPhysiometryData(ArrayList<Integer> measuredPhysiometryData) {
-
 //      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
-        SharedPreferences sharedPrefs = context.getSharedPreferences(ConfigGeneral.preference_file_key, Context.MODE_PRIVATE);
-        String storedJwtToken = sharedPrefs.getString(ConfigGeneral.TOKENSHARED, "");
         ArrayList<Object> fetchedUserData;
         fetchedUserData = getIntent().hasExtra("fetchedUserData") ? (ArrayList<Object>) getIntent().getSerializableExtra("fetchedUserData") : null;
 
@@ -842,6 +877,25 @@ public class HomeActivity extends MainActivity {
             @Override
             public void onFailure(Call<DataFisiometria> call, Throwable t) {
                 System.out.println(t.getMessage());
+            }
+        });
+    }
+
+    public void createNewAlert(String jwtToken, JsonObject alarmData) {
+        AlarmService alarm = ConfigGeneral.retrofit.create(AlarmService.class);
+        final Call<AlarmData> response = alarm.setAlarm("Bearer " + jwtToken, alarmData);
+
+        response.enqueue(new Callback<AlarmData>() {
+            @Override
+            public void onResponse(Call<AlarmData> call, Response<AlarmData> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Alarm response: " + response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AlarmData> call, Throwable t) {
+                Log.d(TAG, "Alarm onFailure: " + t.getMessage());
             }
         });
     }
