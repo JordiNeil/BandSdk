@@ -33,21 +33,22 @@
     <LinearLayout
 
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:background="@color/bg_common_green"
         android:gravity="center_horizontal"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="10dp">
 
         <TextView
             android:id="@+id/show_data"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:paddingBottom="10dp"
-            android:textSize="15dp"
-            android:padding="5dp"
-            android:text="@string/measure_recently"
-            android:textColor="@color/white" />
+
+            android:padding="3dp"
+            android:textColor="@color/white"
+
+            android:textSize="20dp" />
 
 
     </LinearLayout>
