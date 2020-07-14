@@ -55,6 +55,8 @@ public class LoginActivity extends AppCompatActivity {
     TextView toRegisterBtn;
     private JsonObject userCredentials = new JsonObject();
     private Context context = this;
+    private SharedPreferences sharedPrefs;
+    private SharedPreferences.Editor editor;
     View viewAlert;
     AlertDialog.Builder builder;
     AlertDialog dialog;
@@ -63,6 +65,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        sharedPrefs = context.getSharedPreferences(ConfigGeneral.preference_file_key, Context.MODE_PRIVATE);
+        editor = sharedPrefs.edit();
+
         loginBtn = findViewById(R.id.loginBtn);
         toRegisterBtn = findViewById(R.id.tv_thrid_login);
         // Capturing form fields and input
@@ -81,8 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         builder.setCancelable(false);
         dialog = builder.create();
 
-        // Check if there is user data in shared preferences
-        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        // Check if there is a token in shared preferences
         if (sharedPrefs.contains("storedJwtToken") && !sharedPrefs.getString("storedJwtToken", "").equals("")) {
             Log.d(TAG, "JWT Token: " + sharedPrefs.getString("storedJwtToken", ""));
             Intent homeIntent = new Intent(context, HomeActivity.class);
@@ -145,8 +150,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void getJwtToken(Context loginContext, JsonObject credentials) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
         String storedJwtToken = sharedPrefs.getString(ConfigGeneral.TOKENSHARED, "");
         if (storedJwtToken != null || storedJwtToken.equals("")) {
             ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
@@ -187,8 +190,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void fetchUserData(Context loginContext, String jwtToken) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
         AccountService service = ConfigGeneral.retrofit.create(AccountService.class);
         final Call<DataUser> dataResponse = service.getUserData("Bearer " + jwtToken);
 
@@ -224,6 +225,7 @@ public class LoginActivity extends AppCompatActivity {
                     editor.putBoolean("activated", res.getActivated());
                     editor.putString("langKey", res.getLangKey());
                     editor.putString("imageUrl", res.getImageUrl());
+                    editor.commit();
 
                     Intent homeIntent = new Intent(loginContext, HomeActivity.class);
                     homeIntent.putExtra("fetchedUserData", fetchedUserData);
