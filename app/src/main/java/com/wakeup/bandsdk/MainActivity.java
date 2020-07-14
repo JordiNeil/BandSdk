@@ -66,7 +66,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1;
@@ -251,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void connect(View view) {
-       conectarBluetooth();
+        conectarBluetooth();
 
         showDialog();
 
@@ -593,7 +592,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    public void retryMeasure(){
+
+    public void retryMeasure() {
         /**
          *
          * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
@@ -609,6 +609,7 @@ public class MainActivity extends AppCompatActivity {
         TimerTask startMeasure = new TimerTask() {
             @Override
             public void run() {
+                dialog.show();
                 commandManager.oneButtonMeasurement(1);
             }
         };
@@ -631,11 +632,12 @@ public class MainActivity extends AppCompatActivity {
          *
          * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
          */
-        timer.schedule(finishMeasure, 45000+300000);
+        timer.schedule(finishMeasure, 45000 + 300000);
 //        timer.schedule(finishMeasure, 60000+45000);
 
     }
-    public void medirBateria(){
+
+    public void medirBateria() {
         Timer timer;
         timer = new Timer();
 
@@ -648,32 +650,92 @@ public class MainActivity extends AppCompatActivity {
         timer.schedule(batteryInfo, 0, 600000);
     }
 
+
     public void sincronizarHora(){
-        commandManager.setTimeSync();
-//        commandManager.syncData(System.currentTimeMillis());
+        Timer timer;
+        timer = new Timer();
+
+        TimerTask syncTime = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.setTimeSync();
+            }
+        };
+        timer.schedule(syncTime,5000);
+
         Log.i(TAG,"SINCRONIZACIÓN DE TIEMPO");
     }
 
     public void iniciarMedicionHora(){
-        commandManager.openHourlyMeasure(1);
+
+        Timer timer;
+        timer = new Timer();
+
+        TimerTask openMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.openHourlyMeasure(1);;
+            }
+        };
+        timer.schedule(openMeasure,5000);
+
         Log.i(TAG,"INICIO MEDICIÓN POR HORA");
 
+
+
+
+        TimerTask hourMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(1);
+                System.out.println("STARTING HOURLY MEASURE");
+            }
+        };
+
+        TimerTask finishHourMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(0);
+            }
+        };
+
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        Calendar calendar2 = Calendar.getInstance();
+
+
+        calendar2.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DATE),calendar.get(Calendar.HOUR_OF_DAY)+1,1,0);
+        System.out.println("CALENDAR: "+calendar.get(Calendar.YEAR)+"/"+calendar.get(Calendar.DATE)+"/"+calendar.get(Calendar.DATE)+" "+calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE)+":"+calendar.get(Calendar.SECOND));
+        System.out.println("CALENDAR2: "+calendar2.get(Calendar.YEAR)+"/"+calendar2.get(Calendar.MONTH)+"/"+calendar2.get(Calendar.DATE)+" "+calendar2.get(Calendar.HOUR_OF_DAY)+":"+calendar2.get(Calendar.MINUTE)+":"+calendar2.get(Calendar.SECOND));
+
+        long delta=Math.abs(calendar2.getTimeInMillis()-calendar.getTimeInMillis());
+
+        System.out.println("HOURLY MEASURE IN "+Math.round(delta/60000)+" MIN");
+
+//        timer.schedule(hourMeasure,delta,3600000);
+        timer.schedule(finishHourMeasure,delta,3600000);
+
+//
+
+
     }
+
+
+
     public void nivelBateria(ArrayList<Integer> datas){
-        Log.i(TAG,"NIVEL DE BATERÍA: "+datas.get(7));
+        Log.i(TAG,"NIVEL DE BATERÍA: "+datas.get(7)+"%");
     }
     public void conectarBluetooth(){
         mBluetoothLeService.connect(address);
     }
 
 
-
-
-
-    public void hideDialog(){
+    public void hideDialog() {
         dialog.dismiss();
     }
-    public void showDialog(){
+
+    public void showDialog() {
         dialog.show();
     }
 

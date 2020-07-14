@@ -334,7 +334,7 @@ public class HomeActivity extends MainActivity {
                         timer.schedule(reintentarConexion, 0);
                     }
                 };
-                timer.schedule(verificarConexion, 0, 600000);
+                timer.schedule(verificarConexion, 60000, 600000);
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
@@ -401,13 +401,13 @@ public class HomeActivity extends MainActivity {
 //                                        || bandInfo.getBandType() == 0x0D
 //                                        || bandInfo.getBandType() == 0x0E
 //                                        || bandInfo.getBandType() == 0x0F) {
-//
-//
+
+
 //                                    Config.hasContinuousHeart = true;
 //
 //                                }
 //                            }
-
+//
                             break;
 
                         case 0x51:
@@ -452,22 +452,19 @@ public class HomeActivity extends MainActivity {
                                         if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
                                                 datas.get(10) == 0 || datas.get(11) == 0) {
                                             Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN");
+                                            dialog.dismiss();
                                             numeroIntentos++;
                                             if (numeroIntentos < 3) {
-                                                retryMeasure();
+                                                dialog.dismiss();
                                             } else {
                                                 numeroIntentos = 0;
                                                 medicionCorrecta = true;
                                                 ponerManilla = true;
                                                 Log.i(TAG, "POR FAVOR PONERSE LA MANILLA");
-                                                dialog.dismiss();
                                             }
                                         } else {
                                             medicionCorrecta = true;
                                             dialog.dismiss();
-
-
-
                                         }
                                     }
 
@@ -573,6 +570,7 @@ public class HomeActivity extends MainActivity {
 //
                                 if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
                                         datas.get(10) == 0 || datas.get(11) == 0) {
+                                    dialog.dismiss();
                                     numeroIntentos++;
                                     if (numeroIntentos < 3) {
                                         Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN (" + numeroIntentos + "/3).");
@@ -619,7 +617,7 @@ public class HomeActivity extends MainActivity {
                                      */
 
                                     if (oxigenoSangre<95){
-                                        System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%");
+                                        System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%)");
                                     }
                                     else {
                                         medidasCorrectas[1]=oxigenoSangre;

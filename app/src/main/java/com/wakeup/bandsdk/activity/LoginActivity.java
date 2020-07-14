@@ -144,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
             getJwtToken(context, userCredentials);
         });
         toRegisterBtn.setOnClickListener(v -> {
-            Intent registerIntent = new Intent(this, HomeActivity.class);
+            Intent registerIntent = new Intent(this, RegisterActivity.class);
             startActivity(registerIntent);
         });
     }
