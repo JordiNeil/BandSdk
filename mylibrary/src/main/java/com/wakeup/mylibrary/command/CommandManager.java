@@ -132,7 +132,7 @@ public class CommandManager {
     /**
      * DOWNLOAD SYNC DATA
      *
-     * @param timeInMillis SYNCHRONIZATION DATA IN MILISECONDS
+     * @param timeInMillis SYNCHRONIZATION DATA IN MILLISECONDS
      */
     public void syncData(long timeInMillis) {
 

@@ -363,13 +363,13 @@ public class HomeActivity extends MainActivity {
 //                                        || bandInfo.getBandType() == 0x0D
 //                                        || bandInfo.getBandType() == 0x0E
 //                                        || bandInfo.getBandType() == 0x0F) {
-//
-//
+
+
 //                                    Config.hasContinuousHeart = true;
 //
 //                                }
 //                            }
-
+//
                             break;
 
                         case 0x51:
@@ -579,7 +579,7 @@ public class HomeActivity extends MainActivity {
                                      */
 
                                     if (oxigenoSangre<95){
-                                        System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%");
+                                        System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%)");
                                     }
                                     else {
                                         medidasCorrectas[1]=oxigenoSangre;

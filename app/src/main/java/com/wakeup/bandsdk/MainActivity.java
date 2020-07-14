@@ -650,18 +650,38 @@ public class MainActivity extends AppCompatActivity {
         timer.schedule(batteryInfo, 0, 600000);
     }
 
-    public void sincronizarHora() {
-        commandManager.setTimeSync();
-//        commandManager.syncData(System.currentTimeMillis());
-        Log.i(TAG, "SINCRONIZACIÓN DE TIEMPO");
+
+    public void sincronizarHora(){
+        Timer timer;
+        timer = new Timer();
+
+        TimerTask syncTime = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.setTimeSync();
+            }
+        };
+        timer.schedule(syncTime,5000);
+
+        Log.i(TAG,"SINCRONIZACIÓN DE TIEMPO");
     }
 
-    public void iniciarMedicionHora() {
-        commandManager.openHourlyMeasure(0);
-        commandManager.openHourlyMeasure(1);
-        Log.i(TAG, "INICIO MEDICIÓN POR HORA");
+    public void iniciarMedicionHora(){
 
-        Timer timer = new Timer();
+        Timer timer;
+        timer = new Timer();
+
+        TimerTask openMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.openHourlyMeasure(1);;
+            }
+        };
+        timer.schedule(openMeasure,5000);
+
+        Log.i(TAG,"INICIO MEDICIÓN POR HORA");
+
+
 
 
         TimerTask hourMeasure = new TimerTask() {
@@ -684,28 +704,29 @@ public class MainActivity extends AppCompatActivity {
         calendar.setTimeInMillis(System.currentTimeMillis());
         Calendar calendar2 = Calendar.getInstance();
 
-        calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), calendar.get(Calendar.HOUR_OF_DAY) + 1, 0, 0);
-        System.out.println("CALENDAR: " + calendar.get(Calendar.YEAR) + "/" + calendar.get(Calendar.DATE) + "/" + calendar.get(Calendar.DATE) + " " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND));
-        System.out.println("CALENDAR2: " + calendar2.get(Calendar.YEAR) + "/" + calendar2.get(Calendar.MONTH) + "/" + calendar2.get(Calendar.DATE) + " " + calendar2.get(Calendar.HOUR_OF_DAY) + ":" + calendar2.get(Calendar.MINUTE) + ":" + calendar2.get(Calendar.SECOND));
 
-        long delta = Math.abs(calendar2.getTimeInMillis() - calendar.getTimeInMillis());
+        calendar2.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DATE),calendar.get(Calendar.HOUR_OF_DAY)+1,1,0);
+        System.out.println("CALENDAR: "+calendar.get(Calendar.YEAR)+"/"+calendar.get(Calendar.DATE)+"/"+calendar.get(Calendar.DATE)+" "+calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE)+":"+calendar.get(Calendar.SECOND));
+        System.out.println("CALENDAR2: "+calendar2.get(Calendar.YEAR)+"/"+calendar2.get(Calendar.MONTH)+"/"+calendar2.get(Calendar.DATE)+" "+calendar2.get(Calendar.HOUR_OF_DAY)+":"+calendar2.get(Calendar.MINUTE)+":"+calendar2.get(Calendar.SECOND));
 
-        System.out.println("HOURLY MEASURE IN " + Math.round(delta / 60000) + " MIN");
+        long delta=Math.abs(calendar2.getTimeInMillis()-calendar.getTimeInMillis());
 
-        timer.schedule(hourMeasure, delta, 3600000);
-        timer.schedule(finishHourMeasure, delta, 3600000 + 45000);
+        System.out.println("HOURLY MEASURE IN "+Math.round(delta/60000)+" MIN");
+
+//        timer.schedule(hourMeasure,delta,3600000);
+        timer.schedule(finishHourMeasure,delta,3600000);
+
+//
 
 
     }
 
-    public void nivelBateria(ArrayList<Integer> datas) {
-        Log.i(TAG, "NIVEL DE BATERÍA: " + datas.get(7));
-        if (datas.get(7)<=40){
 
-        }
+
+    public void nivelBateria(ArrayList<Integer> datas){
+        Log.i(TAG,"NIVEL DE BATERÍA: "+datas.get(7)+"%");
     }
-
-    public void conectarBluetooth() {
+    public void conectarBluetooth(){
         mBluetoothLeService.connect(address);
     }
 
