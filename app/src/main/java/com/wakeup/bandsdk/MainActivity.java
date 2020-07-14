@@ -659,6 +659,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 commandManager.setTimeSync();
+                commandManager.syncData(System.currentTimeMillis());
             }
         };
         timer.schedule(syncTime,5000);

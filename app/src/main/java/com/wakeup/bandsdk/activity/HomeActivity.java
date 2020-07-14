@@ -393,14 +393,15 @@ public class HomeActivity extends MainActivity {
                                     break;
                                 case 0x08:
                                     //CURRENT DATA
-                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, currentDataBean.toString());
+//                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, currentDataBean.toString());
+                                    System.out.println(datas);
                                     break;
 
                                 case 0x20:
                                     //RETURN HOURLY DATA
-                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+//                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, hourlyMeasureDataBean.toString());
                                     System.out.println(datas);
 
 
@@ -590,7 +591,7 @@ public class HomeActivity extends MainActivity {
                                      */
 
                                     if (presionAlta<80 || presionAlta>120 || presionBaja <60 || presionBaja>80){
-                                        System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg");
+                                        System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg)");
                                     }
                                     else{
                                         medidasCorrectas[2]=presionAlta;
