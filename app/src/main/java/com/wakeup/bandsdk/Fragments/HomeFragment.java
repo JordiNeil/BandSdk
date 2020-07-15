@@ -60,12 +60,6 @@ public class HomeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            a = getArguments().getIntegerArrayList("DataMeasure");
-            System.out.println("estas en home Fragmen" + a);
-
-        }
-
 
     }
 

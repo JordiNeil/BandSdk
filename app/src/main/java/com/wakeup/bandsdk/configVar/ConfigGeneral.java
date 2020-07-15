@@ -32,4 +32,15 @@ public class ConfigGeneral {
             .baseUrl(ConfigGeneral.URL_BASE)
                 .build();
 
+
+
+
+    //DATOS DE MEDICION FUERA DE LO COMUN
+    public static final String TITLE_ALARM="Realice una nueva toma o contacte a su medico más cercano";
+    public static final String DESC_RM="EL RITMO CARDIACO ESTÁ POR FUERA DE LOS RANGOS NORMALES (60 BPM - 100 BPM)";
+    public static final String DESC_OXIME="EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%)";
+    public static final String DESC_PS="LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg";
+    public static final String DES_TEMP="LA TEMPERATURA ESTÁ POR FUERA DE LOS RANGOS NORMALES (36°C - 37.2°C)";
+
+
 }

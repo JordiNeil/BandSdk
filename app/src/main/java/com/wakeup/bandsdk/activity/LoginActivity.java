@@ -88,13 +88,6 @@ public class LoginActivity extends AppCompatActivity {
         dialog = builder.create();
 
         // Check if there is a token in shared preferences
-        if (sharedPrefs.contains("storedJwtToken") && !sharedPrefs.getString("storedJwtToken", "").equals("")) {
-            Log.d(TAG, "JWT Token: " + sharedPrefs.getString("storedJwtToken", ""));
-            Intent homeIntent = new Intent(context, HomeActivity.class);
-            startActivity(homeIntent);
-        } else {
-            Log.d(TAG, "No hay datos de token en shared preferences");
-        }
 
         loginUsernameInput.addTextChangedListener(new TextWatcher() {
             @Override

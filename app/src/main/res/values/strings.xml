@@ -58,4 +58,10 @@
     <string name="unbonded_device" tools:ignore="MissingTranslation">Desvincular dispositivo</string>
 
 
+
+
+
+    <string name="alarma_titel" tools:ignore="MissingTranslation">Se activo la siguiente alarma:</string>
+    <string name="alarma_desc" tools:ignore="MissingTranslation">Por favor siga este procedimiento:</string>
+
 </resources>
