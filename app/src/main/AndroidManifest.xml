@@ -24,6 +24,7 @@
         android:roundIcon="@drawable/suralogo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.PacienteActivity" android:theme="@style/SplashTheme"></activity>
         <activity
             android:name=".activity.LoginActivity"
             android:theme="@style/SplashTheme" />
@@ -38,9 +39,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".activity.HomeActivity" android:theme="@style/SplashTheme" />
-        <activity android:name=".activity.RegisterActivity" android:theme="@style/SplashTheme" />
-        <activity android:name=".activity.DeviceScanActivity"  />
+        <activity
+            android:name=".activity.HomeActivity"
+            android:theme="@style/SplashTheme" />
+        <activity
+            android:name=".activity.RegisterActivity"
+            android:theme="@style/SplashTheme" />
+        <activity android:name=".activity.DeviceScanActivity" />
         <activity android:name=".activity.SendPicActivity" />
     </application>
 
