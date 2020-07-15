@@ -179,6 +179,7 @@ public class HomeActivity extends MainActivity {
         // Mixing alert data with user data
         alertData.add("user", userData);
 //        createNewAlert(storedJwtToken, alertData);
+//        getLatestAlarmByUserId(storedJwtToken, 3);
     }
 
 
@@ -902,6 +903,32 @@ public class HomeActivity extends MainActivity {
             @Override
             public void onFailure(Call<AlarmData> call, Throwable t) {
                 Log.d(TAG, "Alarm onFailure: " + t.getMessage());
+            }
+        });
+    }
+
+    public void getLatestAlarmByUserId(String jwtToken, Integer userId) {
+        AlarmService alarm = ConfigGeneral.retrofit.create(AlarmService.class);
+        final Call<List<AlarmData>> response = alarm.getAlarmData("Bearer " + jwtToken, userId);
+
+        response.enqueue(new Callback<List<AlarmData>>() {
+            @Override
+            public void onResponse(Call<List<AlarmData>> call, Response<List<AlarmData>> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Alarms by userId response: " + response.body());
+                    List<AlarmData> alarmDataList = response.body();
+                    ArrayList<Object> fetchedAlarmData = new ArrayList<>();
+                    fetchedAlarmData.add(0, alarmDataList.get(alarmDataList.size() - 1).getId());
+                    fetchedAlarmData.add(1, alarmDataList.get(alarmDataList.size() - 1).getDescripcion());
+                    fetchedAlarmData.add(2, alarmDataList.get(alarmDataList.size() - 1).getProcedimiento());
+                    fetchedAlarmData.add(3, alarmDataList.get(alarmDataList.size() - 1).getTimeInstant());
+                    System.out.println(fetchedAlarmData);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<AlarmData>> call, Throwable t) {
+                Log.d(TAG, "Alarms by userId onFailure: " + t.getMessage());
             }
         });
     }
