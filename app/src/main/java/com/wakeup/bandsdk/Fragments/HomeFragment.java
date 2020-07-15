@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -26,9 +27,15 @@ import com.wakeup.bandsdk.Services.ServiceFisiometria;
 import com.wakeup.bandsdk.activity.HomeActivity;
 import com.wakeup.bandsdk.configVar.ConfigGeneral;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,6 +55,7 @@ public class HomeFragment extends Fragment {
     Context thiscontect;
     TextView rl_heart_rate;
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +65,8 @@ public class HomeFragment extends Fragment {
             System.out.println("estas en home Fragmen" + a);
 
         }
-        getPhysiometryDataById();
+
+
     }
 
 
@@ -69,6 +78,7 @@ public class HomeFragment extends Fragment {
         final Call<List<DataFisiometria>> dataResponse = service.getPhysiometryData("Bearer " + storedJwtToken, 3);
 
         dataResponse.enqueue(new Callback<List<DataFisiometria>>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onResponse(Call<List<DataFisiometria>> call, Response<List<DataFisiometria>> response) {
 
@@ -84,7 +94,32 @@ public class HomeFragment extends Fragment {
                     fetchedPhysiometryData.add(3, res.get(res.size() - 1).getPresionArterialDiastolica());
                     fetchedPhysiometryData.add(4, res.get(res.size() - 1).getTemperatura());
                     fetchedPhysiometryData.add(5, res.get(res.size() - 1).getFechaToma());
-                    dateRegister=fetchedPhysiometryData.get(5).toString();
+                    System.out.println(fetchedPhysiometryData.get(5).toString());
+
+                    String fecha=fetchedPhysiometryData.get(5).toString();
+
+                    int year=Integer.parseInt(fecha.split("T")[0].split("-")[0]);
+                    int month=Integer.parseInt(fecha.split("T")[0].split("-")[1]);
+                    int day=Integer.parseInt(fecha.split("T")[0].split("-")[2]);
+
+                    int hour=Integer.parseInt(fecha.split("T")[1].split(":")[0]);
+                    int minute=Integer.parseInt(fecha.split("T")[1].split(":")[1]);
+//                    int second= Integer.parseInt(fecha.split("T")[1].split(":")[2].split(".")[0]);
+
+
+
+                    String hora =fecha.split("T")[1];
+                    System.out.println(hora.split(":")[0]);
+                    Calendar calendario=Calendar.getInstance();
+
+                    calendario.set(year,month,day,hour-5,minute,0);
+
+                    dateRegister=getString(R.string.measure_recently)+": "+calendario.get(Calendar.YEAR)+"-"+calendario.get(Calendar.MONTH)+"-"+calendario.get(Calendar.DAY_OF_MONTH)+" " +
+                            calendario.get(Calendar.HOUR)+":"+calendario.get(Calendar.MINUTE);
+
+
+
+
                     temp = fetchedPhysiometryData.get(4) + "°C";
                     presS = fetchedPhysiometryData.get(2) + "/" + fetchedPhysiometryData.get(3);
                     oximetria = fetchedPhysiometryData.get(1).toString();
@@ -126,6 +161,7 @@ public class HomeFragment extends Fragment {
         //tv_blood_pressureFragment.setText(presS);
         tv_heart_rateFragment = fragmentViewHome.findViewById(R.id.tv_heart_rate);
         //  tv_heart_rateFragment.setText(ritmoCar);
+
         getPhysiometryDataById();
 
         return fragmentViewHome;

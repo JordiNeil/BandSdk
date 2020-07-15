@@ -51,12 +51,12 @@
     <string name="conectarDespositivo" tools:ignore="MissingTranslation"> Conectar Dispositivo</string>
 
 
+
     <string name="login" tools:ignore="MissingTranslation" >Registrar</string>
     <string name="measure_recently" tools:ignore="MissingTranslation" >Ultima medición</string>
-    <string name="search_device" tools:ignore="MissingTranslation" >Buscar dispositivo</string>
+    <string name="search_device" tools:ignore="MissingTranslation" >Encontrar dispositivo</string>
     <string name="disconnect_device" tools:ignore="MissingTranslation" >Desconectar dispositivo</string>
     <string name="unbonded_device" tools:ignore="MissingTranslation" >Desvincular dispositivo</string>
-
 
 
 

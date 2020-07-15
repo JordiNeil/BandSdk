@@ -432,15 +432,16 @@ public class HomeActivity extends MainActivity {
                                     break;
                                 case 0x08:
                                     //CURRENT DATA
-                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, currentDataBean.toString());
+//                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, currentDataBean.toString());
+                                    System.out.println("CURRENT DATA: "+datas);
                                     break;
 
                                 case 0x20:
                                     //RETURN HOURLY DATA
-                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, hourlyMeasureDataBean.toString());
-                                    System.out.println(datas);
+//                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+                                    System.out.println("HOURLY DATA: "+datas);
 
 
                                     /**
@@ -448,45 +449,48 @@ public class HomeActivity extends MainActivity {
                                      * DATOS DE LA MEDICIÓN CADA HORA
                                      *
                                      */
-                                    while (!medidaCorrecta) {
-//
-                                        if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
-                                                datas.get(10) == 0 || datas.get(11) == 0) {
-                                            Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN");
-                                            dialog.dismiss();
-                                            numeroIntentos++;
-                                            if (numeroIntentos < 3) {
-                                                dialog.dismiss();
-                                            } else {
-                                                numeroIntentos = 0;
-                                                medicionCorrecta = true;
-                                                ponerManilla = true;
-                                                Log.i(TAG, "POR FAVOR PONERSE LA MANILLA");
-                                            }
-                                        } else {
-                                            medicionCorrecta = true;
-                                            dialog.dismiss();
-                                        }
-                                    }
+//                                    while (!medidaCorrecta) {
+////
+//                                        if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
+//                                                datas.get(10) == 0 || datas.get(11) == 0) {
+//                                            Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN");
+//                                            dialog.dismiss();
+//                                            numeroIntentos++;
+//                                            if (numeroIntentos < 3) {
+//                                                dialog.dismiss();
+//                                            } else {
+//                                                numeroIntentos = 0;
+//                                                medicionCorrecta = true;
+//                                                ponerManilla = true;
+//                                                Log.i(TAG, "POR FAVOR PONERSE LA MANILLA");
+//                                            }
+//                                        } else {
+//                                            medicionCorrecta = true;
+//                                            dialog.dismiss();
+//                                        }
+//                                    }
 
 
                                     break;
                                 case 0x21:
                                     //BODY TEMPERATURE AND IMMUNITY DATA
-                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bodytempAndMianyiBean.toString());
+//                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, bodytempAndMianyiBean.toString());
+                                    System.out.println("BODY TEMPERATURE AND IMMUNITY: "+datas);
                                     break;
 
                                 case 0x13:
                                     //STAND-ALONE BODY TEMPERATURE MEASUREMENT
-                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bodyTempBean.toString());
+//                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, bodyTempBean.toString());
+                                    System.out.println("BODY TEMPERATURE MEASUREMENT: "+datas);
                                     break;
 
                                 case 0x18:
                                     //RETURN TO STAND-ALONE IMMUNITY MEASUREMENT
-                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, mianyiBean.toString());
+//                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, mianyiBean.toString());
+                                    System.out.println("IMMUNITY MEASUREMENT: "+datas);
                                     break;
 
                             }
@@ -495,9 +499,9 @@ public class HomeActivity extends MainActivity {
                             break;
                         case 0x52:
                             //SLEEP TIME RECORD
-                            SleepData sleepData = (SleepData) dataPasrse.parseData(datas);
-                            Log.i(TAG, sleepData.toString());
-
+//                            SleepData sleepData = (SleepData) dataPasrse.parseData(datas);
+//                            Log.i(TAG, sleepData.toString());
+                            System.out.println("SLEEP TIME RECORD: "+datas);
                             break;
 
                         case 0x31:
@@ -629,7 +633,7 @@ public class HomeActivity extends MainActivity {
                                      */
 
                                     if (presionAlta<80 || presionAlta>120 || presionBaja <60 || presionBaja>80){
-                                        System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg");
+                                        System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg)");
                                     }
                                     else{
                                         medidasCorrectas[2]=presionAlta;
