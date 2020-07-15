@@ -108,14 +108,14 @@ public class HomeActivity extends MainActivity {
 
         sharedPrefs = context.getSharedPreferences(ConfigGeneral.preference_file_key, Context.MODE_PRIVATE);
         storedJwtToken = sharedPrefs.getString(ConfigGeneral.TOKENSHARED, "");
-        userId = sharedPrefs.getInt("userId", 0);
-        userLogin = sharedPrefs.getString("login", "");
-        userFirstName = sharedPrefs.getString("firstName", "");
-        userLastName = sharedPrefs.getString("lastName", "");
-        userEmail = sharedPrefs.getString("email", "");
-        userActivated = sharedPrefs.getBoolean("activated", false);
-        userLangKey = sharedPrefs.getString("langKey", "");
-        userImageUrl = sharedPrefs.getString("imageUrl", "");
+        userId = sharedPrefs.getInt(ConfigGeneral.STOREDUSERID, 0);
+        userLogin = sharedPrefs.getString(ConfigGeneral.STOREDUSERLOGIN, "");
+        userFirstName = sharedPrefs.getString(ConfigGeneral.STOREDUSERFIRSTNAME, "");
+        userLastName = sharedPrefs.getString(ConfigGeneral.STOREDUSERLASTNAME, "");
+        userEmail = sharedPrefs.getString(ConfigGeneral.STOREDUSEREMAIL, "");
+        userActivated = sharedPrefs.getBoolean(ConfigGeneral.STOREDUSERACTIVATED, false);
+        userLangKey = sharedPrefs.getString(ConfigGeneral.STOREDUSERLANGKEY, "");
+        userImageUrl = sharedPrefs.getString(ConfigGeneral.STOREDUSERIMAGEURL, "");
 
         radioButtonHome = (RadioButton) findViewById(R.id.rb_home);
 

@@ -9,6 +9,15 @@ public class ConfigGeneral {
     public static final String TYPE = "application/json; charset=utf-8";
 
     public static  final String TOKENSHARED="storedJwtToken";
+    public static final String STOREDUSERID = "userId";
+    public static final String STOREDUSERLOGIN = "login";
+    public static final String STOREDUSERFIRSTNAME = "firstName";
+    public static final String STOREDUSERLASTNAME = "lastName";
+    public static final String STOREDUSEREMAIL = "email";
+    public static final String STOREDUSERACTIVATED = "activated";
+    public static final String STOREDUSERLANGKEY = "langKey";
+    public static final String STOREDUSERIMAGEURL = "imageUrl";
+
     public static  final String PUTEXTRASFISIOMETRIA= "fetchedPhysiometryData";
 
 
