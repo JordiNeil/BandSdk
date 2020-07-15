@@ -249,7 +249,7 @@
                 android:layout_margin="10dp"
                 android:paddingTop="15dp"
                 android:paddingBottom="15dp"
-                android:onClick="desconectarBluetooth">
+                >
 
                 <RelativeLayout
                     android:layout_width="match_parent"
