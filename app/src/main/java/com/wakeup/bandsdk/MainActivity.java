@@ -727,8 +727,18 @@ public class MainActivity extends AppCompatActivity {
     public void nivelBateria(ArrayList<Integer> datas){
         Log.i(TAG,"NIVEL DE BATERÍA: "+datas.get(7)+"%");
     }
+
+    public void desconectarBluetooth(View view){
+        mBluetoothLeService.disconnect();
+    }
+
+
     public void conectarBluetooth(){
         mBluetoothLeService.connect(address);
+    }
+
+    public void encontrarDispositivo(View view){
+        commandManager.vibrate();
     }
 
 
