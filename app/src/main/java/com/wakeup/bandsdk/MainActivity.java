@@ -249,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public boolean desconectadoPorUsuario=false;
+
     public void connect(View view) {
         conectarBluetooth();
         desconectadoPorUsuario=false;
@@ -730,6 +731,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void desconectarBluetooth(View view){
         desconectadoPorUsuario=true;
+        System.out.println("DESCONECTADO POR USUARIO");
         mBluetoothLeService.disconnect();
     }
 

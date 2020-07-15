@@ -330,6 +330,7 @@ public class HomeActivity extends MainActivity {
                             public void run() {
                                 if (!conectado) {
                                     conectarBluetooth();
+                                    System.out.println("REINTENTANDO CONEXIÓN");
                                 }
                             }
                         };
