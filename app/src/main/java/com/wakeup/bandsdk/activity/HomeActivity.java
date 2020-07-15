@@ -365,8 +365,10 @@ public class HomeActivity extends MainActivity {
 
 
                 if (datas.size() == 0) {
+
                     return;
                 }
+                System.out.println(datas);
 
                 if (datas.get(0) == 0xAB) {
                     switch (datas.get(4)) {
@@ -433,7 +435,7 @@ public class HomeActivity extends MainActivity {
                                     System.out.println("HOURLY DATA: " + datas);
                                     HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
                                     Log.i(TAG, hourlyMeasureDataBean.toString());
-                                    System.out.println(datas);
+                                    System.out.println("OXIGENO BAJADO DE CACHE"+hourlyMeasureDataBean.getBloodOxygen());
 
                                     /**
                                      *
