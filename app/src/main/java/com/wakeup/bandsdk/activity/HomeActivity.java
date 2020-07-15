@@ -265,12 +265,7 @@ public class HomeActivity extends MainActivity {
                      */
                     medirBateria();
 
-                    /**
-                     *
-                     * SINCRONIZACIÓN DE HORA
-                     *
-                     */
-                    sincronizarHora();
+
 
                     /**
                      *
@@ -279,8 +274,16 @@ public class HomeActivity extends MainActivity {
                      */
                     iniciarMedicionHora();
                 }
-                StatusConnection = true;
-                conectado = true;
+
+                /**
+                 *
+                 * SINCRONIZACIÓN DE HORA
+                 *
+                 */
+                sincronizarHora();
+
+                StatusConnection=true;
+                conectado=true;
 
                 /**
                  *
@@ -299,7 +302,9 @@ public class HomeActivity extends MainActivity {
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
-                conectado = false;
+
+                System.out.println("DESCONECTADO POR USUARIO= "+desconectadoPorUsuario);
+                conectado=false;
                 Timer timer;
                 timer = new Timer();
 
@@ -311,15 +316,19 @@ public class HomeActivity extends MainActivity {
                             public void run() {
                                 if (!conectado) {
                                     conectarBluetooth();
+                                    System.out.println("REINTENTANDO CONEXIÓN");
+                                    desconectadoPorUsuario=false;
                                 }
                             }
                         };
-                        timer.schedule(reintentarConexion, 0);
+                        if (!desconectadoPorUsuario) {
+                            timer.schedule(reintentarConexion, 0);
+                        }
                     }
                 };
-                if (!desconectadoPorUsuario) {
-                    timer.schedule(verificarConexion, 60000, 600000);
-                }
+
+                timer.schedule(verificarConexion, 60000, 600000);
+
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");

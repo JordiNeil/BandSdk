@@ -249,9 +249,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public boolean desconectadoPorUsuario=false;
+
     public void connect(View view) {
         conectarBluetooth();
-        desconectadoPorUsuario=false;
+//        System.out.println("DESCONECTADO POR USUARIO = FALSE");
         showDialog();
 
 
@@ -267,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
             final String action = intent.getAction();
             if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
-
+                desconectadoPorUsuario=false;
                 dialog.dismiss();
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 hideDialog();
@@ -730,11 +731,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void desconectarBluetooth(View view){
         desconectadoPorUsuario=true;
+        System.out.println("DESCONECTADO POR USUARIO");
         mBluetoothLeService.disconnect();
     }
 
 
     public void conectarBluetooth(){
+        desconectadoPorUsuario=false;
+        System.out.println("DESCONECTADO POR USUARIO=FALSE");
         mBluetoothLeService.connect(address);
     }
 

@@ -70,4 +70,7 @@
     <string name="alarma_titel" tools:ignore="MissingTranslation">Se activó la siguiente alarma: </string>
     <string name="alarma_desc" tools:ignore="MissingTranslation">Por favor siga este procedimiento: </string>
 
+    <string name="register_firstname" tools:ignore="MissingTranslation">Ingrese su nombre</string>
+    <string name="register_lastname" tools:ignore="MissingTranslation">Ingrese su apellido</string>
+
 </resources>

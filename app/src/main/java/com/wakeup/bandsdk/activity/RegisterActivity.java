@@ -34,8 +34,8 @@ import retrofit2.Response;
 public class RegisterActivity extends AppCompatActivity {
 
     private static final String TAG = RegisterActivity.class.getSimpleName();
-    TextInputLayout registerUsernameField, registerPasswordField, registerEmailField;
-    TextInputEditText registerUsernameInput, registerPasswordInput, registerEmailInput;
+    TextInputLayout registerUsernameField, registerPasswordField, registerEmailField, registerFirstNameField, registerLastNameField;
+    TextInputEditText registerUsernameInput, registerPasswordInput, registerEmailInput, registerFirstNameInput, registerLastNameInput;
     private Context context = this;
     private JsonObject newUserCredentials = new JsonObject();
 
@@ -48,10 +48,14 @@ public class RegisterActivity extends AppCompatActivity {
 
         registerUsernameField = findViewById(R.id.registerUsernameField);
         registerUsernameInput = findViewById(R.id.registerUsernameText);
-        registerPasswordField = findViewById(R.id.registerPasswordField);
-        registerPasswordInput = findViewById(R.id.registerPasswordText);
+        registerFirstNameField = findViewById(R.id.registerFirstNameField);
+        registerFirstNameInput = findViewById(R.id.registerFirstNameText);
+        registerLastNameField = findViewById(R.id.registerLastNameField);
+        registerLastNameInput = findViewById(R.id.registerLastNameText);
         registerEmailField = findViewById(R.id.registerEmailField);
         registerEmailInput = findViewById(R.id.registerEmailText);
+        registerPasswordField = findViewById(R.id.registerPasswordField);
+        registerPasswordInput = findViewById(R.id.registerPasswordText);
 
         registerUsernameInput.addTextChangedListener(new TextWatcher(){
             @Override
@@ -75,7 +79,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        registerPasswordInput.addTextChangedListener(new TextWatcher(){
+        registerFirstNameInput.addTextChangedListener(new TextWatcher(){
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -89,10 +93,32 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() > 0) {
-                    registerPasswordField.setErrorEnabled(false);
-                    newUserCredentials.addProperty("password", s.toString());
+                    registerFirstNameField.setErrorEnabled(false);
+                    newUserCredentials.addProperty("firstName", s.toString());
                 } else {
-                    registerPasswordField.setError("Este campo no debe estar vacío");
+                    registerFirstNameField.setError("Este campo no debe estar vacío");
+                }
+            }
+        });
+
+        registerLastNameInput.addTextChangedListener(new TextWatcher(){
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0) {
+                    registerLastNameField.setErrorEnabled(false);
+                    newUserCredentials.addProperty("lastName", s.toString());
+                } else {
+                    registerLastNameField.setError("Este campo no debe estar vacío");
                 }
             }
         });
@@ -115,6 +141,28 @@ public class RegisterActivity extends AppCompatActivity {
                     newUserCredentials.addProperty("email", s.toString());
                 } else {
                     registerEmailField.setError("Este campo no debe estar vacío");
+                }
+            }
+        });
+
+        registerPasswordInput.addTextChangedListener(new TextWatcher(){
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0) {
+                    registerPasswordField.setErrorEnabled(false);
+                    newUserCredentials.addProperty("password", s.toString());
+                } else {
+                    registerPasswordField.setError("Este campo no debe estar vacío");
                 }
             }
         });
