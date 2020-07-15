@@ -248,10 +248,10 @@ public class MainActivity extends AppCompatActivity {
             SPUtils.putString(MainActivity.this, SPUtils.ADDRESS, address);
         }
     }
-
+    public boolean desconectadoPorUsuario=false;
     public void connect(View view) {
         conectarBluetooth();
-
+        desconectadoPorUsuario=false;
         showDialog();
 
 
@@ -729,6 +729,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void desconectarBluetooth(View view){
+        desconectadoPorUsuario=true;
         mBluetoothLeService.disconnect();
     }
 

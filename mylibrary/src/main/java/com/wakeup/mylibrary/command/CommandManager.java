@@ -46,7 +46,7 @@ public class CommandManager {
         bytes[3] = (byte) 0xFF;
         bytes[4] = (byte) 0x71;
         bytes[5] = (byte) 0x80;
-        Log.i(TAG, "查找手环");
+//        Log.i(TAG, "查找手环");
         broadcastData(bytes);
     }
 

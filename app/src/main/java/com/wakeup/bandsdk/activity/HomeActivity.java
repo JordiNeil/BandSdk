@@ -258,6 +258,7 @@ public class HomeActivity extends MainActivity {
     public int numeroIntentos = 0;
     public boolean ponerManilla = false;
 
+
     public boolean conectado=false;
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -334,7 +335,9 @@ public class HomeActivity extends MainActivity {
                         timer.schedule(reintentarConexion, 0);
                     }
                 };
-                timer.schedule(verificarConexion, 60000, 600000);
+                if (!desconectadoPorUsuario) {
+                    timer.schedule(verificarConexion, 60000, 600000);
+                }
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
