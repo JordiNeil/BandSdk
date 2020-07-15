@@ -210,14 +210,14 @@ public class LoginActivity extends AppCompatActivity {
                     fetchedUserData.add(11, res.getLastModifiedDate());
 
                     // Storing necessary user data to shared preferences
-                    editor.putInt("userId", res.getId());
-                    editor.putString("login", res.getLogin());
-                    editor.putString("firstName", res.getFirstName());
-                    editor.putString("lastName", res.getLastName());
-                    editor.putString("email", res.getEmail());
-                    editor.putBoolean("activated", res.getActivated());
-                    editor.putString("langKey", res.getLangKey());
-                    editor.putString("imageUrl", res.getImageUrl());
+                    editor.putInt(ConfigGeneral.STOREDUSERID, res.getId());
+                    editor.putString(ConfigGeneral.STOREDUSERLOGIN, res.getLogin());
+                    editor.putString(ConfigGeneral.STOREDUSERFIRSTNAME, res.getFirstName());
+                    editor.putString(ConfigGeneral.STOREDUSERLASTNAME, res.getLastName());
+                    editor.putString(ConfigGeneral.STOREDUSEREMAIL, res.getEmail());
+                    editor.putBoolean(ConfigGeneral.STOREDUSERACTIVATED, res.getActivated());
+                    editor.putString(ConfigGeneral.STOREDUSERLANGKEY, res.getLangKey());
+                    editor.putString(ConfigGeneral.STOREDUSERIMAGEURL, res.getImageUrl());
                     editor.commit();
 
                     Intent homeIntent = new Intent(loginContext, HomeActivity.class);
