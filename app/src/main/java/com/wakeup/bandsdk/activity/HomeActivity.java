@@ -161,25 +161,7 @@ public class HomeActivity extends MainActivity {
 //            }
 //        });
         // Alert data
-        JsonObject alertData = new JsonObject();
-        alertData.addProperty("descripcion", "Test");
-        alertData.addProperty("procedimiento", "Test");
-        alertData.addProperty("timeInstant", utc.toString());
-        // User data
-        JsonObject userData = new JsonObject();
-        userData.addProperty("id", userId);
-        userData.addProperty("login", userLogin);
-        userData.addProperty("firstName", userFirstName);
-        userData.addProperty("lastName", userLastName);
-        userData.addProperty("email", userEmail);
-        userData.addProperty("imageUrl", userImageUrl);
-        userData.addProperty("activated", userActivated);
-        userData.addProperty("langKey", userLangKey);
-        userData.addProperty("resetDate", (String) null);
-        // Mixing alert data with user data
-        alertData.add("user", userData);
-//        createNewAlert(storedJwtToken, alertData);
-//        getLatestAlarmByUserId(storedJwtToken, 3);
+
     }
 
 
@@ -259,6 +241,7 @@ public class HomeActivity extends MainActivity {
     public int numeroIntentos = 0;
     public boolean ponerManilla = false;
 
+
     public boolean conectado=false;
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -335,7 +318,9 @@ public class HomeActivity extends MainActivity {
                         timer.schedule(reintentarConexion, 0);
                     }
                 };
-                timer.schedule(verificarConexion, 60000, 600000);
+                if (!desconectadoPorUsuario) {
+                    timer.schedule(verificarConexion, 60000, 600000);
+                }
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
@@ -611,6 +596,7 @@ public class HomeActivity extends MainActivity {
 
                                     if (ritmoCardiaco<60 || ritmoCardiaco>100){
                                         System.out.println("EL RITMO CARDIACO ESTÁ POR FUERA DE LOS RANGOS NORMALES (60 BPM - 100 BPM)");
+                                        dataAlarm(ConfigGeneral.DESC_RM,ConfigGeneral.TITLE_ALARM);
                                     }
                                     else{
                                         medidasCorrectas[0]=ritmoCardiaco;
@@ -623,6 +609,7 @@ public class HomeActivity extends MainActivity {
 
                                     if (oxigenoSangre<95){
                                         System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%)");
+                                        dataAlarm(ConfigGeneral.DESC_OXIME,ConfigGeneral.TITLE_ALARM);
                                     }
                                     else {
                                         medidasCorrectas[1]=oxigenoSangre;
@@ -633,7 +620,11 @@ public class HomeActivity extends MainActivity {
                                      */
 
                                     if (presionAlta<80 || presionAlta>120 || presionBaja <60 || presionBaja>80){
-                                        System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg)");
+
+                                        System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg");
+                                        dataAlarm(ConfigGeneral.DESC_PS,ConfigGeneral.TITLE_ALARM);
+
+
                                     }
                                     else{
                                         medidasCorrectas[2]=presionAlta;
@@ -651,13 +642,14 @@ public class HomeActivity extends MainActivity {
 
                                     if (temperatura<36 || temperatura > 37.2){
                                         System.out.println("LA TEMPERATURA ESTÁ POR FUERA DE LOS RANGOS NORMALES (36°C - 37.2°C)");
+                                        dataAlarm(ConfigGeneral.DES_TEMP,ConfigGeneral.TITLE_ALARM);
                                     }
                                     else{
                                         medidasCorrectas[5]=datas.get(11);
                                         medidasCorrectas[6]=datas.get(12);
                                     }
                                     mixUserAndPhysiometryData(datas);
-                                    System.out.println("nuevas medidas"+medidasCorrectas);
+                                   // System.out.println("nuevas medidas"+medidasCorrectas);
                                 }
                             }
                             break;
@@ -883,6 +875,28 @@ public class HomeActivity extends MainActivity {
                 System.out.println(t.getMessage());
             }
         });
+    }
+
+    public void dataAlarm(String descAlarm,String titleAlarm){
+        JsonObject alertData = new JsonObject();
+        alertData.addProperty("descripcion", descAlarm);
+        alertData.addProperty("procedimiento", titleAlarm);
+        alertData.addProperty("timeInstant", utc.toString());
+        // User data
+        JsonObject userData = new JsonObject();
+        userData.addProperty("id", userId);
+        userData.addProperty("login", userLogin);
+        userData.addProperty("firstName", userFirstName);
+        userData.addProperty("lastName", userLastName);
+        userData.addProperty("email", userEmail);
+        userData.addProperty("imageUrl", userImageUrl);
+        userData.addProperty("activated", userActivated);
+        userData.addProperty("langKey", userLangKey);
+        userData.addProperty("resetDate", (String) null);
+        // Mixing alert data with user data
+        alertData.add("user", userData);
+
+        createNewAlert(storedJwtToken, alertData);
     }
 
     public void createNewAlert(String jwtToken, JsonObject alarmData) {
