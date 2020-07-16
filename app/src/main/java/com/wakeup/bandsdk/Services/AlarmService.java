@@ -14,7 +14,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface AlarmService {
-    @GET("alarmas")
+    @GET("alarmas?size=1&sort=id,desc&")
     Call<List<AlarmData>> getAlarmData(@Header("Authorization") String api_token, @Query("userId.equals") int id);
 
     @POST("alarmas")

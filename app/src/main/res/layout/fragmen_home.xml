@@ -33,7 +33,7 @@
     <LinearLayout
 
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="40dp"
         android:background="@color/bg_common_green"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
@@ -44,11 +44,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-
             android:padding="3dp"
             android:textColor="@color/white"
-
-            android:textSize="20dp" />
+            android:textSize="10dp" />
 
 
     </LinearLayout>
@@ -83,7 +81,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="Ritmo Cardiaco"
+                    android:text="@string/Ritmo_Cardiaco"
                     android:textSize="15sp" />
 
                 <LinearLayout
@@ -127,7 +125,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="Presión Sanguinea"
+                    android:text="@string/Presión_Sanguinea"
                     android:textSize="15sp" />
 
                 <LinearLayout
@@ -181,7 +179,7 @@
                     android:gravity="center"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
-                    android:text="Oximetria"
+                    android:text="@string/Oximetria"
                     android:textSize="15sp" />
 
                 <LinearLayout
@@ -224,7 +222,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Temperatura"
+                    android:text="@string/Temperatura"
                     android:textSize="15sp" />
 
                 <LinearLayout
@@ -277,14 +275,17 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tv_desc_alarm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/alarma_titel" />
 
                 <TextView
+                    android:id="@+id/tv_title_alarm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/alarma_desc" />
+
 
             </LinearLayout>
 

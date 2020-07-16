@@ -210,6 +210,7 @@ public class LoginActivity extends AppCompatActivity {
                     fetchedUserData.add(11, res.getLastModifiedDate());
 
                     // Storing necessary user data to shared preferences
+                    //System.out.println("LOGIN--------------------------------++++++++++-----"+res.getLogin());
                     editor.putInt(ConfigGeneral.STOREDUSERID, res.getId());
                     editor.putString(ConfigGeneral.STOREDUSERLOGIN, res.getLogin());
                     editor.putString(ConfigGeneral.STOREDUSERFIRSTNAME, res.getFirstName());

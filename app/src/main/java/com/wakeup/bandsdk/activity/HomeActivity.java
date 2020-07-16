@@ -96,10 +96,10 @@ public class HomeActivity extends MainActivity {
     private ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
     Fragment fragmentHome = new HomeFragment();
     Bundle args = new Bundle();
-    View viewAlert,viewAlertReceived;
-    AlertDialog.Builder builder,builderReceived;
-    AlertDialog dialog,dialogReciver;
-    Boolean StatusConnection=false;
+    View viewAlert, viewAlertReceived;
+    AlertDialog.Builder builder, builderReceived;
+    AlertDialog dialog, dialogReciver;
+    Boolean StatusConnection = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,9 +137,9 @@ public class HomeActivity extends MainActivity {
         builderReceived.setView(viewAlertReceived);
         builderReceived.setCancelable(false);
         dialogReciver = builderReceived.create();
-        TextView txtMessage=viewAlertReceived.findViewById(R.id.messageAlert);
+        TextView txtMessage = viewAlertReceived.findViewById(R.id.messageAlert);
 
-        Button btnConnection=viewAlertReceived.findViewById(R.id.btn_acep);
+        Button btnConnection = viewAlertReceived.findViewById(R.id.btn_acep);
         btnConnection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -187,21 +187,20 @@ public class HomeActivity extends MainActivity {
 
     public synchronized void fragmentInfo(View view) {
 
-        if (StatusConnection){
+        if (StatusConnection) {
             dialog.show();
             meassure();
-        }
-        else {
+        } else {
             viewAlert = LayoutInflater.from(this).inflate(R.layout.alert_dialog_base, null);
             builder = new AlertDialog.Builder(this);
             builder.setView(viewAlert);
             builder.setCancelable(false);
             dialog = builder.create();
             dialog.show();
-            TextView txtMessage=viewAlert.findViewById(R.id.messageAlert);
+            TextView txtMessage = viewAlert.findViewById(R.id.messageAlert);
             txtMessage.setText(ConfigGeneral.SENDCONNECTION);
-            Button btncancelConnection=viewAlert.findViewById(R.id.btn_cancel);
-            Button btnConnection=viewAlert.findViewById(R.id.btn_Connection);
+            Button btncancelConnection = viewAlert.findViewById(R.id.btn_cancel);
+            Button btnConnection = viewAlert.findViewById(R.id.btn_Connection);
             btncancelConnection.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -242,7 +241,7 @@ public class HomeActivity extends MainActivity {
     public boolean ponerManilla = false;
 
 
-    public boolean conectado=false;
+    public boolean conectado = false;
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
@@ -275,6 +274,7 @@ public class HomeActivity extends MainActivity {
                      */
                     iniciarMedicionHora();
                 }
+
                 /**
                  *
                  * SINCRONIZACIÓN DE HORA
@@ -302,14 +302,15 @@ public class HomeActivity extends MainActivity {
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
+
                 System.out.println("DESCONECTADO POR USUARIO= "+desconectadoPorUsuario);
                 conectado=false;
                 Timer timer;
                 timer = new Timer();
 
-                TimerTask verificarConexion=new TimerTask() {
+                TimerTask verificarConexion = new TimerTask() {
                     @Override
-                    public void run(){
+                    public void run() {
                         TimerTask reintentarConexion = new TimerTask() {
                             @Override
                             public void run() {
@@ -337,25 +338,22 @@ public class HomeActivity extends MainActivity {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(System.currentTimeMillis());
-                if (calendar.get(Calendar.MINUTE) >=10 && calendar.get(Calendar.SECOND)>=10) {
+                if (calendar.get(Calendar.MINUTE) >= 10 && calendar.get(Calendar.SECOND) >= 10) {
                     Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
                             + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
                             (calendar.get(Calendar.MINUTE)) + ":" +
                             (calendar.get(Calendar.SECOND)));
-                }
-                else if (calendar.get(calendar.MINUTE)>=10 && calendar.get (Calendar.SECOND)<10) {
+                } else if (calendar.get(calendar.MINUTE) >= 10 && calendar.get(Calendar.SECOND) < 10) {
                     Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
                             + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
                             (calendar.get(Calendar.MINUTE)) + ":0" +
                             (calendar.get(Calendar.SECOND)));
-                }
-                else if (calendar.get(calendar.MINUTE)<10 && calendar.get (Calendar.SECOND)>=10) {
+                } else if (calendar.get(calendar.MINUTE) < 10 && calendar.get(Calendar.SECOND) >= 10) {
                     Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
                             + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":0" +
                             (calendar.get(Calendar.MINUTE)) + ":" +
                             (calendar.get(Calendar.SECOND)));
-                }
-                else{
+                } else {
                     {
                         Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
                                 + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":0" +
@@ -367,8 +365,10 @@ public class HomeActivity extends MainActivity {
 
 
                 if (datas.size() == 0) {
+
                     return;
                 }
+                System.out.println(datas);
 
                 if (datas.get(0) == 0xAB) {
                     switch (datas.get(4)) {
@@ -426,15 +426,16 @@ public class HomeActivity extends MainActivity {
                                     //CURRENT DATA
 //                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
 //                                    Log.i(TAG, currentDataBean.toString());
-                                    System.out.println("CURRENT DATA: "+datas);
+                                    System.out.println("CURRENT DATA: " + datas);
                                     break;
 
                                 case 0x20:
                                     //RETURN HOURLY DATA
-//                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-//                                    Log.i(TAG, hourlyMeasureDataBean.toString());
-                                    System.out.println("HOURLY DATA: "+datas);
-
+//
+                                    System.out.println("HOURLY DATA: " + datas);
+                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+                                    System.out.println("OXIGENO BAJADO DE CACHE"+hourlyMeasureDataBean.getBloodOxygen());
 
                                     /**
                                      *
@@ -468,21 +469,21 @@ public class HomeActivity extends MainActivity {
                                     //BODY TEMPERATURE AND IMMUNITY DATA
 //                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean) dataPasrse.parseData(datas);
 //                                    Log.i(TAG, bodytempAndMianyiBean.toString());
-                                    System.out.println("BODY TEMPERATURE AND IMMUNITY: "+datas);
+                                    System.out.println("BODY TEMPERATURE AND IMMUNITY: " + datas);
                                     break;
 
                                 case 0x13:
                                     //STAND-ALONE BODY TEMPERATURE MEASUREMENT
 //                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
 //                                    Log.i(TAG, bodyTempBean.toString());
-                                    System.out.println("BODY TEMPERATURE MEASUREMENT: "+datas);
+                                    System.out.println("BODY TEMPERATURE MEASUREMENT: " + datas);
                                     break;
 
                                 case 0x18:
                                     //RETURN TO STAND-ALONE IMMUNITY MEASUREMENT
 //                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
 //                                    Log.i(TAG, mianyiBean.toString());
-                                    System.out.println("IMMUNITY MEASUREMENT: "+datas);
+                                    System.out.println("IMMUNITY MEASUREMENT: " + datas);
                                     break;
 
                             }
@@ -493,7 +494,7 @@ public class HomeActivity extends MainActivity {
                             //SLEEP TIME RECORD
 //                            SleepData sleepData = (SleepData) dataPasrse.parseData(datas);
 //                            Log.i(TAG, sleepData.toString());
-                            System.out.println("SLEEP TIME RECORD: "+datas);
+                            System.out.println("SLEEP TIME RECORD: " + datas);
                             break;
 
                         case 0x31:
@@ -583,17 +584,17 @@ public class HomeActivity extends MainActivity {
                                     medicionCorrecta = true;
                                     dialog.dismiss();
 
-                                    int ritmoCardiaco=datas.get(6);
-                                    int oxigenoSangre=datas.get(7);
-                                    int presionAlta=datas.get(8);
-                                    int presionBaja=datas.get(9);
-                                    double temperatura=datas.get(11)+datas.get(12)*Math.pow(10,-2);
+                                    int ritmoCardiaco = datas.get(6);
+                                    int oxigenoSangre = datas.get(7);
+                                    int presionAlta = datas.get(8);
+                                    int presionBaja = datas.get(9);
+                                    double temperatura = datas.get(11) + datas.get(12) * Math.pow(10, -2);
 
-                                    int []medidasCorrectas=new int[7];
+                                    int[] medidasCorrectas = new int[7];
 
 
-                                    for (int i=0;i<medidasCorrectas.length;i++){
-                                        medidasCorrectas[i]=0;
+                                    for (int i = 0; i < medidasCorrectas.length; i++) {
+                                        medidasCorrectas[i] = 0;
                                     }
 
                                     /**
@@ -601,12 +602,11 @@ public class HomeActivity extends MainActivity {
                                      *
                                      */
 
-                                    if (ritmoCardiaco<60 || ritmoCardiaco>100){
+                                    if (ritmoCardiaco < 60 || ritmoCardiaco > 100) {
                                         System.out.println("EL RITMO CARDIACO ESTÁ POR FUERA DE LOS RANGOS NORMALES (60 BPM - 100 BPM)");
-                                        dataAlarm(ConfigGeneral.DESC_RM,ConfigGeneral.TITLE_ALARM);
-                                    }
-                                    else{
-                                        medidasCorrectas[0]=ritmoCardiaco;
+                                        dataAlarm(ConfigGeneral.DESC_RM, ConfigGeneral.TITLE_ALARM);
+                                    } else {
+                                        medidasCorrectas[0] = ritmoCardiaco;
                                     }
 
                                     /**
@@ -614,49 +614,46 @@ public class HomeActivity extends MainActivity {
                                      * VALIDACIÓN DE NIVEL DE OXÍGENO
                                      */
 
-                                    if (oxigenoSangre<95){
+                                    if (oxigenoSangre < 95) {
                                         System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%)");
-                                        dataAlarm(ConfigGeneral.DESC_OXIME,ConfigGeneral.TITLE_ALARM);
-                                    }
-                                    else {
-                                        medidasCorrectas[1]=oxigenoSangre;
+                                        dataAlarm(ConfigGeneral.DESC_OXIME, ConfigGeneral.TITLE_ALARM);
+                                    } else {
+                                        medidasCorrectas[1] = oxigenoSangre;
                                     }
 
                                     /**
                                      * VALIDACIÓN DE PRESIÓN SANGUÍNEA
                                      */
 
-                                    if (presionAlta<80 || presionAlta>120 || presionBaja <60 || presionBaja>80){
+                                    if (presionAlta < 80 || presionAlta > 120 || presionBaja < 60 || presionBaja > 80) {
 
                                         System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg");
-                                        dataAlarm(ConfigGeneral.DESC_PS,ConfigGeneral.TITLE_ALARM);
+                                        dataAlarm(ConfigGeneral.DESC_PS, ConfigGeneral.TITLE_ALARM);
 
 
-                                    }
-                                    else{
-                                        medidasCorrectas[2]=presionAlta;
-                                        medidasCorrectas[3]=presionBaja;
+                                    } else {
+                                        medidasCorrectas[2] = presionAlta;
+                                        medidasCorrectas[3] = presionBaja;
                                     }
 
                                     /**
                                      * VALIDACIÓN INMUNE
                                      */
-                                    medidasCorrectas[4]=datas.get(10);
+                                    medidasCorrectas[4] = datas.get(10);
 
                                     /**
                                      * VALIDACIÓN DE TEMPERATURA
                                      */
 
-                                    if (temperatura<36 || temperatura > 37.2){
+                                    if (temperatura < 36 || temperatura > 37.2) {
                                         System.out.println("LA TEMPERATURA ESTÁ POR FUERA DE LOS RANGOS NORMALES (36°C - 37.2°C)");
-                                        dataAlarm(ConfigGeneral.DES_TEMP,ConfigGeneral.TITLE_ALARM);
-                                    }
-                                    else{
-                                        medidasCorrectas[5]=datas.get(11);
-                                        medidasCorrectas[6]=datas.get(12);
+                                        dataAlarm(ConfigGeneral.DES_TEMP, ConfigGeneral.TITLE_ALARM);
+                                    } else {
+                                        medidasCorrectas[5] = datas.get(11);
+                                        medidasCorrectas[6] = datas.get(12);
                                     }
                                     mixUserAndPhysiometryData(datas);
-                                   // System.out.println("nuevas medidas"+medidasCorrectas);
+                                    // System.out.println("nuevas medidas"+medidasCorrectas);
                                 }
                             }
                             break;
@@ -825,9 +822,6 @@ public class HomeActivity extends MainActivity {
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
 
 
-
-
-
     public void mixUserAndPhysiometryData(ArrayList<Integer> measuredPhysiometryData) {
 //      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
         ArrayList<Object> fetchedUserData;
@@ -840,7 +834,7 @@ public class HomeActivity extends MainActivity {
             physiometryData.addProperty("oximetria", measuredPhysiometryData.get(7));
             physiometryData.addProperty("presionArterialSistolica", measuredPhysiometryData.get(8));
             physiometryData.addProperty("presionArterialDiastolica", measuredPhysiometryData.get(9));
-            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(11)+"."+measuredPhysiometryData.get(12));
+            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(11) + "." + measuredPhysiometryData.get(12));
             physiometryData.addProperty("fechaRegistro", utc.toString());
             physiometryData.addProperty("fechaToma", utc.toString());
             // Defining userData object to store the user data from login activity
@@ -884,7 +878,7 @@ public class HomeActivity extends MainActivity {
         });
     }
 
-    public void dataAlarm(String descAlarm,String titleAlarm){
+    public void dataAlarm(String descAlarm, String titleAlarm) {
         JsonObject alertData = new JsonObject();
         alertData.addProperty("descripcion", descAlarm);
         alertData.addProperty("procedimiento", titleAlarm);
@@ -925,31 +919,6 @@ public class HomeActivity extends MainActivity {
         });
     }
 
-    public void getLatestAlarmByUserId(String jwtToken, Integer userId) {
-        AlarmService alarm = ConfigGeneral.retrofit.create(AlarmService.class);
-        final Call<List<AlarmData>> response = alarm.getAlarmData("Bearer " + jwtToken, userId);
-
-        response.enqueue(new Callback<List<AlarmData>>() {
-            @Override
-            public void onResponse(Call<List<AlarmData>> call, Response<List<AlarmData>> response) {
-                if (response.isSuccessful()) {
-                    Log.d(TAG, "Alarms by userId response: " + response.body());
-                    List<AlarmData> alarmDataList = response.body();
-                    ArrayList<Object> fetchedAlarmData = new ArrayList<>();
-                    fetchedAlarmData.add(0, alarmDataList.get(alarmDataList.size() - 1).getId());
-                    fetchedAlarmData.add(1, alarmDataList.get(alarmDataList.size() - 1).getDescripcion());
-                    fetchedAlarmData.add(2, alarmDataList.get(alarmDataList.size() - 1).getProcedimiento());
-                    fetchedAlarmData.add(3, alarmDataList.get(alarmDataList.size() - 1).getTimeInstant());
-                    System.out.println(fetchedAlarmData);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<AlarmData>> call, Throwable t) {
-                Log.d(TAG, "Alarms by userId onFailure: " + t.getMessage());
-            }
-        });
-    }
 
     @Override
     protected void onResume() {
