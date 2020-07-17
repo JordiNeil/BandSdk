@@ -515,6 +515,7 @@ public class HomeActivity extends MainActivity {
                                     }
 
                                     contadorData++;
+                                    mixUserAndPhysiometryDataHor(dataMedida);
 
                                     System.out.println("DATOSSS PARA GUARDAR"+dataMedida);
 
@@ -679,8 +680,8 @@ public class HomeActivity extends MainActivity {
                         case 0x32:
                             //ONE-CLICK MEASUREMENT
 //                            OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);}
-                            args.putIntegerArrayList("DataMeasure", datas);
-                            fragmentHome.setArguments(args);
+                           // args.putIntegerArrayList("DataMeasure", datas);
+//                            fragmentHome.setArguments(args);
                             System.out.println("-----------" + datas);
 
                             System.out.println("---------" + datas);
@@ -990,19 +991,28 @@ public class HomeActivity extends MainActivity {
 
     public void mixUserAndPhysiometryDataHor(List<int[]> measuredPhysiometryData) {
 //      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
+
+
+
         ArrayList<Object> fetchedUserData;
         fetchedUserData = getIntent().hasExtra("fetchedUserData") ? (ArrayList<Object>) getIntent().getSerializableExtra("fetchedUserData") : null;
 
         if (fetchedUserData != null) {
             // Defining Physiometry object and adding data to it
             JsonObject physiometryData = new JsonObject();
-            physiometryData.addProperty("ritmoCardiaco", String.valueOf(measuredPhysiometryData.get(0)));
-            physiometryData.addProperty("oximetria", String.valueOf(measuredPhysiometryData.get(7)));
-            physiometryData.addProperty("presionArterialSistolica", String.valueOf(measuredPhysiometryData.get(8)));
-            physiometryData.addProperty("presionArterialDiastolica", String.valueOf(measuredPhysiometryData.get(9)));
-            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(11) + "." + measuredPhysiometryData.get(12));
+            physiometryData.addProperty("ritmoCardiaco", String.valueOf(measuredPhysiometryData.get(9)));
+            physiometryData.addProperty("oximetria", String.valueOf(measuredPhysiometryData.get(10)));
+            physiometryData.addProperty("presionArterialSistolica", String.valueOf(measuredPhysiometryData.get(11)));
+            physiometryData.addProperty("presionArterialDiastolica", String.valueOf(measuredPhysiometryData.get(12)));
+            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(5) + "." + measuredPhysiometryData.get(6));
             physiometryData.addProperty("fechaRegistro", utc.toString());
-            physiometryData.addProperty("fechaToma", utc.toString());
+            //2020-07-17T05:00:00.000Z
+            Calendar calendarioh=Calendar.getInstance();
+            calendarioh.setTimeInMillis(measuredPhysiometryData.get(4).length);
+
+            int minuteh=calendarioh.get(Calendar.MINUTE);
+            int secondh=Math.round(calendarioh.get(Calendar.SECOND));
+            physiometryData.addProperty("fechaToma", (measuredPhysiometryData.get(0)+"-"+measuredPhysiometryData.get(1)+"-"+measuredPhysiometryData.get(2)+"T"+ measuredPhysiometryData.get(3)+":"+minuteh+":"+secondh+"Z"));
             // Defining userData object to store the user data from login activity
             JsonObject userData = new JsonObject();
             userData.addProperty("id", (Number) fetchedUserData.get(0));
