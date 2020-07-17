@@ -67,7 +67,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1;
@@ -250,7 +249,8 @@ public class MainActivity extends AppCompatActivity {
             SPUtils.putString(MainActivity.this, SPUtils.ADDRESS, address);
         }
     }
-    public boolean desconectadoPorUsuario=false;
+
+    public boolean desconectadoPorUsuario = false;
 
     public void connect(View view) {
         conectarBluetooth();
@@ -270,12 +270,13 @@ public class MainActivity extends AppCompatActivity {
             final String action = intent.getAction();
             if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
-                desconectadoPorUsuario=false;
+                desconectadoPorUsuario = false;
+
                 dialog.dismiss();
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 hideDialog();
-
                 tv_connect_state.setText("Desconectado");
+                imgConecct.setBackgroundResource(R.drawable.band_unconnect);
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
@@ -654,7 +655,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void sincronizarHora(){
+    public void sincronizarHora() {
         Timer timer;
         timer = new Timer();
 
@@ -677,12 +678,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-        timer.schedule(syncTime,5000);
+        timer.schedule(syncTime, 5000);
 
-        Log.i(TAG,"SINCRONIZACIÓN DE TIEMPO");
+        Log.i(TAG, "SINCRONIZACIÓN DE TIEMPO");
     }
 
-    public void iniciarMedicionHora(){
+    public void iniciarMedicionHora() {
 
         Timer timer;
         timer = new Timer();
@@ -690,14 +691,13 @@ public class MainActivity extends AppCompatActivity {
         TimerTask openMeasure = new TimerTask() {
             @Override
             public void run() {
-                commandManager.openHourlyMeasure(1);;
+                commandManager.openHourlyMeasure(1);
+                ;
             }
         };
-        timer.schedule(openMeasure,5000);
+        timer.schedule(openMeasure, 5000);
 
-        Log.i(TAG,"INICIO MEDICIÓN POR HORA");
-
-
+        Log.i(TAG, "INICIO MEDICIÓN POR HORA");
 
 
         TimerTask hourMeasure = new TimerTask() {
@@ -721,16 +721,16 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar2 = Calendar.getInstance();
 
 
-        calendar2.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DATE),calendar.get(Calendar.HOUR_OF_DAY)+1,1,0);
-        System.out.println("CALENDAR: "+calendar.get(Calendar.YEAR)+"/"+calendar.get(Calendar.DATE)+"/"+calendar.get(Calendar.DATE)+" "+calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE)+":"+calendar.get(Calendar.SECOND));
-        System.out.println("CALENDAR2: "+calendar2.get(Calendar.YEAR)+"/"+calendar2.get(Calendar.MONTH)+"/"+calendar2.get(Calendar.DATE)+" "+calendar2.get(Calendar.HOUR_OF_DAY)+":"+calendar2.get(Calendar.MINUTE)+":"+calendar2.get(Calendar.SECOND));
+        calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), calendar.get(Calendar.HOUR_OF_DAY) + 1, 1, 0);
+        System.out.println("CALENDAR: " + calendar.get(Calendar.YEAR) + "/" + calendar.get(Calendar.DATE) + "/" + calendar.get(Calendar.DATE) + " " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND));
+        System.out.println("CALENDAR2: " + calendar2.get(Calendar.YEAR) + "/" + calendar2.get(Calendar.MONTH) + "/" + calendar2.get(Calendar.DATE) + " " + calendar2.get(Calendar.HOUR_OF_DAY) + ":" + calendar2.get(Calendar.MINUTE) + ":" + calendar2.get(Calendar.SECOND));
 
-        long delta=Math.abs(calendar2.getTimeInMillis()-calendar.getTimeInMillis());
+        long delta = Math.abs(calendar2.getTimeInMillis() - calendar.getTimeInMillis());
 
-        System.out.println("HOURLY MEASURE IN "+Math.round(delta/60000)+" MIN");
+        System.out.println("HOURLY MEASURE IN " + Math.round(delta / 60000) + " MIN");
 
 //        timer.schedule(hourMeasure,delta,3600000);
-        timer.schedule(finishHourMeasure,delta,3600000);
+        timer.schedule(finishHourMeasure, delta, 3600000);
 
 //
 
@@ -738,25 +738,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-    public void nivelBateria(ArrayList<Integer> datas){
-        Log.i(TAG,"NIVEL DE BATERÍA: "+datas.get(7)+"%");
+    public void nivelBateria(ArrayList<Integer> datas) {
+        Log.i(TAG, "NIVEL DE BATERÍA: " + datas.get(7) + "%");
     }
 
-    public void desconectarBluetooth(View view){
-        desconectadoPorUsuario=true;
+    public void desconectarBluetooth(View view) {
+        desconectadoPorUsuario = true;
         System.out.println("DESCONECTADO POR USUARIO");
         mBluetoothLeService.disconnect();
     }
 
 
-    public void conectarBluetooth(){
-        desconectadoPorUsuario=false;
+    public void conectarBluetooth() {
+        desconectadoPorUsuario = false;
         System.out.println("DESCONECTADO POR USUARIO=FALSE");
         mBluetoothLeService.connect(address);
     }
 
-    public void encontrarDispositivo(View view){
+    public void encontrarDispositivo(View view) {
         commandManager.vibrate();
     }
 
@@ -770,49 +769,50 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     *
-     * @param n NUEVO TAMAÑO DEL VECTOR
+     * @param n       NUEVO TAMAÑO DEL VECTOR
      * @param arreglo ARREGLO AL CUAL SE LE VA A ADICIONAR EL SUBARREGLO AGREGAR
      * @param agregar SUBARREGLO A AGREGAR
      * @return RETORNA EL AERREGLO CON LA ADICIÓN
      */
-    public int[][] redimensionarArreglo(int n, int [][]arreglo, int []agregar){
-        int [][]nuevoArreglo=new int[n+1][14];
+    public int[][] redimensionarArreglo(int n, int[][] arreglo, int[] agregar) {
+        int[][] nuevoArreglo = new int[n + 1][14];
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < 14; j++) {
                 try {
                     nuevoArreglo[i][j] = arreglo[i][j];
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     System.out.println(e);
                 }
             }
         }
 
-        for (int k=0;k<14;k++){
-            nuevoArreglo[n][k]=agregar[k];
+        for (int k = 0; k < 14; k++) {
+            nuevoArreglo[n][k] = agregar[k];
         }
         return nuevoArreglo;
     }
 
     /**
-     *
      * @param arreglo SE ELIMINA EL CACHE DE LA MANILLA Y SE MUESTRAN LOS DATOS QUE SE TRAEN
      */
-    public void mostrarDataBorrarCache(List arreglo){
+
+    public void mostrarDataBorrarCache(List arreglo) {
         commandManager.clearData();
 
-        int n=arreglo.size();
-        for (int i=0;i<n;i++){
-            int [] objetos=(int[]) arreglo.get(i);
-            String texto="";
-            for (int elemento:objetos){
-                texto=texto+","+elemento;
+        int n = arreglo.size();
+        for (int i = 0; i < n; i++) {
+            int[] objetos = (int[]) arreglo.get(i);
+            String texto = "";
+            for (int elemento : objetos) {
+            for (int elemento : objetos) {
+                texto = texto + "," + elemento;
+
             }
             System.out.println(texto);
         }
-        System.out.println(n);;
+        System.out.println(n);
+        ;
     }
 
 }
