@@ -801,7 +801,7 @@ public class MainActivity extends AppCompatActivity {
      * @param arreglo SE ELIMINA EL CACHE DE LA MANILLA Y SE MUESTRAN LOS DATOS QUE SE TRAEN
      */
     public void mostrarDataBorrarCache(List arreglo){
-//        commandManager.clearData();
+        commandManager.clearData();
 
         int n=arreglo.size();
         for (int i=0;i<n;i++){
