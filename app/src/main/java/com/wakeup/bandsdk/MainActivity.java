@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.app.AlertDialog.Builder;
 import android.util.Log;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,6 +65,7 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.Timer;
 import java.util.TimerTask;
+
 
 
 public class MainActivity extends AppCompatActivity {
@@ -660,7 +662,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 commandManager.setTimeSync();
-                commandManager.syncData(System.currentTimeMillis());
+//                commandManager.syncData(0);
+//                commandManager.syncDataHr(30000,30000);
+                if (Config.hasContinuousHeart) {
+                    Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
+
+                    commandManager.syncDataHr(System.currentTimeMillis() - 7 * 24 * 3600 * 1000,
+                            System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
+
+                } else {
+                    //不带连续心率的手环的同步数据的方式
+                    commandManager.syncData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
+
+                }
             }
         };
         timer.schedule(syncTime,5000);
@@ -753,6 +767,52 @@ public class MainActivity extends AppCompatActivity {
 
     public void showDialog() {
         dialog.show();
+    }
+
+    /**
+     *
+     * @param n NUEVO TAMAÑO DEL VECTOR
+     * @param arreglo ARREGLO AL CUAL SE LE VA A ADICIONAR EL SUBARREGLO AGREGAR
+     * @param agregar SUBARREGLO A AGREGAR
+     * @return RETORNA EL AERREGLO CON LA ADICIÓN
+     */
+    public int[][] redimensionarArreglo(int n, int [][]arreglo, int []agregar){
+        int [][]nuevoArreglo=new int[n+1][14];
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < 14; j++) {
+                try {
+                    nuevoArreglo[i][j] = arreglo[i][j];
+                }
+                catch (Exception e){
+                    System.out.println(e);
+                }
+            }
+        }
+
+        for (int k=0;k<14;k++){
+            nuevoArreglo[n][k]=agregar[k];
+        }
+        return nuevoArreglo;
+    }
+
+    /**
+     *
+     * @param arreglo SE ELIMINA EL CACHE DE LA MANILLA Y SE MUESTRAN LOS DATOS QUE SE TRAEN
+     */
+    public void mostrarDataBorrarCache(List arreglo){
+//        commandManager.clearData();
+
+        int n=arreglo.size();
+        for (int i=0;i<n;i++){
+            int [] objetos=(int[]) arreglo.get(i);
+            String texto="";
+            for (int elemento:objetos){
+                texto=texto+","+elemento;
+            }
+            System.out.println(texto);
+        }
+        System.out.println(n);;
     }
 
 }
