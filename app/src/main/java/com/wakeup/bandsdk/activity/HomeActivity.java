@@ -991,6 +991,7 @@ public class HomeActivity extends MainActivity {
 
     public void mixUserAndPhysiometryDataHor(List<int[]> measuredPhysiometryData) {
 //      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
+        System.out.println(measuredPhysiometryData);
 
 
 

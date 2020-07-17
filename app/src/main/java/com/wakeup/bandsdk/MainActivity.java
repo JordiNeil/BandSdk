@@ -798,14 +798,14 @@ public class MainActivity extends AppCompatActivity {
      */
 
     public void mostrarDataBorrarCache(List arreglo) {
-        commandManager.clearData();
+//        commandManager.clearData();
 
         int n = arreglo.size();
         for (int i = 0; i < n; i++) {
             int[] objetos = (int[]) arreglo.get(i);
             String texto = "";
             for (int elemento : objetos) {
-            for (int elemento : objetos) {
+
                 texto = texto + "," + elemento;
 
             }
@@ -814,6 +814,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(n);
         ;
     }
+
 
 }
 
