@@ -23,11 +23,13 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.wakeup.bandsdk.MainActivity;
 import com.wakeup.bandsdk.Pojos.Alarms.AlarmData;
 import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
 import com.wakeup.bandsdk.R;
 import com.wakeup.bandsdk.Services.AlarmService;
 import com.wakeup.bandsdk.Services.ServiceFisiometria;
+import com.wakeup.bandsdk.activity.FisiometriaUserActivity;
 import com.wakeup.bandsdk.activity.HomeActivity;
 import com.wakeup.bandsdk.configVar.ConfigGeneral;
 
@@ -54,10 +56,11 @@ public class HomeFragment extends Fragment {
     String ritmoCar;
     String dateRegister;
     ArrayList<Integer> a;
-    TextView rl_heart_rate;
+    TextView tx_heart_rate;
     String storedJwtToken;
     Integer userId;
     ScrollView scroll_alarma;
+    LinearLayout rl_heart_rate;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -124,7 +127,7 @@ public class HomeFragment extends Fragment {
                         tv_blood_pressureFragment.setText(presS);
                         tv_heart_rateFragment.setText(ritmoCar);
 
-                        rl_heart_rate.setText(dateRegister);
+                        tx_heart_rate.setText(dateRegister);
                     }
                 }
 
@@ -183,7 +186,8 @@ public class HomeFragment extends Fragment {
         userId = sharedPrefs.getInt(ConfigGeneral.STOREDUSERID, 0);
         // Inflate the layout for this fragment
         View fragmentViewHome = inflater.inflate(R.layout.fragmen_home, container, false);
-        rl_heart_rate = fragmentViewHome.findViewById(R.id.show_data);
+        tx_heart_rate = fragmentViewHome.findViewById(R.id.show_data);
+        rl_heart_rate=fragmentViewHome.findViewById(R.id.rl_heart_rate);
 
         tv_tiredFragment = fragmentViewHome.findViewById(R.id.tv_tired);
         //tv_tiredFragment.setText(temp);
@@ -200,7 +204,22 @@ public class HomeFragment extends Fragment {
         getPhysiometryDataById();
         getLatestAlarmByUserId();
 
+        rl_heart_rate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getInformationFisiometria();
+            }
+        });
+
         return fragmentViewHome;
+
+    }
+
+
+    public void getInformationFisiometria(){
+        System.out.println("cambio");
+        Intent intent = new Intent(getActivity(), FisiometriaUserActivity.class);
+        startActivity(intent);
 
     }
 

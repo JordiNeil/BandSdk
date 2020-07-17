@@ -51,20 +51,17 @@
     <string name="conectarDespositivo" tools:ignore="MissingTranslation"> Conectar Dispositivo</string>
 
 
-
-    <string name="login" tools:ignore="MissingTranslation" >Registrar</string>
-    <string name="measure_recently" tools:ignore="MissingTranslation" >Última medición</string>
-    <string name="search_device" tools:ignore="MissingTranslation" >Encontrar dispositivo</string>
-    <string name="disconnect_device" tools:ignore="MissingTranslation" >Desconectar dispositivo</string>
-    <string name="unbonded_device" tools:ignore="MissingTranslation" >Desvincular dispositivo</string>
-
+    <string name="login" tools:ignore="MissingTranslation">Registrar</string>
+    <string name="measure_recently" tools:ignore="MissingTranslation">Última medición</string>
+    <string name="search_device" tools:ignore="MissingTranslation">Encontrar dispositivo</string>
+    <string name="disconnect_device" tools:ignore="MissingTranslation">Desconectar dispositivo</string>
+    <string name="unbonded_device" tools:ignore="MissingTranslation">Desvincular dispositivo</string>
 
 
-    <string name="Presión_Sanguinea" tools:ignore="MissingTranslation" >Presión Sanguínea</string>
-    <string name="Ritmo_Cardiaco" tools:ignore="MissingTranslation" >Ritmo Cardíaco</string>
-    <string name="Oximetria" tools:ignore="MissingTranslation" >Oximetría</string>
-    <string name="Temperatura" tools:ignore="MissingTranslation" >Temperatura</string>
-
+    <string name="Presión_Sanguinea" tools:ignore="MissingTranslation">Presión Sanguínea</string>
+    <string name="Ritmo_Cardiaco" tools:ignore="MissingTranslation">Ritmo Cardíaco</string>
+    <string name="Oximetria" tools:ignore="MissingTranslation">Oximetría</string>
+    <string name="Temperatura" tools:ignore="MissingTranslation">Temperatura</string>
 
 
     <string name="alarma_titel" tools:ignore="MissingTranslation">Se activó la siguiente alarma: </string>

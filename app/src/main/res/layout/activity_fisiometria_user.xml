@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.HomeActivity">
+
+
+
+
+
+    <LinearLayout
+        android:id="@+id/rg_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="false"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@color/line_color" />
+
+        <RadioGroup
+            android:id="@+id/rg"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_centerInParent="true"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_ritmo_cardiaco"
+                style="@style/rg_bc_style"
+                android:padding="10dp"
+
+                android:drawableTop="@drawable/heart_rate_36"
+
+                android:onClick="fragmentHome"
+                />
+
+            <RadioButton
+                android:id="@+id/rb_oximetria"
+                style="@style/rg_bc_style"
+                android:padding="10dp"
+                android:drawableTop="@drawable/blood_oxygen_48"
+                android:onClick="fragmentInfo"
+                />
+
+            <RadioButton
+                android:id="@+id/rb_presion_sanguinea"
+                android:padding="10dp"
+                style="@style/rg_bc_style"
+                android:drawableTop="@drawable/blood_pressure_48"
+                android:onClick="fragmentUser"
+                />
+            <RadioButton
+                android:id="@+id/rb_temperatura"
+                style="@style/rg_bc_style"
+                android:padding="10dp"
+                android:drawableTop="@drawable/termometro_36"
+                android:onClick="fragmentUser"
+                />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true">
+
+        <ImageView
+            android:id="@+id/iv_guide"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY" />
+    </FrameLayout>
+
+</RelativeLayout>
