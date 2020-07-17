@@ -59,6 +59,7 @@ import com.wakeup.mylibrary.command.CommandManager;
 import com.wakeup.mylibrary.data.DataParse;
 import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
+import com.wakeup.mylibrary.utils.DateUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
 import java.time.ZoneOffset;
@@ -240,8 +241,13 @@ public class HomeActivity extends MainActivity {
     public int numeroIntentos = 0;
     public boolean ponerManilla = false;
 
-
     public boolean conectado = false;
+
+
+    public List<int[]> dataCache =new ArrayList<int[]>();
+    public List<int[]> dataMedida =new ArrayList<int[]>();
+    public int contadorTemperatura=0;
+    public int contadorData=0;
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
@@ -287,17 +293,19 @@ public class HomeActivity extends MainActivity {
 
                 /**
                  *
-                 * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+                 * MOSTRAR DATA DEL CACHE
                  **/
                 Timer timer;
                 timer = new Timer();
 
-                TimerTask batteryInfo = new TimerTask() {
+                TimerTask borrarCache = new TimerTask() {
                     @Override
                     public void run() {
-//                        commandManager.getBatteryInfo();
+                        mostrarDataBorrarCache(dataMedida);
                     }
                 };
+
+                timer.schedule(borrarCache,30000);
 
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
@@ -368,7 +376,7 @@ public class HomeActivity extends MainActivity {
 
                     return;
                 }
-                System.out.println(datas);
+
 
                 if (datas.get(0) == 0xAB) {
                     switch (datas.get(4)) {
@@ -413,31 +421,104 @@ public class HomeActivity extends MainActivity {
                                     Log.i(TAG, heartRateBean.toString());
                                     break;
                                 case 0x12:
-                                    //STAND-ALONE MEASUREMENT OF BLOOD OXYGEN RATE DATA
-                                    BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bloodOxygenBean.toString());
+                                    //单机测量 血氧数据
+//                                    BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, bloodOxygenBean.toString());
+                                    System.out.println("BLOOD OXYGEN BEAN: "+datas);
                                     break;
                                 case 0x14:
-                                    //STAND-ALONE MEASUREMENT OF BLOOD PRESSURE
-                                    BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bloodPressureBean.toString());
+                                    //单机测量 血压数据
+//                                    BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, bloodPressureBean.toString());
+                                    System.out.println("BLOOD PRESSURE BEAN: "+datas);
                                     break;
                                 case 0x08:
-                                    //CURRENT DATA
+                                    //当前数据
 //                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
 //                                    Log.i(TAG, currentDataBean.toString());
-                                    System.out.println("CURRENT DATA: " + datas);
+                                    System.out.println("-------------"+datas);
                                     break;
 
                                 case 0x20:
                                     //RETURN HOURLY DATA
 //
                                     System.out.println("HOURLY DATA: " + datas);
-                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, hourlyMeasureDataBean.toString());
-                                    System.out.println("OXIGENO BAJADO DE CACHE"+hourlyMeasureDataBean.getBloodOxygen());
+//                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+//                                    System.out.println("OXIGENO BAJADO DE CACHE "+hourlyMeasureDataBean.getBloodOxygen());
+                                    System.out.println("HOURLY MEASURE BEAN: "+datas);
+
+
+                                    int yearh = datas.get(6) + 2000;
+                                    int monthh = datas.get(7);
+                                    int dayh = datas.get(8);
+                                    int hourh = datas.get(9);
+                                    long timeInMillish = DateUtils.getMilliSecondFromTime(yearh + String.format("%02d", monthh) +
+                                            String.format("%02d", dayh) + String.format("%02d", hourh) + 00);
+                                    Calendar calendarioh=Calendar.getInstance();
+                                    calendarioh.setTimeInMillis(timeInMillish);
+
+                                    int minuteh=calendarioh.get(Calendar.MINUTE);
+                                    int secondh=Math.round(calendarioh.get(Calendar.SECOND));
+
+
+                                    int steps = (datas.get(10) << 16) + (datas.get(11) << 8) +
+                                            datas.get(12);
+
+                                    int calory = (datas.get(13) << 16) + (datas.get(14) << 8) +
+                                            datas.get(15);
+
+                                    int heartRate = datas.get(16);
+                                    int bloodOxygen = datas.get(17);
+                                    int bloodPressure_high = datas.get(18);
+                                    int bloodPressure_low = datas.get(19);
+
+                                    int []arregloh=new int[11];
+
+                                    arregloh[0]=yearh;
+                                    arregloh[1]=monthh;
+                                    arregloh[2]=dayh;
+                                    arregloh[3]=hourh;
+                                    arregloh[4]=(int) timeInMillish;
+//                                    arregloh[5]=secondh;
+                                    arregloh[5]=steps;
+                                    arregloh[6]=calory;
+                                    arregloh[7]=heartRate;
+                                    arregloh[8]=bloodOxygen;
+                                    arregloh[9]=bloodPressure_high;
+                                    arregloh[10]=bloodPressure_low;
+
+                                    for (int i=0;i<contadorTemperatura;i++){
+                                        int [] objetos=(int[]) dataCache.get(i);
+
+                                        if (arregloh[0]==objetos[0] &&
+                                                arregloh[1]==objetos[1] &&
+                                                arregloh[2]==objetos[2] &&
+                                                arregloh[3]==objetos[3] &&
+                                                Math.abs(arregloh[4]-objetos[4])<2000) {
+
+                                            int[] arregloAgregar = new int[13];
+                                            for (int j = 0; j < 7; j++) {
+                                                arregloAgregar[j] = objetos[j];
+                                            }
+                                            arregloAgregar[7] = arregloh[5];
+                                            arregloAgregar[8] = arregloh[6];
+                                            arregloAgregar[9] = arregloh[7];
+                                            arregloAgregar[10] = arregloh[8];
+                                            arregloAgregar[11] = arregloh[9];
+                                            arregloAgregar[12] = arregloh[10];
+
+                                            dataMedida.add(arregloAgregar);
+                                        }
+
+                                    }
+                                    contadorData++;
+                                    System.out.println(contadorData);
+
+
 
                                     /**
+                                     *
                                      *
                                      * DATOS DE LA MEDICIÓN CADA HORA
                                      *
@@ -464,12 +545,58 @@ public class HomeActivity extends MainActivity {
 //                                    }
 
 
+
                                     break;
                                 case 0x21:
                                     //BODY TEMPERATURE AND IMMUNITY DATA
 //                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean) dataPasrse.parseData(datas);
 //                                    Log.i(TAG, bodytempAndMianyiBean.toString());
                                     System.out.println("BODY TEMPERATURE AND IMMUNITY: " + datas);
+
+                                    int []arregloTemporal=new int[7];
+
+                                    int year = datas.get(6) + 2000;
+                                    int month = datas.get(7);
+                                    int day = datas.get(8);
+                                    int hour = datas.get(9);
+                                    long timeInMillis1 = DateUtils.getMilliSecondFromTime(year + String.format("%02d", month) +
+                                            String.format("%02d", day) + String.format("%02d", hour) + 00);
+
+                                    Calendar calendario=Calendar.getInstance();
+                                    calendario.setTimeInMillis(timeInMillis1);
+
+                                    int minute=calendario.get(Calendar.MINUTE);
+                                    int second=Math.round(calendario.get(Calendar.SECOND));
+
+
+                                    int bodyTemp1 = datas.get(11);
+                                    int bodyTemp2 = datas.get(12);
+
+                                    arregloTemporal[0]=year;
+                                    arregloTemporal[1]=month;
+                                    arregloTemporal[2]=day;
+                                    arregloTemporal[3]=hour;
+                                    arregloTemporal[4]=(int) timeInMillis1;
+//                                    arregloTemporal[5]=second;
+                                    arregloTemporal[5]=bodyTemp1;
+                                    arregloTemporal[6]=bodyTemp2;
+
+
+
+
+//                                    String textoTemporal="";
+//                                    for(int element:arregloTemporal){
+//                                        textoTemporal=textoTemporal+","+element;
+//                                    }
+//                                    System.out.println(textoTemporal);
+//                                    textoTemporal="";
+
+//                                    redimensionarArreglo(contadorTemperatura,dataCache,arregloTemporal);
+                                    dataCache.add(arregloTemporal);
+                                    contadorTemperatura++;
+                                    System.out.println(contadorTemperatura);
+
+
                                     break;
 
                                 case 0x13:
