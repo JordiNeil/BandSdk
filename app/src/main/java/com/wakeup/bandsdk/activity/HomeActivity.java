@@ -417,8 +417,8 @@ public class HomeActivity extends MainActivity {
                                 case 0x11:
                                     //STAND-ALONE MEASUREMENT OF HEART RATE DATA
 
-                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, heartRateBean.toString());
+//                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
+                                    //Log.i(TAG, heartRateBean.toString());
                                     break;
                                 case 0x12:
                                     //单机测量 血氧数据
@@ -509,11 +509,14 @@ public class HomeActivity extends MainActivity {
                                             arregloAgregar[12] = arregloh[10];
 
                                             dataMedida.add(arregloAgregar);
+
                                         }
 
                                     }
+
                                     contadorData++;
-                                    System.out.println(contadorData);
+
+                                    System.out.println("DATOSSS PARA GUARDAR"+dataMedida);
 
 
 
@@ -983,6 +986,43 @@ public class HomeActivity extends MainActivity {
             Log.d(TAG, "mixUserAndPhysiometryData -> No hay datos de usuario desde login");
         }
     }
+
+
+    public void mixUserAndPhysiometryDataHor(List<int[]> measuredPhysiometryData) {
+//      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
+        ArrayList<Object> fetchedUserData;
+        fetchedUserData = getIntent().hasExtra("fetchedUserData") ? (ArrayList<Object>) getIntent().getSerializableExtra("fetchedUserData") : null;
+
+        if (fetchedUserData != null) {
+            // Defining Physiometry object and adding data to it
+            JsonObject physiometryData = new JsonObject();
+            physiometryData.addProperty("ritmoCardiaco", String.valueOf(measuredPhysiometryData.get(0)));
+            physiometryData.addProperty("oximetria", String.valueOf(measuredPhysiometryData.get(7)));
+            physiometryData.addProperty("presionArterialSistolica", String.valueOf(measuredPhysiometryData.get(8)));
+            physiometryData.addProperty("presionArterialDiastolica", String.valueOf(measuredPhysiometryData.get(9)));
+            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(11) + "." + measuredPhysiometryData.get(12));
+            physiometryData.addProperty("fechaRegistro", utc.toString());
+            physiometryData.addProperty("fechaToma", utc.toString());
+            // Defining userData object to store the user data from login activity
+            JsonObject userData = new JsonObject();
+            userData.addProperty("id", (Number) fetchedUserData.get(0));
+            userData.addProperty("login", (String) fetchedUserData.get(1));
+            userData.addProperty("firstName", (String) fetchedUserData.get(2));
+            userData.addProperty("lastName", (String) fetchedUserData.get(3));
+            userData.addProperty("email", (String) fetchedUserData.get(4));
+            userData.addProperty("imageUrl", (String) fetchedUserData.get(5));
+            userData.addProperty("activated", (Boolean) fetchedUserData.get(6));
+            userData.addProperty("langKey", (String) fetchedUserData.get(7));
+            // Adding userData object to Physiometry object
+            physiometryData.add("user", userData);
+            // Sending physiometry data to the service
+            sendPhysiometryData(storedJwtToken, physiometryData);
+        } else {
+
+            Log.d(TAG, "mixUserAndPhysiometryData -> No hay datos de usuario desde login");
+        }
+    }
+
 
     public void sendPhysiometryData(String jwtToken, JsonObject data) {
         ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
