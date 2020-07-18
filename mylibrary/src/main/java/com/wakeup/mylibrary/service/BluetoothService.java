@@ -146,7 +146,6 @@ public class BluetoothService extends Service {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
-
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
@@ -169,6 +168,8 @@ public class BluetoothService extends Service {
                  * It should be greater than the time from LLCP Feature Exchange to ATT Write for Service Change indication.
                  * If your device does not use Service Change indication (for example does not have DFU) the delay may be 0.
                  */
+                boolean rdRemoteRssi = mBluetoothGatt.readRemoteRssi();
+                Log.i(TAG, "RSSI VALUE: "+rdRemoteRssi);
                 final boolean bonded = gatt.getDevice().getBondState() == BluetoothDevice.BOND_BONDED;
                 final int delay = bonded ? 1600 : 0; // around 1600 ms is required when connection interval is ~45ms.
                 if (delay > 0)
@@ -186,6 +187,7 @@ public class BluetoothService extends Service {
                         Log.i(TAG, "Attempting to start service discovery:" +
                                 mBluetoothGatt.discoverServices());
                     }
+
                 }, delay);
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -312,9 +314,16 @@ public class BluetoothService extends Service {
             super.onReliableWriteCompleted(gatt, status);
         }
 
-        @Override
+        /*@Override
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
             super.onReadRemoteRssi(gatt, rssi, status);
+        }*/
+        @Override
+        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status){
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d(TAG, String.format("BluetoothGatt ReadRssi[%d]", rssi));
+                Log.i(TAG, "Distance:  "+ ((10 ^ ((-69 - rssi) / (10 * 2)))*10^6)+ " cm");
+            }
         }
 
         @Override

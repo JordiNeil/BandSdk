@@ -194,7 +194,6 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
                         }
                     });
                     builder.create().show();
-
                 } else {
                     Log.i(TAG, "No explanation needed, we can request the permission.");
                     // No explanation needed, we can request the permission.
@@ -221,6 +220,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
                     if (bluetoothDevice.getName() != null) {
                         if (bluetoothDevice.getName().contains("T1") || bluetoothDevice.getName().contains("T1S")) {
                             Log.i(TAG, "Name: " + bluetoothDevice.getName() + " Address: " + bluetoothDevice.getAddress() + " Alias: " + bluetoothDevice.getAlias());
+                            Log.i("RSSI VALUE: ", String.valueOf(((10 ^ ((-69 - i) / (10 * 2)))*10^6))+ "cm");
                             leDeviceListAdapter.addDevice(bluetoothDevice);
                             leDeviceListAdapter.notifyDataSetChanged();
                         }
@@ -233,6 +233,7 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         BluetoothDevice device = leDeviceListAdapter.getDevice(i);
+
         if (device == null) {
             return;
         }
