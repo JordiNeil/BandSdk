@@ -1,8 +1,10 @@
 package com.wakeup.bandsdk.activity;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.JsonObject;
+import com.wakeup.bandsdk.MainActivity;
 import com.wakeup.bandsdk.Pojos.Authenticate.JWTAuth;
 import com.wakeup.bandsdk.Pojos.DataUser;
 import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
@@ -10,22 +12,32 @@ import com.wakeup.bandsdk.R;
 import com.wakeup.bandsdk.Services.AccountService;
 import com.wakeup.bandsdk.Services.ServiceFisiometria;
 import com.wakeup.bandsdk.configVar.ConfigGeneral;
+import com.wakeup.mylibrary.Config;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.service.autofill.UserData;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.widget.Button;
+
+import androidx.annotation.RequiresApi;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,32 +49,47 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
-    TextInputLayout loginUsernameField, loginPasswordField;
-    TextInputEditText loginUsernameInput, loginPasswordInput;
+
+    EditText loginUsernameInput, loginPasswordInput;
+    Button loginBtn;
+    TextView toRegisterBtn;
     private JsonObject userCredentials = new JsonObject();
     private Context context = this;
+    private SharedPreferences sharedPrefs;
+    private SharedPreferences.Editor editor;
+    View viewAlert;
+    AlertDialog.Builder builder;
+    AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Button directAccessBtn = findViewById(R.id.directAccess);
-        Button loginBtn = findViewById(R.id.loginBtn);
-        Button toRegisterBtn = findViewById(R.id.toRegisterBtn);
+        sharedPrefs = context.getSharedPreferences(ConfigGeneral.preference_file_key, Context.MODE_PRIVATE);
+        editor = sharedPrefs.edit();
 
+        loginBtn = findViewById(R.id.loginBtn);
+        toRegisterBtn = findViewById(R.id.tv_thrid_login);
         // Capturing form fields and input
-        loginPasswordField = findViewById(R.id.loginPasswordField);
         loginUsernameInput = findViewById(R.id.loginUsernameText);
-        loginUsernameField = findViewById(R.id.loginUsernameField);
         loginPasswordInput = findViewById(R.id.loginPasswordText);
 
-        directAccessBtn.setOnClickListener(v -> {
+       /* directAccessBtn.setOnClickListener(v -> {
             Intent homeIntent = new Intent(context, HomeActivity.class);
             startActivity(homeIntent);
-        });
+        });*/
 
-        loginUsernameInput.addTextChangedListener(new TextWatcher(){
+        //Loading
+        viewAlert = LayoutInflater.from(this).inflate(R.layout.loading_data, null);
+        builder = new AlertDialog.Builder(this);
+        builder.setView(viewAlert);
+        builder.setCancelable(false);
+        dialog = builder.create();
+
+        // Check if there is a token in shared preferences
+
+        loginUsernameInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -78,12 +105,12 @@ public class LoginActivity extends AppCompatActivity {
                 if (s.length() > 0) {
                     userCredentials.addProperty("username", s.toString());
                 } else {
-                    loginUsernameField.setError("Este campo no debe estar vacío");
+                    loginUsernameInput.setError(ConfigGeneral.INPUTVACIO);
                 }
             }
         });
 
-        loginPasswordInput.addTextChangedListener(new TextWatcher(){
+        loginPasswordInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -99,13 +126,14 @@ public class LoginActivity extends AppCompatActivity {
                 if (s.length() > 0) {
                     userCredentials.addProperty("password", s.toString());
                 } else {
-                    loginPasswordField.setError("Este campo no debe estar vacío");
+                    loginPasswordInput.setError(ConfigGeneral.INPUTVACIO);
                 }
             }
         });
 
-        loginBtn.setOnClickListener( v -> {
+        loginBtn.setOnClickListener(v -> {
             Log.d(TAG, "User credentials -> " + userCredentials);
+            dialog.show();
             getJwtToken(context, userCredentials);
         });
         toRegisterBtn.setOnClickListener(v -> {
@@ -115,9 +143,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void getJwtToken(Context loginContext, JsonObject credentials) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        String storedJwtToken = sharedPrefs.getString("storedJwtToken", "");
+        String storedJwtToken = sharedPrefs.getString(ConfigGeneral.TOKENSHARED, "");
         if (storedJwtToken != null || storedJwtToken.equals("")) {
             ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
             final Call<JWTAuth> responseData = service.getJwtToken(credentials);
@@ -125,23 +151,30 @@ public class LoginActivity extends AppCompatActivity {
             responseData.enqueue(new Callback<JWTAuth>() {
                 @Override
                 public void onResponse(Call<JWTAuth> call, Response<JWTAuth> response) {
-                    if (response.isSuccessful()){
+                    if (response.isSuccessful()) {
                         assert response.body() != null;
                         Log.i(TAG, "onResponse: " + response.body().toString());
-                        editor.putString("storedJwtToken", response.body().getIdToken());
+                        editor.putString(ConfigGeneral.TOKENSHARED, response.body().getIdToken());
                         editor.commit();
                         fetchUserData(loginContext, response.body().getIdToken());
+
                     }
                     if (response.code() == 401) {
-                        loginUsernameField.setError("Credenciales inválidas. Intentalo de nuevo.");
-                        loginPasswordField.setError("Credenciales inválidas. Intentalo de nuevo.");
+                        loginUsernameInput.setError(ConfigGeneral.ERRORINPUTS);
+                        loginPasswordInput.setError(ConfigGeneral.ERRORINPUTS);
+                        dialog.dismiss();
                     }
                 }
 
+                @RequiresApi(api = Build.VERSION_CODES.M)
                 @Override
                 public void onFailure(Call<JWTAuth> call, Throwable t) {
                     System.out.println(t.getMessage());
-                    Snackbar.make(loginPasswordField, "Ha ocurrido un error. Por favor intentalo de nuevo.", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(loginPasswordInput, ConfigGeneral.ERRORGENERAL, Snackbar.LENGTH_LONG)
+                            .setTextColor(getColor(R.color.e9))
+                            .setBackgroundTint(getColor(R.color.error_color_material_light))
+                            .show();
+                    dialog.dismiss();
                 }
             });
         } else {
@@ -150,8 +183,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void fetchUserData(Context loginContext, String jwtToken) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
         AccountService service = ConfigGeneral.retrofit.create(AccountService.class);
         final Call<DataUser> dataResponse = service.getUserData("Bearer " + jwtToken);
 
@@ -179,48 +210,61 @@ public class LoginActivity extends AppCompatActivity {
                     fetchedUserData.add(11, res.getLastModifiedDate());
 
                     // Storing necessary user data to shared preferences
-                    editor.putInt("userId", res.getId());
-                    editor.putString("login", res.getLogin());
-                    editor.putString("firstName", res.getFirstName());
-                    editor.putString("lastName", res.getLastName());
-                    editor.putString("email", res.getEmail());
-                    editor.putBoolean("activated", res.getActivated());
-                    editor.putString("langKey", res.getLangKey());
-                    editor.putString("imageUrl", res.getImageUrl());
+                    //System.out.println("LOGIN--------------------------------++++++++++-----"+res.getLogin());
+                    editor.putInt(ConfigGeneral.STOREDUSERID, res.getId());
+                    editor.putString(ConfigGeneral.STOREDUSERLOGIN, res.getLogin());
+                    editor.putString(ConfigGeneral.STOREDUSERFIRSTNAME, res.getFirstName());
+                    editor.putString(ConfigGeneral.STOREDUSERLASTNAME, res.getLastName());
+                    editor.putString(ConfigGeneral.STOREDUSEREMAIL, res.getEmail());
+                    editor.putBoolean(ConfigGeneral.STOREDUSERACTIVATED, res.getActivated());
+                    editor.putString(ConfigGeneral.STOREDUSERLANGKEY, res.getLangKey());
+                    editor.putString(ConfigGeneral.STOREDUSERIMAGEURL, res.getImageUrl());
+                    editor.commit();
 
                     Intent homeIntent = new Intent(loginContext, HomeActivity.class);
                     homeIntent.putExtra("fetchedUserData", fetchedUserData);
                     startActivity(homeIntent);
+                    dialog.dismiss();
                 }
                 if (response.code() == 401) {
-                    editor.remove("storedJwtToken");
+                    editor.remove(ConfigGeneral.TOKENSHARED);
                     editor.commit();
                     getJwtToken(context, userCredentials);
+                    dialog.dismiss();
                 }
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onFailure(Call<DataUser> call, Throwable t) {
                 System.out.println(t.getMessage());
-                Snackbar.make(loginPasswordField, "Ha ocurrido un error. Por favor intentalo de nuevo.", Snackbar.LENGTH_LONG).show();
+
+                Snackbar.make(loginPasswordInput, ConfigGeneral.ERRORGENERAL, Snackbar.LENGTH_LONG)
+                        .setTextColor(getColor(R.color.e9))
+                        .setBackgroundTint(getColor(R.color.error_color_material_light))
+                        .show();
 //                if (Objects.requireNonNull(t.getMessage()).equals("timeout")) {
 //                    Toast.makeText(context, "Ha ocurrido un error. Por favor intentalo de nuevo.", Toast.LENGTH_LONG);
 //                }
+                dialog.dismiss();
             }
         });
     }
 
-    public void getPhysiometryDataById(Context loginContext, String jwtToken, int userId) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
+    /*public void getPhysiometryDataById(Context loginContext, String jwtToken, int userId) {
+        System.out.println("------------------------ENTRO-----------------");
+
         ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
         final Call<List<DataFisiometria>> dataResponse = service.getPhysiometryData("Bearer " + jwtToken, userId);
 
         dataResponse.enqueue(new Callback<List<DataFisiometria>>() {
             @Override
             public void onResponse(Call<List<DataFisiometria>> call, Response<List<DataFisiometria>> response) {
+
+
                 if (response.isSuccessful()) {
                     List<DataFisiometria> res = response.body();
+
                     assert res != null;
                     ArrayList<Object> fetchedPhysiometryData = new ArrayList<>();
                     fetchedPhysiometryData.add(0, res.get(res.size() - 1).getRitmoCardiaco());
@@ -228,24 +272,24 @@ public class LoginActivity extends AppCompatActivity {
                     fetchedPhysiometryData.add(2, res.get(res.size() - 1).getPresionArterialSistolica());
                     fetchedPhysiometryData.add(3, res.get(res.size() - 1).getPresionArterialDiastolica());
                     fetchedPhysiometryData.add(4, res.get(res.size() - 1).getTemperatura());
-                    Intent homeIntent = new Intent(loginContext, HomeActivity.class);
-                    homeIntent.putExtra("fetchedPhysiometryData", fetchedPhysiometryData);
-                    startActivity(homeIntent);
+                    System.out.println(fetchedPhysiometryData);
+
                 }
                 if (response.code() == 401) {
-                    editor.remove("storedJwtToken");
-                    editor.commit();
+
                     getJwtToken(context, userCredentials);
                 }
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onFailure(Call<List<DataFisiometria>> call, Throwable t) {
                 System.out.println(t.getMessage());
-                if (Objects.requireNonNull(t.getMessage()).equals("timeout")) {
-                    Toast.makeText(context, "Ha ocurrido un error. Por favor intentalo de nuevo.", Toast.LENGTH_LONG);
-                }
+                Snackbar.make(loginPasswordInput, ConfigGeneral.ERRORGENERAL, Snackbar.LENGTH_LONG)
+                        .setTextColor(getColor(R.color.e9))
+                        .setBackgroundTint(getColor(R.color.error_color_material_light))
+                        .show();
             }
         });
-    }
+    }*/
 }

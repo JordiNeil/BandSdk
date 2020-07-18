@@ -46,7 +46,7 @@ public class CommandManager {
         bytes[3] = (byte) 0xFF;
         bytes[4] = (byte) 0x71;
         bytes[5] = (byte) 0x80;
-        Log.i(TAG, "查找手环");
+//        Log.i(TAG, "查找手环");
         broadcastData(bytes);
     }
 
@@ -71,7 +71,7 @@ public class CommandManager {
         bytes[3] = (byte) 0xff;
         bytes[4] = (byte) 0x93;
         bytes[5] = (byte) 0x80;
-//        bytes[6] = (byte)0;//占位符
+        bytes[6] = (byte)0;//
         bytes[7] = (byte) ((year & 0xff00) >> 8);
         bytes[8] = (byte) (year & 0xff);
         bytes[9] = (byte) (month & 0xff);
@@ -80,6 +80,7 @@ public class CommandManager {
         bytes[12] = (byte) (minute & 0xff);
         bytes[13] = (byte) (second & 0xff);
         broadcastData(bytes);
+        System.out.println("LA SINCRONIZACIÓN DE TIEMPO SE ESTABLECIÓ A LAS "+hour+":"+minute+":"+second);
     }
 
     /**
@@ -131,10 +132,10 @@ public class CommandManager {
     /**
      * DOWNLOAD SYNC DATA
      *
-     * @param timeInMillis SYNCHRONIZATION DATA IN MILISECONDS
+     * @param timeInMillis SYNCHRONIZATION DATA IN MILLISECONDS
      */
     public void syncData(long timeInMillis) {
-        Log.i(TAG, "syncData: ");
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeInMillis);
         int year = calendar.get(Calendar.YEAR);
@@ -143,6 +144,8 @@ public class CommandManager {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
         int second = calendar.get(Calendar.SECOND);
+
+        Log.i(TAG, "syncData: "+hour+":"+minute+":"+second);
 
         byte[] data = new byte[12];
         data[0] = (byte) 0xAB;

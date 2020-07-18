@@ -36,8 +36,10 @@ import com.google.gson.JsonObject;
 import com.wakeup.bandsdk.Fragments.HomeFragment;
 import com.wakeup.bandsdk.Fragments.UserFragment;
 import com.wakeup.bandsdk.MainActivity;
+import com.wakeup.bandsdk.Pojos.Alarms.AlarmData;
 import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
 import com.wakeup.bandsdk.R;
+import com.wakeup.bandsdk.Services.AlarmService;
 import com.wakeup.bandsdk.Services.ServiceFisiometria;
 import com.wakeup.bandsdk.configVar.ConfigGeneral;
 import com.wakeup.mylibrary.Config;
@@ -57,6 +59,7 @@ import com.wakeup.mylibrary.command.CommandManager;
 import com.wakeup.mylibrary.data.DataParse;
 import com.wakeup.mylibrary.service.BluetoothService;
 import com.wakeup.mylibrary.utils.DataHandUtils;
+import com.wakeup.mylibrary.utils.DateUtils;
 import com.wakeup.mylibrary.utils.SPUtils;
 
 import java.time.ZoneOffset;
@@ -74,7 +77,6 @@ import retrofit2.Response;
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class HomeActivity extends MainActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-
     public RadioButton radioButtonHome;
     public RadioButton radioButtonInfo;
     public RadioButton radioButtonUser;
@@ -87,17 +89,35 @@ public class HomeActivity extends MainActivity {
     private BandInfo bandInfo;
     public Button btnMeassre;
     private Context context = this;
+    SharedPreferences sharedPrefs;
+    String storedJwtToken, userLogin, userFirstName, userLastName, userEmail, userLangKey, userImageUrl;
+    Integer userId;
+    Boolean userActivated;
+
     private ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
     Fragment fragmentHome = new HomeFragment();
     Bundle args = new Bundle();
-    View viewAlert;
-    AlertDialog.Builder builder;
-    AlertDialog dialog;
-    Boolean StatusConnection=false;
+    View viewAlert, viewAlertReceived;
+    AlertDialog.Builder builder, builderReceived;
+    AlertDialog dialog, dialogReciver;
+    Boolean StatusConnection = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        sharedPrefs = context.getSharedPreferences(ConfigGeneral.preference_file_key, Context.MODE_PRIVATE);
+        storedJwtToken = sharedPrefs.getString(ConfigGeneral.TOKENSHARED, "");
+        userId = sharedPrefs.getInt(ConfigGeneral.STOREDUSERID, 0);
+        userLogin = sharedPrefs.getString(ConfigGeneral.STOREDUSERLOGIN, "");
+        userFirstName = sharedPrefs.getString(ConfigGeneral.STOREDUSERFIRSTNAME, "");
+        userLastName = sharedPrefs.getString(ConfigGeneral.STOREDUSERLASTNAME, "");
+        userEmail = sharedPrefs.getString(ConfigGeneral.STOREDUSEREMAIL, "");
+        userActivated = sharedPrefs.getBoolean(ConfigGeneral.STOREDUSERACTIVATED, false);
+        userLangKey = sharedPrefs.getString(ConfigGeneral.STOREDUSERLANGKEY, "");
+        userImageUrl = sharedPrefs.getString(ConfigGeneral.STOREDUSERIMAGEURL, "");
+
         radioButtonHome = (RadioButton) findViewById(R.id.rb_home);
 
         //radioButtonHome.callOnClick();
@@ -112,6 +132,21 @@ public class HomeActivity extends MainActivity {
         builder.setCancelable(false);
         dialog = builder.create();
 
+        //DATARECEIVED
+        viewAlertReceived = LayoutInflater.from(this).inflate(R.layout.alert_dialog_base_recived_data, null);
+        builderReceived = new AlertDialog.Builder(this);
+        builderReceived.setView(viewAlertReceived);
+        builderReceived.setCancelable(false);
+        dialogReciver = builderReceived.create();
+        TextView txtMessage = viewAlertReceived.findViewById(R.id.messageAlert);
+
+        Button btnConnection = viewAlertReceived.findViewById(R.id.btn_acep);
+        btnConnection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogReciver.dismiss();
+            }
+        });
 
 //        btnMeassure = (Button) findViewById(R.id.button4);
         /*FragmentManager fragmentManager = getSupportFragmentManager();
@@ -126,6 +161,8 @@ public class HomeActivity extends MainActivity {
 //                Measure();
 //            }
 //        });
+        // Alert data
+
     }
 
 
@@ -151,26 +188,34 @@ public class HomeActivity extends MainActivity {
 
     public synchronized void fragmentInfo(View view) {
 
-        if (StatusConnection){
+        if (StatusConnection) {
             dialog.show();
             meassure();
-        }
-        else {
+        } else {
             viewAlert = LayoutInflater.from(this).inflate(R.layout.alert_dialog_base, null);
             builder = new AlertDialog.Builder(this);
             builder.setView(viewAlert);
-            builder.setCancelable(true);
+            builder.setCancelable(false);
             dialog = builder.create();
             dialog.show();
-            TextView txtMessage=viewAlert.findViewById(R.id.messageAlert);
-            txtMessage.setText("No existe un dispositivo conectado");
-            Button btnConnection=viewAlert.findViewById(R.id.btn_cancel);
-            btnConnection.setOnClickListener(new View.OnClickListener() {
+            TextView txtMessage = viewAlert.findViewById(R.id.messageAlert);
+            txtMessage.setText(ConfigGeneral.SENDCONNECTION);
+            Button btncancelConnection = viewAlert.findViewById(R.id.btn_cancel);
+            Button btnConnection = viewAlert.findViewById(R.id.btn_Connection);
+            btncancelConnection.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     dialog.dismiss();
                 }
             });
+            btnConnection.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+            });
+
 
         }
 
@@ -196,7 +241,13 @@ public class HomeActivity extends MainActivity {
     public int numeroIntentos = 0;
     public boolean ponerManilla = false;
 
-    public boolean conectado=false;
+    public boolean conectado = false;
+
+
+    public List<int[]> dataCache =new ArrayList<int[]>();
+    public List<int[]> dataMedida =new ArrayList<int[]>();
+    public int contadorTemperatura=0;
+    public int contadorData=0;
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 
@@ -220,12 +271,7 @@ public class HomeActivity extends MainActivity {
                      */
                     medirBateria();
 
-                    /**
-                     *
-                     * SINCRONIZACIÓN DE HORA
-                     *
-                     */
-                    sincronizarHora();
+
 
                     /**
                      *
@@ -234,45 +280,63 @@ public class HomeActivity extends MainActivity {
                      */
                     iniciarMedicionHora();
                 }
+
+                /**
+                 *
+                 * SINCRONIZACIÓN DE HORA
+                 *
+                 */
+                sincronizarHora();
+
                 StatusConnection=true;
                 conectado=true;
 
                 /**
                  *
-                 * INICIO MEDICIÓN AUTOMÁTICA DEL NIVEL DE BATERÍA
+                 * MOSTRAR DATA DEL CACHE
                  **/
                 Timer timer;
                 timer = new Timer();
 
-                TimerTask batteryInfo = new TimerTask() {
+                TimerTask borrarCache = new TimerTask() {
                     @Override
                     public void run() {
-//                        commandManager.getBatteryInfo();
+                        mostrarDataBorrarCache(dataMedida);
                     }
                 };
+
+                timer.schedule(borrarCache,30000);
 
 
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_DISCONNECTED");
+
+                System.out.println("DESCONECTADO POR USUARIO= "+desconectadoPorUsuario);
                 conectado=false;
                 Timer timer;
                 timer = new Timer();
 
-                TimerTask verificarConexion=new TimerTask() {
+                TimerTask verificarConexion = new TimerTask() {
                     @Override
-                    public void run(){
+                    public void run() {
                         TimerTask reintentarConexion = new TimerTask() {
                             @Override
                             public void run() {
                                 if (!conectado) {
                                     conectarBluetooth();
+                                    System.out.println("REINTENTANDO CONEXIÓN");
+                                    desconectadoPorUsuario=false;
                                 }
                             }
                         };
-                        timer.schedule(reintentarConexion, 0);
+                        if (!desconectadoPorUsuario) {
+                            timer.schedule(reintentarConexion, 0);
+                        }
                     }
                 };
-                timer.schedule(verificarConexion, 0, 600000);
+
+                timer.schedule(verificarConexion, 60000, 600000);
+
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
@@ -282,25 +346,22 @@ public class HomeActivity extends MainActivity {
                 final byte[] txValue = intent.getByteArrayExtra(BluetoothService.EXTRA_DATA);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(System.currentTimeMillis());
-                if (calendar.get(Calendar.MINUTE) >=10 && calendar.get(Calendar.SECOND)>=10) {
+                if (calendar.get(Calendar.MINUTE) >= 10 && calendar.get(Calendar.SECOND) >= 10) {
                     Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
                             + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
                             (calendar.get(Calendar.MINUTE)) + ":" +
                             (calendar.get(Calendar.SECOND)));
-                }
-                else if (calendar.get(calendar.MINUTE)>=10 && calendar.get (Calendar.SECOND)<10) {
+                } else if (calendar.get(calendar.MINUTE) >= 10 && calendar.get(Calendar.SECOND) < 10) {
                     Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
                             + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
                             (calendar.get(Calendar.MINUTE)) + ":0" +
                             (calendar.get(Calendar.SECOND)));
-                }
-                else if (calendar.get(calendar.MINUTE)<10 && calendar.get (Calendar.SECOND)>=10) {
+                } else if (calendar.get(calendar.MINUTE) < 10 && calendar.get(Calendar.SECOND) >= 10) {
                     Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
                             + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":0" +
                             (calendar.get(Calendar.MINUTE)) + ":" +
                             (calendar.get(Calendar.SECOND)));
-                }
-                else{
+                } else {
                     {
                         Log.d(TAG, "RECEIVED DATA：" + DataHandUtils.bytesToHexStr(txValue)
                                 + " at " + (calendar.get(Calendar.HOUR_OF_DAY)) + ":0" +
@@ -312,8 +373,10 @@ public class HomeActivity extends MainActivity {
 
 
                 if (datas.size() == 0) {
+
                     return;
                 }
+
 
                 if (datas.get(0) == 0xAB) {
                     switch (datas.get(4)) {
@@ -339,13 +402,13 @@ public class HomeActivity extends MainActivity {
 //                                        || bandInfo.getBandType() == 0x0D
 //                                        || bandInfo.getBandType() == 0x0E
 //                                        || bandInfo.getBandType() == 0x0F) {
-//
-//
+
+
 //                                    Config.hasContinuousHeart = true;
 //
 //                                }
 //                            }
-
+//
                             break;
 
                         case 0x51:
@@ -354,76 +417,204 @@ public class HomeActivity extends MainActivity {
                                 case 0x11:
                                     //STAND-ALONE MEASUREMENT OF HEART RATE DATA
 
-                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, heartRateBean.toString());
+//                                    HeartRateBean heartRateBean = (HeartRateBean) dataPasrse.parseData(datas);
+                                    //Log.i(TAG, heartRateBean.toString());
                                     break;
                                 case 0x12:
-                                    //STAND-ALONE MEASUREMENT OF BLOOD OXYGEN RATE DATA
-                                    BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bloodOxygenBean.toString());
+                                    //单机测量 血氧数据
+//                                    BloodOxygenBean bloodOxygenBean = (BloodOxygenBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, bloodOxygenBean.toString());
+                                    System.out.println("BLOOD OXYGEN BEAN: "+datas);
                                     break;
                                 case 0x14:
-                                    //STAND-ALONE MEASUREMENT OF BLOOD PRESSURE
-                                    BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bloodPressureBean.toString());
+                                    //单机测量 血压数据
+//                                    BloodPressureBean bloodPressureBean = (BloodPressureBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, bloodPressureBean.toString());
+                                    System.out.println("BLOOD PRESSURE BEAN: "+datas);
                                     break;
                                 case 0x08:
-                                    //CURRENT DATA
-                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, currentDataBean.toString());
+                                    //当前数据
+//                                    CurrentDataBean currentDataBean = (CurrentDataBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, currentDataBean.toString());
+                                    System.out.println("-------------"+datas);
                                     break;
 
                                 case 0x20:
                                     //RETURN HOURLY DATA
-                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, hourlyMeasureDataBean.toString());
-                                    System.out.println(datas);
+//
+                                    System.out.println("HOURLY DATA: " + datas);
+//                                    HourlyMeasureDataBean hourlyMeasureDataBean = (HourlyMeasureDataBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, hourlyMeasureDataBean.toString());
+//                                    System.out.println("OXIGENO BAJADO DE CACHE "+hourlyMeasureDataBean.getBloodOxygen());
+                                    System.out.println("HOURLY MEASURE BEAN: "+datas);
+
+
+                                    int yearh = datas.get(6) + 2000;
+                                    int monthh = datas.get(7);
+                                    int dayh = datas.get(8);
+                                    int hourh = datas.get(9);
+                                    long timeInMillish = DateUtils.getMilliSecondFromTime(yearh + String.format("%02d", monthh) +
+                                            String.format("%02d", dayh) + String.format("%02d", hourh) + 00);
+                                    Calendar calendarioh=Calendar.getInstance();
+                                    calendarioh.setTimeInMillis(timeInMillish);
+
+                                    int minuteh=calendarioh.get(Calendar.MINUTE);
+                                    int secondh=Math.round(calendarioh.get(Calendar.SECOND));
+
+
+                                    int steps = (datas.get(10) << 16) + (datas.get(11) << 8) +
+                                            datas.get(12);
+
+                                    int calory = (datas.get(13) << 16) + (datas.get(14) << 8) +
+                                            datas.get(15);
+
+                                    int heartRate = datas.get(16);
+                                    int bloodOxygen = datas.get(17);
+                                    int bloodPressure_high = datas.get(18);
+                                    int bloodPressure_low = datas.get(19);
+
+                                    int []arregloh=new int[11];
+
+                                    arregloh[0]=yearh;
+                                    arregloh[1]=monthh;
+                                    arregloh[2]=dayh;
+                                    arregloh[3]=hourh;
+                                    arregloh[4]=(int) timeInMillish;
+//                                    arregloh[5]=secondh;
+                                    arregloh[5]=steps;
+                                    arregloh[6]=calory;
+                                    arregloh[7]=heartRate;
+                                    arregloh[8]=bloodOxygen;
+                                    arregloh[9]=bloodPressure_high;
+                                    arregloh[10]=bloodPressure_low;
+
+                                    for (int i=0;i<contadorTemperatura;i++){
+                                        int [] objetos=(int[]) dataCache.get(i);
+
+                                        if (arregloh[0]==objetos[0] &&
+                                                arregloh[1]==objetos[1] &&
+                                                arregloh[2]==objetos[2] &&
+                                                arregloh[3]==objetos[3] &&
+                                                Math.abs(arregloh[4]-objetos[4])<2000) {
+
+                                            int[] arregloAgregar = new int[13];
+                                            for (int j = 0; j < 7; j++) {
+                                                arregloAgregar[j] = objetos[j];
+                                            }
+                                            arregloAgregar[7] = arregloh[5];
+                                            arregloAgregar[8] = arregloh[6];
+                                            arregloAgregar[9] = arregloh[7];
+                                            arregloAgregar[10] = arregloh[8];
+                                            arregloAgregar[11] = arregloh[9];
+                                            arregloAgregar[12] = arregloh[10];
+
+                                            dataMedida.add(arregloAgregar);
+                                            mixUserAndPhysiometryDataHor(arregloAgregar);
+
+                                        }
+
+                                    }
+
+                                    contadorData++;
+
+                                    System.out.println("DATOSSS PARA GUARDAR"+dataMedida);
+
 
 
                                     /**
                                      *
+                                     *
                                      * DATOS DE LA MEDICIÓN CADA HORA
                                      *
                                      */
-                                    while (!medidaCorrecta) {
-//
-                                        if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
-                                                datas.get(10) == 0 || datas.get(11) == 0) {
-                                            Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN");
-                                            numeroIntentos++;
-                                            if (numeroIntentos < 3) {
-                                                retryMeasure();
-                                            } else {
-                                                numeroIntentos = 0;
-                                                medicionCorrecta = true;
-                                                ponerManilla = true;
-                                                Log.i(TAG, "POR FAVOR PONERSE LA MANILLA");
-                                                dialog.dismiss();
-                                            }
-                                        } else {
-                                            medicionCorrecta = true;
-                                            dialog.dismiss();
-                                        }
-                                    }
+//                                    while (!medidaCorrecta) {
+////
+//                                        if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
+//                                                datas.get(10) == 0 || datas.get(11) == 0) {
+//                                            Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN");
+//                                            dialog.dismiss();
+//                                            numeroIntentos++;
+//                                            if (numeroIntentos < 3) {
+//                                                dialog.dismiss();
+//                                            } else {
+//                                                numeroIntentos = 0;
+//                                                medicionCorrecta = true;
+//                                                ponerManilla = true;
+//                                                Log.i(TAG, "POR FAVOR PONERSE LA MANILLA");
+//                                            }
+//                                        } else {
+//                                            medicionCorrecta = true;
+//                                            dialog.dismiss();
+//                                        }
+//                                    }
+
 
 
                                     break;
                                 case 0x21:
                                     //BODY TEMPERATURE AND IMMUNITY DATA
-                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bodytempAndMianyiBean.toString());
+//                                    BodytempAndMianyiBean bodytempAndMianyiBean = (BodytempAndMianyiBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, bodytempAndMianyiBean.toString());
+                                    System.out.println("BODY TEMPERATURE AND IMMUNITY: " + datas);
+
+                                    int []arregloTemporal=new int[7];
+
+                                    int year = datas.get(6) + 2000;
+                                    int month = datas.get(7);
+                                    int day = datas.get(8);
+                                    int hour = datas.get(9);
+                                    long timeInMillis1 = DateUtils.getMilliSecondFromTime(year + String.format("%02d", month) +
+                                            String.format("%02d", day) + String.format("%02d", hour) + 00);
+
+                                    Calendar calendario=Calendar.getInstance();
+                                    calendario.setTimeInMillis(timeInMillis1);
+
+                                    int minute=calendario.get(Calendar.MINUTE);
+                                    int second=Math.round(calendario.get(Calendar.SECOND));
+
+
+                                    int bodyTemp1 = datas.get(11);
+                                    int bodyTemp2 = datas.get(12);
+
+                                    arregloTemporal[0]=year;
+                                    arregloTemporal[1]=month;
+                                    arregloTemporal[2]=day;
+                                    arregloTemporal[3]=hour;
+                                    arregloTemporal[4]=(int) timeInMillis1;
+//                                    arregloTemporal[5]=second;
+                                    arregloTemporal[5]=bodyTemp1;
+                                    arregloTemporal[6]=bodyTemp2;
+
+
+
+
+//                                    String textoTemporal="";
+//                                    for(int element:arregloTemporal){
+//                                        textoTemporal=textoTemporal+","+element;
+//                                    }
+//                                    System.out.println(textoTemporal);
+//                                    textoTemporal="";
+
+//                                    redimensionarArreglo(contadorTemperatura,dataCache,arregloTemporal);
+                                    dataCache.add(arregloTemporal);
+                                    contadorTemperatura++;
+                                    System.out.println(contadorTemperatura);
+
+
                                     break;
 
                                 case 0x13:
                                     //STAND-ALONE BODY TEMPERATURE MEASUREMENT
-                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, bodyTempBean.toString());
+//                                    BodyTempBean bodyTempBean = (BodyTempBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, bodyTempBean.toString());
+                                    System.out.println("BODY TEMPERATURE MEASUREMENT: " + datas);
                                     break;
 
                                 case 0x18:
                                     //RETURN TO STAND-ALONE IMMUNITY MEASUREMENT
-                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
-                                    Log.i(TAG, mianyiBean.toString());
+//                                    MianyiBean mianyiBean = (MianyiBean) dataPasrse.parseData(datas);
+//                                    Log.i(TAG, mianyiBean.toString());
+                                    System.out.println("IMMUNITY MEASUREMENT: " + datas);
                                     break;
 
                             }
@@ -432,9 +623,9 @@ public class HomeActivity extends MainActivity {
                             break;
                         case 0x52:
                             //SLEEP TIME RECORD
-                            SleepData sleepData = (SleepData) dataPasrse.parseData(datas);
-                            Log.i(TAG, sleepData.toString());
-
+//                            SleepData sleepData = (SleepData) dataPasrse.parseData(datas);
+//                            Log.i(TAG, sleepData.toString());
+                            System.out.println("SLEEP TIME RECORD: " + datas);
                             break;
 
                         case 0x31:
@@ -489,8 +680,8 @@ public class HomeActivity extends MainActivity {
                         case 0x32:
                             //ONE-CLICK MEASUREMENT
 //                            OneButtonMeasurementBean oneButtonMeasurementBean = (OneButtonMeasurementBean) dataPasrse.parseData(datas);}
-                            args.putIntegerArrayList("DataMeasure", datas);
-                            fragmentHome.setArguments(args);
+                           // args.putIntegerArrayList("DataMeasure", datas);
+//                            fragmentHome.setArguments(args);
                             System.out.println("-----------" + datas);
 
                             System.out.println("---------" + datas);
@@ -508,6 +699,7 @@ public class HomeActivity extends MainActivity {
 //
                                 if (datas.get(6) == 0 || datas.get(7) == 0 || datas.get(8) == 0 || datas.get(9) == 0 ||
                                         datas.get(10) == 0 || datas.get(11) == 0) {
+                                    dialog.dismiss();
                                     numeroIntentos++;
                                     if (numeroIntentos < 3) {
                                         Log.i(TAG, "WRONG MEASURE, WILL TRY AGAIN IN 5 MIN (" + numeroIntentos + "/3).");
@@ -522,6 +714,77 @@ public class HomeActivity extends MainActivity {
                                 } else {
                                     medicionCorrecta = true;
                                     dialog.dismiss();
+
+                                    int ritmoCardiaco = datas.get(6);
+                                    int oxigenoSangre = datas.get(7);
+                                    int presionAlta = datas.get(8);
+                                    int presionBaja = datas.get(9);
+                                    double temperatura = datas.get(11) + datas.get(12) * Math.pow(10, -2);
+
+                                    int[] medidasCorrectas = new int[7];
+
+
+                                    for (int i = 0; i < medidasCorrectas.length; i++) {
+                                        medidasCorrectas[i] = 0;
+                                    }
+
+                                    /**
+                                     * VALIDACIÓN DE RITMO CARDIACO
+                                     *
+                                     */
+
+                                    if (ritmoCardiaco < 60 || ritmoCardiaco > 100) {
+                                        System.out.println("EL RITMO CARDIACO ESTÁ POR FUERA DE LOS RANGOS NORMALES (60 BPM - 100 BPM)");
+                                        dataAlarm(ConfigGeneral.DESC_RM, ConfigGeneral.TITLE_ALARM);
+                                    } else {
+                                        medidasCorrectas[0] = ritmoCardiaco;
+                                    }
+
+                                    /**
+                                     *
+                                     * VALIDACIÓN DE NIVEL DE OXÍGENO
+                                     */
+
+                                    if (oxigenoSangre < 95) {
+                                        System.out.println("EL NIVEL DE OXÍGENO ESTÁ POR FUERA DE LOS RANGOS NORMALES (95% - 100%)");
+                                        dataAlarm(ConfigGeneral.DESC_OXIME, ConfigGeneral.TITLE_ALARM);
+                                    } else {
+                                        medidasCorrectas[1] = oxigenoSangre;
+                                    }
+
+                                    /**
+                                     * VALIDACIÓN DE PRESIÓN SANGUÍNEA
+                                     */
+
+                                    if (presionAlta < 80 || presionAlta > 120 || presionBaja < 60 || presionBaja > 80) {
+
+                                        System.out.println("LA PRESIÓN SANGUÍNEA ESTÁ POR FUERA DE LOS RANGOS NORMALES (SISTÓLICA 80mmHg - 120mmHg, DIASTÓLICA 60mmHg - 80 mmHg");
+                                        dataAlarm(ConfigGeneral.DESC_PS, ConfigGeneral.TITLE_ALARM);
+
+
+                                    } else {
+                                        medidasCorrectas[2] = presionAlta;
+                                        medidasCorrectas[3] = presionBaja;
+                                    }
+
+                                    /**
+                                     * VALIDACIÓN INMUNE
+                                     */
+                                    medidasCorrectas[4] = datas.get(10);
+
+                                    /**
+                                     * VALIDACIÓN DE TEMPERATURA
+                                     */
+
+                                    if (temperatura < 36 || temperatura > 37.2) {
+                                        System.out.println("LA TEMPERATURA ESTÁ POR FUERA DE LOS RANGOS NORMALES (36°C - 37.2°C)");
+                                        dataAlarm(ConfigGeneral.DES_TEMP, ConfigGeneral.TITLE_ALARM);
+                                    } else {
+                                        medidasCorrectas[5] = datas.get(11);
+                                        medidasCorrectas[6] = datas.get(12);
+                                    }
+                                    mixUserAndPhysiometryData(datas);
+                                    // System.out.println("nuevas medidas"+medidasCorrectas);
                                 }
                             }
                             break;
@@ -670,7 +933,7 @@ public class HomeActivity extends MainActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mServiceConnection);
+//        unbindService(mServiceConnection);
         //unregisterReceiver(mGattUpdateReceiver);
     }
 
@@ -690,25 +953,19 @@ public class HomeActivity extends MainActivity {
     //-------------------------------------------OWN FUNCTIONS------------------------------------------
 
 
-
-
-
     public void mixUserAndPhysiometryData(ArrayList<Integer> measuredPhysiometryData) {
-
 //      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
-        SharedPreferences sharedPrefs = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        String storedJwtToken = sharedPrefs.getString("storedJwtToken", "");
         ArrayList<Object> fetchedUserData;
         fetchedUserData = getIntent().hasExtra("fetchedUserData") ? (ArrayList<Object>) getIntent().getSerializableExtra("fetchedUserData") : null;
 
         if (fetchedUserData != null) {
             // Defining Physiometry object and adding data to it
             JsonObject physiometryData = new JsonObject();
-            physiometryData.addProperty("ritmoCardiaco", measuredPhysiometryData.get(0));
-            physiometryData.addProperty("oximetria", measuredPhysiometryData.get(1));
-            physiometryData.addProperty("presionArterialSistolica", measuredPhysiometryData.get(2));
-            physiometryData.addProperty("presionArterialDiastolica", measuredPhysiometryData.get(3));
-            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(4));
+            physiometryData.addProperty("ritmoCardiaco", measuredPhysiometryData.get(10));
+            physiometryData.addProperty("oximetria", measuredPhysiometryData.get(7));
+            physiometryData.addProperty("presionArterialSistolica", measuredPhysiometryData.get(8));
+            physiometryData.addProperty("presionArterialDiastolica", measuredPhysiometryData.get(9));
+            physiometryData.addProperty("temperatura", measuredPhysiometryData.get(11) + "." + measuredPhysiometryData.get(12));
             physiometryData.addProperty("fechaRegistro", utc.toString());
             physiometryData.addProperty("fechaToma", utc.toString());
             // Defining userData object to store the user data from login activity
@@ -726,9 +983,57 @@ public class HomeActivity extends MainActivity {
             // Sending physiometry data to the service
             sendPhysiometryData(storedJwtToken, physiometryData);
         } else {
+
             Log.d(TAG, "mixUserAndPhysiometryData -> No hay datos de usuario desde login");
         }
     }
+
+
+    public void mixUserAndPhysiometryDataHor(int[] measuredPhysiometryData) {
+//      Log.d(TAG, "Fetched User Data: " + getIntent().getSerializableExtra("fetchedUserData"));
+        System.out.println(measuredPhysiometryData);
+
+        System.out.println(measuredPhysiometryData);
+
+        ArrayList<Object> fetchedUserData;
+        fetchedUserData = getIntent().hasExtra("fetchedUserData") ? (ArrayList<Object>) getIntent().getSerializableExtra("fetchedUserData") : null;
+
+        if (fetchedUserData != null) {
+            // Defining Physiometry object and adding data to it
+            JsonObject physiometryData = new JsonObject();
+            physiometryData.addProperty("ritmoCardiaco", String.valueOf(measuredPhysiometryData[9]));
+            physiometryData.addProperty("oximetria", String.valueOf(measuredPhysiometryData[10]));
+            physiometryData.addProperty("presionArterialSistolica", String.valueOf(measuredPhysiometryData[11]));
+            physiometryData.addProperty("presionArterialDiastolica", String.valueOf(measuredPhysiometryData[12]));
+            physiometryData.addProperty("temperatura", measuredPhysiometryData[5] + "." + measuredPhysiometryData[6]);
+            physiometryData.addProperty("fechaRegistro", utc.toString());
+            //2020-07-17T05:00:00.000Z
+            Calendar calendarioh=Calendar.getInstance();
+            calendarioh.setTimeInMillis(measuredPhysiometryData[4]);
+
+            int minuteh=calendarioh.get(Calendar.MINUTE);
+            int secondh=Math.round(calendarioh.get(Calendar.SECOND));
+            physiometryData.addProperty("fechaToma", (measuredPhysiometryData[0]+"-"+measuredPhysiometryData[1]+"-"+measuredPhysiometryData[2]+"T"+ measuredPhysiometryData[3]+":"+minuteh+":"+secondh+"Z"));
+            // Defining userData object to store the user data from login activity
+            JsonObject userData = new JsonObject();
+            userData.addProperty("id", (Number) fetchedUserData.get(0));
+            userData.addProperty("login", (String) fetchedUserData.get(1));
+            userData.addProperty("firstName", (String) fetchedUserData.get(2));
+            userData.addProperty("lastName", (String) fetchedUserData.get(3));
+            userData.addProperty("email", (String) fetchedUserData.get(4));
+            userData.addProperty("imageUrl", (String) fetchedUserData.get(5));
+            userData.addProperty("activated", (Boolean) fetchedUserData.get(6));
+            userData.addProperty("langKey", (String) fetchedUserData.get(7));
+            // Adding userData object to Physiometry object
+            physiometryData.add("user", userData);
+            // Sending physiometry data to the service
+            sendPhysiometryData(storedJwtToken, physiometryData);
+        } else {
+
+            Log.d(TAG, "mixUserAndPhysiometryData -> No hay datos de usuario desde login");
+        }
+    }
+
 
     public void sendPhysiometryData(String jwtToken, JsonObject data) {
         ServiceFisiometria service = ConfigGeneral.retrofit.create(ServiceFisiometria.class);
@@ -739,7 +1044,8 @@ public class HomeActivity extends MainActivity {
             public void onResponse(Call<DataFisiometria> call, Response<DataFisiometria> response) {
                 if (response.isSuccessful()) {
                     assert response.body() != null;
-                    Log.i(TAG, "onResponse: " + response.body().toString());
+                    dialogReciver.show();
+                    Log.i(TAG, "onResponse: " + response.body());
                 }
             }
 
@@ -749,6 +1055,48 @@ public class HomeActivity extends MainActivity {
             }
         });
     }
+
+    public void dataAlarm(String descAlarm, String titleAlarm) {
+        JsonObject alertData = new JsonObject();
+        alertData.addProperty("descripcion", descAlarm);
+        alertData.addProperty("procedimiento", titleAlarm);
+        alertData.addProperty("timeInstant", utc.toString());
+        // User data
+        JsonObject userData = new JsonObject();
+        userData.addProperty("id", userId);
+        userData.addProperty("login", userLogin);
+        userData.addProperty("firstName", userFirstName);
+        userData.addProperty("lastName", userLastName);
+        userData.addProperty("email", userEmail);
+        userData.addProperty("imageUrl", userImageUrl);
+        userData.addProperty("activated", userActivated);
+        userData.addProperty("langKey", userLangKey);
+        userData.addProperty("resetDate", (String) null);
+        // Mixing alert data with user data
+        alertData.add("user", userData);
+
+        createNewAlert(storedJwtToken, alertData);
+    }
+
+    public void createNewAlert(String jwtToken, JsonObject alarmData) {
+        AlarmService alarm = ConfigGeneral.retrofit.create(AlarmService.class);
+        final Call<AlarmData> response = alarm.setAlarm("Bearer " + jwtToken, alarmData);
+
+        response.enqueue(new Callback<AlarmData>() {
+            @Override
+            public void onResponse(Call<AlarmData> call, Response<AlarmData> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Alarm response: " + response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AlarmData> call, Throwable t) {
+                Log.d(TAG, "Alarm onFailure: " + t.getMessage());
+            }
+        });
+    }
+
 
     @Override
     protected void onResume() {

@@ -151,6 +151,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
             <LinearLayout
                 android:id="@+id/ll_device_manager"
                 android:layout_width="match_parent"
@@ -158,6 +159,8 @@
                 android:background="@drawable/item_bg_selector"
                 android:orientation="vertical"
                 android:paddingTop="15dp"
+                android:layout_margin="10dp"
+
                 android:paddingBottom="15dp">
 
                 <RelativeLayout
@@ -170,7 +173,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:text="Conectar"
+                        android:text="@string/conectar"
                         android:textColor="@color/textcolor"
                         android:textSize="16sp" />
 
@@ -194,11 +197,100 @@
                         android:id="@+id/tv_connect_state"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Conectar Dispositivo"
+                        android:text="@string/conectarDespositivo"
                         android:textColor="@color/topbar_step"
                         android:textSize="14sp" />
 
-                   <!-- <ProgressBar
+
+                </RelativeLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/search_device_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/item_bg_selector"
+                android:orientation="vertical"
+                android:layout_margin="10dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:onClick="encontrarDispositivo">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/search_device"
+                        android:textColor="@color/textcolor"
+                        android:textSize="16sp" />
+
+                    <!--<ImageView
+                        android:id="@+id/iv_common_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/item_arrow" />-->
+                </RelativeLayout>
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_device_disconnect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/item_bg_selector"
+                android:orientation="vertical"
+                android:layout_margin="10dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/disconnect_device"
+                        android:textColor="@color/textcolor"
+                        android:textSize="16sp" />
+
+                    <!--<ImageView
+                        android:id="@+id/iv_common_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/item_arrow" />-->
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp">
+
+                    <TextView
+                        android:id="@+id/tv_diconnect_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/unbonded_device"
+                        android:textColor="@color/topbar_step"
+                        android:textSize="14sp"
+                        />
+
+                    <!-- <ProgressBar
                         android:id="@+id/pb_battery_progress"
                         android:layout_width="25dp"
                         android:layout_height="12dp"
