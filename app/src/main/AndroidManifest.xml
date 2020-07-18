@@ -19,11 +19,15 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/sura_logoicon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/sura_logoicon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.FisiometriaUserActivity"></activity>
+        <activity
+            android:name=".activity.PacienteActivity"
+            android:theme="@style/SplashTheme" />
         <activity
             android:name=".activity.LoginActivity"
             android:theme="@style/SplashTheme" />
@@ -38,9 +42,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".activity.HomeActivity" android:theme="@style/SplashTheme" />
-        <activity android:name=".activity.RegisterActivity" />
-        <activity android:name=".activity.DeviceScanActivity"  />
+        <activity
+            android:name=".activity.HomeActivity"
+            android:theme="@style/SplashTheme" />
+        <activity
+            android:name=".activity.RegisterActivity"
+            android:theme="@style/SplashTheme" />
+        <activity android:name=".activity.DeviceScanActivity" />
         <activity android:name=".activity.SendPicActivity" />
     </application>
 

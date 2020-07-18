@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.app.AlertDialog.Builder;
 import android.util.Log;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,7 +65,6 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.Timer;
 import java.util.TimerTask;
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -250,9 +250,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void connect(View view) {
-       conectarBluetooth();
+    public boolean desconectadoPorUsuario = false;
 
+    public void connect(View view) {
+        conectarBluetooth();
+//        System.out.println("DESCONECTADO POR USUARIO = FALSE");
         showDialog();
 
 
@@ -268,16 +270,17 @@ public class MainActivity extends AppCompatActivity {
             final String action = intent.getAction();
             if (BluetoothService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
+                desconectadoPorUsuario = false;
 
                 dialog.dismiss();
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 hideDialog();
-
                 tv_connect_state.setText("Desconectado");
+                imgConecct.setBackgroundResource(R.drawable.band_unconnect);
 
             } else if (BluetoothService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
-
+                dialog.dismiss();
                 imgConecct.setBackgroundResource(R.drawable.band_connected);
                 tv_connect_state.setText("Conectado");
             }
@@ -593,7 +596,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    public void retryMeasure(){
+
+    public void retryMeasure() {
         /**
          *
          * DECLARACIÓN DEL TIMER PARA CORRER LAS MEDICIONES.
@@ -609,6 +613,7 @@ public class MainActivity extends AppCompatActivity {
         TimerTask startMeasure = new TimerTask() {
             @Override
             public void run() {
+                dialog.show();
                 commandManager.oneButtonMeasurement(1);
             }
         };
@@ -631,11 +636,12 @@ public class MainActivity extends AppCompatActivity {
          *
          * INICIO DE LAS TAREAS DE INICIO DE TEMPERATURA Y FINALIZACIÓN DE LA MEDICIÓN
          */
-        timer.schedule(finishMeasure, 45000+300000);
+        timer.schedule(finishMeasure, 45000 + 300000);
 //        timer.schedule(finishMeasure, 60000+45000);
 
     }
-    public void medirBateria(){
+
+    public void medirBateria() {
         Timer timer;
         timer = new Timer();
 
@@ -648,33 +654,167 @@ public class MainActivity extends AppCompatActivity {
         timer.schedule(batteryInfo, 0, 600000);
     }
 
-    public void sincronizarHora(){
-        commandManager.setTimeSync();
-        Log.i(TAG,"SINCRONIZACIÓN DE TIEMPO");
+
+    public void sincronizarHora() {
+        Timer timer;
+        timer = new Timer();
+
+        TimerTask syncTime = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.setTimeSync();
+//                commandManager.syncData(0);
+//                commandManager.syncDataHr(30000,30000);
+                if (Config.hasContinuousHeart) {
+                    Log.i(TAG, "hasContinuousHeart:" + Config.hasContinuousHeart);
+
+                    commandManager.syncDataHr(System.currentTimeMillis() - 7 * 24 * 3600 * 1000,
+                            System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
+
+                } else {
+                    //不带连续心率的手环的同步数据的方式
+                    commandManager.syncData(System.currentTimeMillis() - 7 * 24 * 3600 * 1000);
+
+                }
+            }
+        };
+        timer.schedule(syncTime, 5000);
+
+        Log.i(TAG, "SINCRONIZACIÓN DE TIEMPO");
     }
 
-    public void iniciarMedicionHora(){
-        commandManager.openHourlyMeasure(1);
-        Log.i(TAG,"INICIO MEDICIÓN POR HORA");
+    public void iniciarMedicionHora() {
+
+        Timer timer;
+        timer = new Timer();
+
+        TimerTask openMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.openHourlyMeasure(1);
+                ;
+            }
+        };
+        timer.schedule(openMeasure, 5000);
+
+        Log.i(TAG, "INICIO MEDICIÓN POR HORA");
+
+
+        TimerTask hourMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(1);
+                System.out.println("STARTING HOURLY MEASURE");
+            }
+        };
+
+        TimerTask finishHourMeasure = new TimerTask() {
+            @Override
+            public void run() {
+                commandManager.oneButtonMeasurement(0);
+            }
+        };
+
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        Calendar calendar2 = Calendar.getInstance();
+
+
+        calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), calendar.get(Calendar.HOUR_OF_DAY) + 1, 1, 0);
+        System.out.println("CALENDAR: " + calendar.get(Calendar.YEAR) + "/" + calendar.get(Calendar.DATE) + "/" + calendar.get(Calendar.DATE) + " " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND));
+        System.out.println("CALENDAR2: " + calendar2.get(Calendar.YEAR) + "/" + calendar2.get(Calendar.MONTH) + "/" + calendar2.get(Calendar.DATE) + " " + calendar2.get(Calendar.HOUR_OF_DAY) + ":" + calendar2.get(Calendar.MINUTE) + ":" + calendar2.get(Calendar.SECOND));
+
+        long delta = Math.abs(calendar2.getTimeInMillis() - calendar.getTimeInMillis());
+
+        System.out.println("HOURLY MEASURE IN " + Math.round(delta / 60000) + " MIN");
+
+//        timer.schedule(hourMeasure,delta,3600000);
+        timer.schedule(finishHourMeasure, delta, 3600000);
+
+//
+
 
     }
-    public void nivelBateria(ArrayList<Integer> datas){
-        Log.i(TAG,"NIVEL DE BATERÍA: "+datas.get(7));
+
+
+    public void nivelBateria(ArrayList<Integer> datas) {
+        Log.i(TAG, "NIVEL DE BATERÍA: " + datas.get(7) + "%");
     }
-    public void conectarBluetooth(){
+
+    public void desconectarBluetooth(View view) {
+        desconectadoPorUsuario = true;
+        System.out.println("DESCONECTADO POR USUARIO");
+        mBluetoothLeService.disconnect();
+    }
+
+
+    public void conectarBluetooth() {
+        desconectadoPorUsuario = false;
+        System.out.println("DESCONECTADO POR USUARIO=FALSE");
         mBluetoothLeService.connect(address);
     }
 
+    public void encontrarDispositivo(View view) {
+        commandManager.vibrate();
+    }
 
 
-
-
-    public void hideDialog(){
+    public void hideDialog() {
         dialog.dismiss();
     }
-    public void showDialog(){
+
+    public void showDialog() {
         dialog.show();
     }
+
+    /**
+     * @param n       NUEVO TAMAÑO DEL VECTOR
+     * @param arreglo ARREGLO AL CUAL SE LE VA A ADICIONAR EL SUBARREGLO AGREGAR
+     * @param agregar SUBARREGLO A AGREGAR
+     * @return RETORNA EL AERREGLO CON LA ADICIÓN
+     */
+    public int[][] redimensionarArreglo(int n, int[][] arreglo, int[] agregar) {
+        int[][] nuevoArreglo = new int[n + 1][14];
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < 14; j++) {
+                try {
+                    nuevoArreglo[i][j] = arreglo[i][j];
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+        }
+
+        for (int k = 0; k < 14; k++) {
+            nuevoArreglo[n][k] = agregar[k];
+        }
+        return nuevoArreglo;
+    }
+
+    /**
+     * @param arreglo SE ELIMINA EL CACHE DE LA MANILLA Y SE MUESTRAN LOS DATOS QUE SE TRAEN
+     */
+
+    public void mostrarDataBorrarCache(List arreglo) {
+//        commandManager.clearData();
+
+        int n = arreglo.size();
+        for (int i = 0; i < n; i++) {
+            int[] objetos = (int[]) arreglo.get(i);
+            String texto = "";
+            for (int elemento : objetos) {
+
+                texto = texto + "," + elemento;
+
+            }
+            System.out.println(texto);
+        }
+        System.out.println(n);
+        ;
+    }
+
 
 }
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sex_array">
+        <item>MASCULINO</item>
+        <item>FEMENINO</item>
+        <item>OTRO</item>
+    </string-array>
+    <string-array name="id_type_array" >
+        <item>CEDULA</item>
+        <item>TARJETA</item>
+        <item>IDENTIDAD</item>
+        <item>CEDULA_EXTRANJERIA</item>
+        <item>PASAPORTE</item>
+        <item>OTRO</item>
+    </string-array>
+</resources>
