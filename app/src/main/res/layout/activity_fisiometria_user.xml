@@ -7,20 +7,12 @@
     tools:context=".activity.HomeActivity">
 
 
-
-
-
     <LinearLayout
         android:id="@+id/rg_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="false"
         android:orientation="vertical">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.3dp"
-            android:background="@color/line_color" />
 
         <RadioGroup
             android:id="@+id/rg"
@@ -36,11 +28,9 @@
                 android:id="@+id/rb_ritmo_cardiaco"
                 style="@style/rg_bc_style"
                 android:padding="10dp"
-
                 android:drawableTop="@drawable/heart_rate_36"
-
-                android:onClick="fragmentHome"
-                />
+                android:onClick="fragmentTemp"
+                tools:ignore="OnClick" />
 
             <RadioButton
                 android:id="@+id/rb_oximetria"
@@ -72,14 +62,10 @@
     <FrameLayout
         android:id="@+id/fl_fragment_container_fisiometria"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="660dp"
         android:layout_alignParentBottom="true">
 
-        <ImageView
-            android:id="@+id/iv_guide"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY" />
+
     </FrameLayout>
 
 </RelativeLayout>
