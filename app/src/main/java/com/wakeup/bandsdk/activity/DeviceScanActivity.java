@@ -186,7 +186,6 @@ public class DeviceScanActivity extends AppCompatActivity implements AdapterView
                         }
                     });
                     builder.create().show();
-
                 } else {
                     Log.i(TAG, "No explanation needed, we can request the permission.");
                     // No explanation needed, we can request the permission.
