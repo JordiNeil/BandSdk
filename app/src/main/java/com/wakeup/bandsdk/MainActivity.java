@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
 
                 dialog.dismiss();
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                hideDialog();
+//                hideDialog();
                 tv_connect_state.setText("Desconectado");
                 imgConecct.setBackgroundResource(R.drawable.band_unconnect);
 
@@ -813,6 +813,9 @@ public class MainActivity extends AppCompatActivity {
         }
         System.out.println(n);
         ;
+    }
+    public void borrarCache(){
+        commandManager.clearData();
     }
 
 

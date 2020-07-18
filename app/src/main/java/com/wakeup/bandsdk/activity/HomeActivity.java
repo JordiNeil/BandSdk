@@ -784,6 +784,7 @@ public class HomeActivity extends MainActivity {
                                         medidasCorrectas[6] = datas.get(12);
                                     }
                                     mixUserAndPhysiometryData(datas);
+                                    borrarCache();
                                     // System.out.println("nuevas medidas"+medidasCorrectas);
                                 }
                             }
