@@ -798,7 +798,7 @@ public class MainActivity extends AppCompatActivity {
      */
 
     public void mostrarDataBorrarCache(List arreglo) {
-//        commandManager.clearData();
+        commandManager.clearData();
 
         int n = arreglo.size();
         for (int i = 0; i < n; i++) {
