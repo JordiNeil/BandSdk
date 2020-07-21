@@ -9,8 +9,8 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Fisiometria data"
+        android:layout_height="wrap_content"
+        android:text="Fisiometria data RITMO CARDIACO"
         android:textSize="25dp"/>
 
     <ScrollView
@@ -18,10 +18,11 @@
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_temperatura"
+            android:id="@+id/rv_ritmo_cardiaco"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:scrollbars="vertical"
-            android:layout_height="match_parent" />
+            />
     </ScrollView>
 
 

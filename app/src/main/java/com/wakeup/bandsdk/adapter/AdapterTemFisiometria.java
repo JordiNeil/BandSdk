@@ -3,6 +3,7 @@ package com.wakeup.bandsdk.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,12 +34,10 @@ public class AdapterTemFisiometria extends RecyclerView.Adapter<AdapterTemFisiom
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolderFisiometria holder, int position) {
-        holder.t1.setText(Integer.toString(listFisiome.get(position).getOximetria()));
-        holder.t2.setText(Integer.toString(listFisiome.get(position).getRitmoCardiaco()));
-        holder.t3.setText(Integer.toString(listFisiome.get(position).getPresionArterialDiastolica()));
-        holder.t4.setText(Integer.toString(listFisiome.get(position).getPresionArterialSistolica()));
-        holder.t5.setText(Float.toString( listFisiome.get(position).getTemperatura()));
-        holder.t6.setText(listFisiome.get(position).getFechaToma());
+       // holder.t1.setText(Integer.toString(listFisiome.get(position).getOximetria()));
+        holder.p_Bar_temp.setProgress(listFisiome.get(position).getOximetria());
+        holder.t4.setText(listFisiome.get(position).getOximetria());
+
     }
 
     @Override
@@ -48,16 +47,15 @@ public class AdapterTemFisiometria extends RecyclerView.Adapter<AdapterTemFisiom
 
     public class ViewHolderFisiometria extends RecyclerView.ViewHolder {
 
-        TextView t1, t2, t3, t4, t5, t6;
+        TextView t4;
+        ProgressBar p_Bar_temp;
 
         public ViewHolderFisiometria(@NonNull View itemView) {
             super(itemView);
-            t1 = itemView.findViewById(R.id.txt1);
-            t2 = itemView.findViewById(R.id.txt2);
-            t3 = itemView.findViewById(R.id.txt3);
+          //  t1 = itemView.findViewById(R.id.txt1);
+            p_Bar_temp=itemView.findViewById(R.id.p_Bar_temp);
             t4 = itemView.findViewById(R.id.txt4);
-            t5 = itemView.findViewById(R.id.txt5);
-            t6 = itemView.findViewById(R.id.txt6);
+
 
 
         }

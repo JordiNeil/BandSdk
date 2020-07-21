@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
 
+import com.wakeup.bandsdk.Fragments.Fisiometria.RitmoCardiaco;
 import com.wakeup.bandsdk.Fragments.Fisiometria.temperature;
 import com.wakeup.bandsdk.Fragments.HomeFragment;
 import com.wakeup.bandsdk.Pojos.Fisiometria.DataFisiometria;
@@ -32,8 +33,9 @@ import retrofit2.Response;
 public class FisiometriaUserActivity extends AppCompatActivity {
     String storedJwtToken;
     Integer userId;
+    Fragment fragmentRitmo = new RitmoCardiaco();
     Fragment fragmentTemp = new temperature();
-    RadioButton radioButtonTemp;
+    RadioButton radioButtonTemp,rb_ritmo_cardiaco;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +43,8 @@ public class FisiometriaUserActivity extends AppCompatActivity {
         SharedPreferences sharedPrefs = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         storedJwtToken = sharedPrefs.getString(ConfigGeneral.TOKENSHARED, "");
         userId = sharedPrefs.getInt(ConfigGeneral.STOREDUSERID, 0);
-        radioButtonTemp = (RadioButton) findViewById(R.id.rb_ritmo_cardiaco);
-
+        radioButtonTemp = (RadioButton) findViewById(R.id.rb_temperatura);
+        rb_ritmo_cardiaco=(RadioButton)findViewById(R.id.rb_ritmo_cardiaco);
 
     }
 
@@ -50,10 +52,25 @@ public class FisiometriaUserActivity extends AppCompatActivity {
     public void fragmentTemp(View view) {
 
         if (radioButtonTemp.isChecked() == true) {
-            System.out.println("cambio a home");
+            System.out.println("cambio a temp");
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fl_fragment_container_fisiometria, fragmentTemp);
+            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+
+        }
+
+    }
+
+    public void fragmentRitmoCardiaco(View view) {
+
+        if (rb_ritmo_cardiaco.isChecked() == true) {
+            System.out.println("cambio a cardiaco");
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.fl_fragment_container_fisiometria, fragmentRitmo);
             fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();

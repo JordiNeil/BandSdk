@@ -15,22 +15,27 @@
             android:orientation="vertical">
 
             <ProgressBar
-                android:id="@+id/p_Bar_temp"
+                android:id="@+id/p_Bar_ritmo_cardiaco"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:max="100"
                 android:progress="10" />
 
-
             <TextView
-                android:id="@+id/txt4"
+                android:id="@+id/txt1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="Fisiometria" />
 
 
+            <TextView
+                android:id="@+id/txt7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Fisiometria" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

@@ -24,7 +24,7 @@
         android:roundIcon="@drawable/sura_logoicon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.FisiometriaUserActivity"></activity>
+        <activity android:name=".activity.FisiometriaUserActivity" android:theme="@style/SplashTheme" ></activity>
         <activity
             android:name=".activity.PacienteActivity"
             android:theme="@style/SplashTheme" />
