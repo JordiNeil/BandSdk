@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
                 desconectadoPorUsuario = false;
 
-                dialog.dismiss();
+//                dialog.dismiss();
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
 //                hideDialog();
                 tv_connect_state.setText("Desconectado");
