@@ -7,20 +7,12 @@
     tools:context=".activity.HomeActivity">
 
 
-
-
-
     <LinearLayout
         android:id="@+id/rg_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="false"
+        android:layout_alignParentTop="true"
         android:orientation="vertical">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.3dp"
-            android:background="@color/line_color" />
 
         <RadioGroup
             android:id="@+id/rg"
@@ -29,57 +21,55 @@
             android:layout_centerInParent="true"
             android:background="@color/white"
             android:gravity="center_vertical"
-            android:padding="5dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="5dp">
 
             <RadioButton
                 android:id="@+id/rb_ritmo_cardiaco"
                 style="@style/rg_bc_style"
-                android:padding="10dp"
-
                 android:drawableTop="@drawable/heart_rate_36"
-
-                android:onClick="fragmentHome"
-                />
+                android:onClick="fragmentRitmoCardiaco"
+                android:padding="10dp"
+                tools:ignore="OnClick" />
 
             <RadioButton
                 android:id="@+id/rb_oximetria"
                 style="@style/rg_bc_style"
-                android:padding="10dp"
                 android:drawableTop="@drawable/blood_oxygen_48"
                 android:onClick="fragmentInfo"
-                />
+                android:padding="10dp" />
 
             <RadioButton
                 android:id="@+id/rb_presion_sanguinea"
-                android:padding="10dp"
                 style="@style/rg_bc_style"
                 android:drawableTop="@drawable/blood_pressure_48"
                 android:onClick="fragmentUser"
-                />
+                android:padding="10dp" />
+
             <RadioButton
                 android:id="@+id/rb_temperatura"
                 style="@style/rg_bc_style"
-                android:padding="10dp"
                 android:drawableTop="@drawable/termometro_36"
-                android:onClick="fragmentUser"
-                />
+                android:onClick="fragmentTemp"
+                android:padding="10dp"
+                tools:ignore="OnClick" />
 
         </RadioGroup>
 
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/fl_fragment_container_fisiometria"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true">
-
-        <ImageView
-            android:id="@+id/iv_guide"
+        <FrameLayout
+            android:id="@+id/fl_fragment_container_fisiometria"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY" />
-    </FrameLayout>
+            android:layout_alignParentBottom="true">
+
+            <ImageView
+                android:id="@+id/iv_guide"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY" />
+        </FrameLayout>
+
+    </LinearLayout>
+
 
 </RelativeLayout>

@@ -272,9 +272,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "ACTION_GATT_CONNECTED");
                 desconectadoPorUsuario = false;
 
-                dialog.dismiss();
+//                dialog.dismiss();
             } else if (BluetoothService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                hideDialog();
+//                hideDialog();
                 tv_connect_state.setText("Desconectado");
                 imgConecct.setBackgroundResource(R.drawable.band_unconnect);
 
@@ -798,7 +798,7 @@ public class MainActivity extends AppCompatActivity {
      */
 
     public void mostrarDataBorrarCache(List arreglo) {
-//        commandManager.clearData();
+        commandManager.clearData();
 
         int n = arreglo.size();
         for (int i = 0; i < n; i++) {
@@ -813,6 +813,9 @@ public class MainActivity extends AppCompatActivity {
         }
         System.out.println(n);
         ;
+    }
+    public void borrarCache(){
+        commandManager.clearData();
     }
 
 
